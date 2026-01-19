@@ -18,10 +18,11 @@ export function HeroLogin() {
     const handleLogin = async (provider: "google" | "facebook" | "instagram") => {
         setIsLoading(true);
         try {
+            const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
             await supabase.auth.signInWithOAuth({
                 provider: provider as any,
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
+                    redirectTo: `${redirectUrl}/auth/callback`,
                 },
             });
         } catch (error) {
@@ -42,9 +43,10 @@ export function HeroLogin() {
                 router.refresh();
                 router.push("/dashboard");
             } else {
+                const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
                 const { error } = await supabase.auth.signUp({
                     email, password,
-                    options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+                    options: { emailRedirectTo: `${redirectUrl}/auth/callback` },
                 });
                 if (error) throw error;
                 setIsVerificationSent(true);

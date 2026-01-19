@@ -20,10 +20,11 @@ export default function LoginPage() {
     const handleLogin = async (provider: "google" | "facebook") => {
         setIsLoading(true);
         try {
+            const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || location.origin;
             await supabase.auth.signInWithOAuth({
                 provider: provider as any,
                 options: {
-                    redirectTo: `${location.origin}/auth/callback`,
+                    redirectTo: `${redirectUrl}/auth/callback`,
                 },
             });
         } catch (error) {
@@ -47,11 +48,12 @@ export default function LoginPage() {
                 router.refresh();
                 router.push("/dashboard");
             } else {
+                const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
-                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                        emailRedirectTo: `${redirectUrl}/auth/callback`,
                     },
                 });
                 if (error) throw error;
