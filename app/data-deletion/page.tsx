@@ -23,11 +23,11 @@ export default function DataDeletionPage() {
                 </div>
 
                 {/* Content */}
-                <div className="space-y-8">
+                <div className="space-y-6 md:space-y-8">
                     {/* Introduction */}
-                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-8">
-                        <h2 className="text-2xl font-bold text-[#F5EFEA] mb-4">Your Privacy Matters</h2>
-                        <p className="text-[#B8B0A6] leading-relaxed">
+                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-xl md:text-2xl font-bold text-[#F5EFEA] mb-3 md:mb-4">Your Privacy Matters</h2>
+                        <p className="text-[#B8B0A6] leading-relaxed text-sm md:text-base">
                             At OpenCourt, we respect your privacy and your right to control your personal data.
                             If you wish to delete your account and all associated data, you can do so at any time
                             by following the instructions below.
@@ -35,17 +35,17 @@ export default function DataDeletionPage() {
                     </section>
 
                     {/* Method 1: In-App Deletion */}
-                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-8">
-                        <div className="flex items-start gap-4 mb-4">
+                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-6 md:p-8">
+                        <div className="flex items-start gap-3 md:gap-4">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                                 <span className="text-primary font-black text-lg">1</span>
                             </div>
-                            <div>
-                                <h2 className="text-xl font-bold text-[#F5EFEA] mb-2">Delete Your Account In-App</h2>
-                                <p className="text-[#B8B0A6] leading-relaxed mb-4">
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-lg md:text-xl font-bold text-[#F5EFEA] mb-2">Delete Your Account In-App</h2>
+                                <p className="text-[#B8B0A6] leading-relaxed mb-4 text-sm md:text-base">
                                     The easiest way to delete your account is directly through the OpenCourt app:
                                 </p>
-                                <ol className="list-decimal list-inside space-y-2 text-[#B8B0A6]">
+                                <ol className="list-decimal list-inside space-y-2 text-[#B8B0A6] text-sm md:text-base">
                                     <li>Open the OpenCourt app and log in to your account</li>
                                     <li>Navigate to <span className="text-[#F5EFEA] font-semibold">Profile</span></li>
                                     <li>Scroll down and tap <span className="text-[#F5EFEA] font-semibold">Account Settings</span></li>
@@ -57,27 +57,27 @@ export default function DataDeletionPage() {
                     </section>
 
                     {/* Method 2: Email Request */}
-                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-8">
-                        <div className="flex items-start gap-4 mb-4">
+                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-6 md:p-8">
+                        <div className="flex items-start gap-3 md:gap-4">
                             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                                 <span className="text-primary font-black text-lg">2</span>
                             </div>
-                            <div className="flex-1">
-                                <h2 className="text-xl font-bold text-[#F5EFEA] mb-2">Request Deletion via Email</h2>
-                                <p className="text-[#B8B0A6] leading-relaxed mb-4">
+                            <div className="flex-1 min-w-0">
+                                <h2 className="text-lg md:text-xl font-bold text-[#F5EFEA] mb-2">Request Deletion via Email</h2>
+                                <p className="text-[#B8B0A6] leading-relaxed mb-4 text-sm md:text-base">
                                     Alternatively, you can send us an email requesting account deletion:
                                 </p>
 
-                                <div className="bg-[#1F1D1D] border border-white/5 rounded-xl p-6 space-y-4">
+                                <div className="bg-[#1F1D1D] border border-white/5 rounded-xl p-4 md:p-6 space-y-4">
                                     <div>
                                         <p className="text-xs font-bold uppercase tracking-widest text-[#B8B0A6] mb-2">
                                             Send your request to:
                                         </p>
                                         <a
                                             href="mailto:support@opencourt.app?subject=Data%20Deletion%20Request"
-                                            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-semibold"
+                                            className="inline-flex items-center gap-2 text-primary hover:text-primary/80 transition-colors font-semibold text-sm md:text-base break-all"
                                         >
-                                            <Mail className="w-5 h-5" />
+                                            <Mail className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" />
                                             support@opencourt.app
                                         </a>
                                     </div>
@@ -99,39 +99,39 @@ export default function DataDeletionPage() {
                     </section>
 
                     {/* What Gets Deleted */}
-                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-8">
-                        <h2 className="text-xl font-bold text-[#F5EFEA] mb-4">What Data Will Be Deleted?</h2>
-                        <p className="text-[#B8B0A6] leading-relaxed mb-4">
+                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-lg md:text-xl font-bold text-[#F5EFEA] mb-3 md:mb-4">What Data Will Be Deleted?</h2>
+                        <p className="text-[#B8B0A6] leading-relaxed mb-4 text-sm md:text-base">
                             When you delete your account, we will permanently remove:
                         </p>
-                        <ul className="space-y-2 text-[#B8B0A6]">
+                        <ul className="space-y-2 text-[#B8B0A6] text-sm md:text-base">
                             <li className="flex items-start gap-3">
-                                <span className="text-primary mt-1">✓</span>
+                                <span className="text-primary mt-1 flex-shrink-0">✓</span>
                                 <span>Your profile information (name, email, photo)</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-primary mt-1">✓</span>
+                                <span className="text-primary mt-1 flex-shrink-0">✓</span>
                                 <span>Game history and statistics</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-primary mt-1">✓</span>
+                                <span className="text-primary mt-1 flex-shrink-0">✓</span>
                                 <span>Reliability scores and ratings</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-primary mt-1">✓</span>
+                                <span className="text-primary mt-1 flex-shrink-0">✓</span>
                                 <span>Any games you've hosted or joined</span>
                             </li>
                             <li className="flex items-start gap-3">
-                                <span className="text-primary mt-1">✓</span>
+                                <span className="text-primary mt-1 flex-shrink-0">✓</span>
                                 <span>All other personal data associated with your account</span>
                             </li>
                         </ul>
                     </section>
 
                     {/* Timeline */}
-                    <section className="bg-primary/10 border border-primary/20 rounded-2xl p-8">
-                        <h2 className="text-xl font-bold text-[#F5EFEA] mb-4">Processing Timeline</h2>
-                        <p className="text-[#B8B0A6] leading-relaxed">
+                    <section className="bg-primary/10 border border-primary/20 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-lg md:text-xl font-bold text-[#F5EFEA] mb-3 md:mb-4">Processing Timeline</h2>
+                        <p className="text-[#B8B0A6] leading-relaxed text-sm md:text-base">
                             <span className="text-primary font-bold">In-app deletions</span> are processed immediately.
                             <span className="text-primary font-bold ml-1">Email requests</span> will be processed within
                             <span className="text-[#F5EFEA] font-bold ml-1">30 days</span> of receipt.
@@ -140,22 +140,22 @@ export default function DataDeletionPage() {
                     </section>
 
                     {/* Note */}
-                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-8">
-                        <h2 className="text-xl font-bold text-[#F5EFEA] mb-4">Important Note</h2>
-                        <p className="text-[#B8B0A6] leading-relaxed">
+                    <section className="bg-[#2A2827] border border-white/5 rounded-2xl p-6 md:p-8">
+                        <h2 className="text-lg md:text-xl font-bold text-[#F5EFEA] mb-3 md:mb-4">Important Note</h2>
+                        <p className="text-[#B8B0A6] leading-relaxed text-sm md:text-base">
                             Please note that once your account is deleted, this action <span className="text-[#F5EFEA] font-bold">cannot be undone</span>.
                             All your data will be permanently removed from our systems and cannot be recovered.
                         </p>
                     </section>
 
                     {/* Contact */}
-                    <section className="text-center pt-8">
-                        <p className="text-[#B8B0A6] mb-4">
+                    <section className="text-center pt-4 md:pt-8">
+                        <p className="text-[#B8B0A6] mb-4 text-sm md:text-base">
                             Have questions about data deletion or privacy?
                         </p>
                         <a
                             href="mailto:support@opencourt.app"
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold text-sm tracking-widest uppercase hover:bg-primary/90 transition-all"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 rounded-xl bg-primary text-white font-bold text-xs md:text-sm tracking-widest uppercase hover:bg-primary/90 transition-all"
                         >
                             <Mail className="w-4 h-4" />
                             Contact Support
