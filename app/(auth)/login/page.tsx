@@ -21,6 +21,11 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || location.origin;
+            console.log('🔍 Login Page OAuth Debug:');
+            console.log('NEXT_PUBLIC_SITE_URL:', process.env.NEXT_PUBLIC_SITE_URL);
+            console.log('location.origin:', location.origin);
+            console.log('Final redirectUrl:', redirectUrl);
+
             await supabase.auth.signInWithOAuth({
                 provider: provider as any,
                 options: {
