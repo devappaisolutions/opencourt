@@ -50,7 +50,18 @@ export default function ProfilePage() {
             }
 
             // Get OAuth avatar if profile doesn't have one
-            const oauthAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url;
+            let oauthAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture || user.identities?.[0]?.identity_data?.avatar_url;
+
+            // If it's a Facebook avatar, request higher resolution
+            if (oauthAvatar && oauthAvatar.includes('facebook')) {
+                // Facebook graph API allows specifying size with ?width= and ?height= or ?type=large
+                if (!oauthAvatar.includes('?')) {
+                    oauthAvatar = `${oauthAvatar}?width=500&height=500`;
+                } else if (!oauthAvatar.includes('width=') && !oauthAvatar.includes('type=')) {
+                    oauthAvatar = `${oauthAvatar}&width=500&height=500`;
+                }
+            }
+
             const profileData = data || {};
 
             // Use profile avatar if exists, otherwise use OAuth avatar
@@ -222,7 +233,14 @@ export default function ProfilePage() {
 
                         <div className="w-32 h-32 rounded-full bg-zinc-800 border-4 border-white/10 flex items-center justify-center overflow-hidden relative shadow-2xl group-hover:border-primary/30 transition-all">
                             {profile?.avatar_url ? (
-                                <Image src={profile.avatar_url} alt="Profile" fill className="object-cover" />
+                                <Image
+                                    src={profile.avatar_url}
+                                    alt="Profile"
+                                    fill
+                                    className="object-cover"
+                                    sizes="128px"
+                                    priority
+                                />
                             ) : (
                                 <UserIcon className="w-12 h-12 text-zinc-500" />
                             )}
