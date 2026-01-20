@@ -11,6 +11,7 @@ export default function ProfilePage() {
     const supabase = createClient();
     const [loading, setLoading] = useState(true);
     const [profile, setProfile] = useState<any>(null);
+    const [user, setUser] = useState<any>(null);
     const [saving, setSaving] = useState(false);
 
     // Form State
@@ -18,8 +19,6 @@ export default function ProfilePage() {
     const [skillLevel, setSkillLevel] = useState("Casual");
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(9);
-    const [username, setUsername] = useState("");
-    const [instagram, setInstagram] = useState("");
 
     useEffect(() => {
         getProfile();
@@ -33,6 +32,8 @@ export default function ProfilePage() {
                 router.push("/login");
                 return;
             }
+
+            setUser(user);
 
             const { data, error } = await supabase
                 .from('profiles')
@@ -67,7 +68,6 @@ export default function ProfilePage() {
 
             if (data || oauthAvatar) {
                 setProfile(finalProfile);
-                setUsername(finalProfile.username || "");
                 // Convert full position name to abbreviation
                 const reversePositionMap: Record<string, string> = {
                     'Point Guard': 'PG',
@@ -80,7 +80,6 @@ export default function ProfilePage() {
                 setSkillLevel(finalProfile.skill_level || "Casual");
                 setHeightFt(finalProfile.height_ft || 5);
                 setHeightIn(finalProfile.height_in || 9);
-                setInstagram(finalProfile.instagram_handle || "");
             }
         } catch (error) {
             console.error(error);
@@ -106,8 +105,6 @@ export default function ProfilePage() {
 
             const updates = {
                 id: user.id,
-                username,
-                instagram_handle: instagram,
                 position: positionMap[position] || position,
                 skill_level: skillLevel,
                 height_ft: heightFt,
@@ -217,34 +214,13 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="flex-1 space-y-6 text-center md:text-left w-full">
-                        <div className="space-y-4">
-                            <div className="space-y-1">
-                                <label className="text-xs uppercase font-bold text-zinc-500 tracking-wider flex items-center gap-2 justify-center md:justify-start">
-                                    <Zap className="w-3 h-3 text-primary" />
-                                    Baller Tag
-                                </label>
-                                <input
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className="w-full bg-transparent text-2xl md:text-4xl font-bold text-white focus:outline-none border-b-2 border-transparent focus:border-primary/50 transition-all placeholder:text-zinc-700 uppercase italic tracking-tighter input-premium"
-                                    placeholder="Enter Username"
-                                />
-                            </div>
-
-                            <div className="space-y-1">
-                                <label className="text-xs uppercase font-bold text-zinc-500 tracking-wider">Instagram</label>
-                                <div className="flex items-center gap-1 text-xl text-white">
-                                    <span className="text-zinc-500">@</span>
-                                    <input
-                                        type="text"
-                                        value={instagram}
-                                        onChange={(e) => setInstagram(e.target.value)}
-                                        className="w-full bg-transparent font-bold focus:outline-none border-b-2 border-transparent focus:border-primary/50 transition-all placeholder:text-zinc-700 input-premium"
-                                        placeholder="instagram_handle"
-                                    />
-                                </div>
-                            </div>
+                        <div className="space-y-2">
+                            <h2 className="text-3xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
+                                {profile?.full_name || profile?.username || user?.email?.split('@')[0] || 'Player'}
+                            </h2>
+                            <p className="text-zinc-400 text-sm font-medium">
+                                {user?.email}
+                            </p>
                         </div>
 
                         {/* Reliability Score Badge */}
