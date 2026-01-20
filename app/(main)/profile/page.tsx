@@ -360,7 +360,7 @@ export default function ProfilePage() {
                         <label className="text-sm font-medium text-white flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-primary" /> Height
                         </label>
-                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 border border-white/5 hover:border-white/10 transition-all max-w-md">
+                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all max-w-md">
                             <div className="flex-1">
                                 <label className="text-xs text-zinc-500 mb-1 block">Feet</label>
                                 <select
