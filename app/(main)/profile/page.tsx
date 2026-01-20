@@ -353,7 +353,7 @@ export default function ProfilePage() {
                     </div>
 
                     {/* Height */}
-                    <div className="space-y-3 md:col-span-2">
+                    <div className="space-y-3">
                         <label className="text-sm font-medium text-white flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-primary" /> Height
                         </label>
