@@ -216,16 +216,16 @@ export default function ProfilePage() {
             </div>
 
             {/* Main Player Card */}
-            <div className="glass-card-premium p-8 rounded-[2.5rem] space-y-8 border-t border-white/10 relative overflow-hidden holographic card-shine">
+            <div className="glass-card-premium rounded-[2.5rem] border-t border-white/10 relative overflow-hidden holographic card-shine">
                 {/* Background Decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none -translate-y-20" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none translate-y-20" />
 
                 {/* Holographic Border Effect */}
                 <div className="absolute inset-0 rounded-[2.5rem] p-[1px] bg-gradient-to-br from-primary/30 via-transparent to-indigo-500/30 opacity-50 pointer-events-none" />
 
                 {/* Avatar & Reliability */}
-                <div className="flex flex-col md:flex-row gap-8 items-center relative z-10">
+                <div className="flex flex-col md:flex-row gap-8 items-center relative z-10 px-8 pt-8 pb-6">
                     {/* Avatar Container */}
                     <div className="relative group shrink-0">
                         {/* Outer Glow Ring */}
@@ -302,62 +302,65 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mx-8" />
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                    {/* Position */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-medium text-white flex items-center gap-2">
-                            <UserIcon className="w-4 h-4 text-primary" /> Position
-                        </label>
-                        <div className="grid grid-cols-5 gap-2">
-                            {['PG', 'SG', 'SF', 'PF', 'C'].map((pos) => (
-                                <button
-                                    key={pos}
-                                    onClick={() => setPosition(pos)}
-                                    className={`py-3 rounded-xl text-sm font-bold border transition-all duration-300 ${position === pos
-                                        ? "bg-white text-black border-white shadow-lg shadow-white/20 scale-105"
-                                        : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
-                                        }`}
-                                >
-                                    {pos}
-                                </button>
-                            ))}
+                {/* Stats Grid - Full Width with Padding */}
+                <div className="space-y-8 relative z-10 px-8 pt-6 pb-8">
+                    {/* Position and Skill Level Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Position */}
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                                <UserIcon className="w-4 h-4 text-primary" /> Position
+                            </label>
+                            <div className="grid grid-cols-5 gap-2">
+                                {['PG', 'SG', 'SF', 'PF', 'C'].map((pos) => (
+                                    <button
+                                        key={pos}
+                                        onClick={() => setPosition(pos)}
+                                        className={`py-3 rounded-xl text-sm font-bold border transition-all duration-300 ${position === pos
+                                            ? "bg-white text-black border-white shadow-lg shadow-white/20 scale-105"
+                                            : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
+                                            }`}
+                                    >
+                                        {pos}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Skill Level */}
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                                <Trophy className="w-4 h-4 text-primary" /> Skill Level
+                            </label>
+                            <div className="flex flex-col gap-2">
+                                {['Casual', 'Competitive', 'Elite'].map((lvl) => (
+                                    <button
+                                        key={lvl}
+                                        onClick={() => setSkillLevel(lvl)}
+                                        className={`px-4 py-3 rounded-xl text-sm font-medium border text-left transition-all flex items-center justify-between group ${skillLevel === lvl
+                                            ? "bg-primary/20 text-primary border-primary/50 shadow-lg shadow-primary/10"
+                                            : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
+                                            }`}
+                                    >
+                                        <span className="flex items-center gap-2">
+                                            {lvl === 'Elite' && <Sparkles className="w-4 h-4" />}
+                                            {lvl}
+                                        </span>
+                                        {skillLevel === lvl && <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Skill Level */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-medium text-white flex items-center gap-2">
-                            <Trophy className="w-4 h-4 text-primary" /> Skill Level
-                        </label>
-                        <div className="flex flex-col gap-2">
-                            {['Casual', 'Competitive', 'Elite'].map((lvl) => (
-                                <button
-                                    key={lvl}
-                                    onClick={() => setSkillLevel(lvl)}
-                                    className={`px-4 py-3 rounded-xl text-sm font-medium border text-left transition-all flex items-center justify-between group ${skillLevel === lvl
-                                        ? "bg-primary/20 text-primary border-primary/50 shadow-lg shadow-primary/10"
-                                        : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
-                                        }`}
-                                >
-                                    <span className="flex items-center gap-2">
-                                        {lvl === 'Elite' && <Sparkles className="w-4 h-4" />}
-                                        {lvl}
-                                    </span>
-                                    {skillLevel === lvl && <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(168,85,247,0.8)]" />}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Height */}
+                    {/* Height - Full Width */}
                     <div className="space-y-3">
                         <label className="text-sm font-medium text-white flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-primary" /> Height
                         </label>
-                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all">
+                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 border border-white/5 hover:border-white/10 transition-all max-w-md">
                             <div className="flex-1">
                                 <label className="text-xs text-zinc-500 mb-1 block">Feet</label>
                                 <select

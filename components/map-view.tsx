@@ -1,58 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import { APIProvider, Map, AdvancedMarker, Pin, InfoWindow } from "@vis.gl/react-google-maps";
 import { createClient } from "@/lib/supabase/client";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 
-// Fix Leaflet's default icon path issues in Next.js
-const icon = L.icon({
-    iconUrl: "/images/marker-icon.png",
-    shadowUrl: "/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
-});
-
-// Since we don't have local marker images yet, let's use a CDN or a colored div icon for now
-// Or we can try to rely on the default if we fix the paths, but often it breaks in webpack.
-// Let's use a custom DivIcon for a "Baller" look.
-const customIcon = L.divIcon({
-    className: "bg-transparent",
-    html: `<div class="w-8 h-8 rounded-full bg-primary border-4 border-white shadow-xl flex items-center justify-center animate-bounce-slow">
-             <div class="w-3 h-3 bg-white rounded-full"></div>
-           </div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
-});
-
 export default function MapView() {
     const [games, setGames] = useState<any[]>([]);
-    const [location, setLocation] = useState<[number, number]>([51.505, -0.09]); // Default London
+    const [location, setLocation] = useState<{ lat: number; lng: number }>({ lat: 14.0693, lng: 121.3265 }); // Default: San Pablo, Philippines
     const [loading, setLoading] = useState(true);
+    const [selectedGame, setSelectedGame] = useState<any | null>(null);
     const supabase = createClient();
+
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
     useEffect(() => {
         // 1. Get User Location
         if (navigator.geolocation) {
+            console.log("🗺️ Requesting user location...");
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setLocation([position.coords.latitude, position.coords.longitude]);
+                    console.log("✅ Location obtained:", position.coords.latitude, position.coords.longitude);
+                    setLocation({
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    });
                 },
                 (error) => {
-                    // Silently fail to default location (New York) if denied/timed out
-                    setLocation([40.7128, -74.0060]);
+                    console.error("❌ Geolocation error:", error.message);
+                    console.log("Using default location (San Pablo, Philippines)");
+                    // Silently fail to default location (San Pablo) if denied/timed out
+                    setLocation({ lat: 14.0693, lng: 121.3265 });
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
             );
+        } else {
+            console.error("❌ Geolocation is not supported by this browser");
+            setLocation({ lat: 14.0693, lng: 121.3265 });
         }
 
         // 2. Fetch Games
-        // Ideally we'd filter by lat/long, but for now fetch all
         const fetchGames = async () => {
             const { data } = await supabase
                 .from('games')
@@ -67,71 +59,217 @@ export default function MapView() {
         fetchGames();
     }, []);
 
-    if (loading) return <div className="h-full w-full flex items-center justify-center text-zinc-500">Scouting courts...</div>;
+    if (loading) {
+        return (
+            <div className="h-full w-full flex items-center justify-center text-zinc-500">
+                Scouting courts...
+            </div>
+        );
+    }
+
+    if (!apiKey || apiKey === "YOUR_GOOGLE_MAPS_API_KEY_HERE") {
+        return (
+            <div className="h-full w-full flex items-center justify-center p-8">
+                <div className="text-center space-y-4 max-w-md">
+                    <div className="text-6xl">🗺️</div>
+                    <h3 className="text-xl font-bold text-white">Google Maps API Key Required</h3>
+                    <p className="text-zinc-400 text-sm">
+                        To use Google Maps, please add your API key to the <code className="bg-zinc-800 px-2 py-1 rounded text-primary">.env.local</code> file:
+                    </p>
+                    <div className="bg-zinc-900 p-4 rounded-lg text-left text-xs font-mono text-zinc-300 border border-zinc-800">
+                        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_api_key_here
+                    </div>
+                    <p className="text-zinc-500 text-xs">
+                        Get your API key from{" "}
+                        <a
+                            href="https://console.cloud.google.com/google/maps-apis"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                        >
+                            Google Cloud Console
+                        </a>
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <MapContainer
-            center={location}
-            zoom={13}
-            scrollWheelZoom={true}
-            className="w-full h-full z-0"
-            style={{ minHeight: "100%", background: "#18181b" }} // Match zinc-900
-        >
-            {/* Dark Mode Tiles - CartoDB Dark Matter */}
-            <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-            />
+        <APIProvider apiKey={apiKey}>
+            <Map
+                defaultCenter={location}
+                defaultZoom={13}
+                mapId="opencourt-map"
+                className="w-full h-full"
+                style={{ minHeight: "100%" }}
+                gestureHandling="greedy"
+                disableDefaultUI={false}
+                styles={[
+                    {
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#212121" }]
+                    },
+                    {
+                        "elementType": "labels.icon",
+                        "stylers": [{ "visibility": "off" }]
+                    },
+                    {
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#757575" }]
+                    },
+                    {
+                        "elementType": "labels.text.stroke",
+                        "stylers": [{ "color": "#212121" }]
+                    },
+                    {
+                        "featureType": "administrative",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#757575" }]
+                    },
+                    {
+                        "featureType": "poi",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#757575" }]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#181818" }]
+                    },
+                    {
+                        "featureType": "poi.park",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#616161" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "geometry.fill",
+                        "stylers": [{ "color": "#2c2c2c" }]
+                    },
+                    {
+                        "featureType": "road",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#8a8a8a" }]
+                    },
+                    {
+                        "featureType": "road.arterial",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#373737" }]
+                    },
+                    {
+                        "featureType": "road.highway",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#3c3c3c" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "geometry",
+                        "stylers": [{ "color": "#000000" }]
+                    },
+                    {
+                        "featureType": "water",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#3d3d3d" }]
+                    }
+                ]}
+            >
+                {/* User Marker */}
+                <AdvancedMarker position={location}>
+                    <Pin
+                        background="#3b82f6"
+                        borderColor="#1e40af"
+                        glyphColor="#ffffff"
+                    />
+                </AdvancedMarker>
 
-            {/* User Marker (Maybe different color) */}
-            <Marker position={location} icon={customIcon}>
-                <Popup className="glass-popup">
-                    <div className="text-sm font-bold">You are here</div>
-                </Popup>
-            </Marker>
 
-            {/* Game Markers */}
-            {/* For now we need lat/long on games. The schema has 'location' text. 
-                In a real app, we'd Geocode this string. 
-                For this MVP, I'll randomly scatter them near the user or use fixed coords if available.
-                Since we don't have coords in DB yet, I will MOCK the positions relative to the user for demo purposes.
-            */}
-            {games.map((game, idx) => {
-                // Mock random offset for demo (since we only store text address currently)
-                // In production, we need a 'lat' and 'lng' column in 'games' table.
-                const latOffset = (Math.random() - 0.5) * 0.05;
-                const lngOffset = (Math.random() - 0.5) * 0.05;
-                const gamePos: [number, number] = [location[0] + latOffset, location[1] + lngOffset];
+                {/* Game Markers */}
+                {games.map((game, idx) => {
+                    let gamePos: { lat: number; lng: number };
 
-                return (
-                    <Marker key={game.id} position={gamePos} icon={customIcon}>
-                        <Popup className="glass-popup">
-                            <div className="min-w-[200px] p-1">
-                                <h3 className="font-bold text-lg mb-1">{game.title}</h3>
-                                <div className="flex items-center gap-2 text-xs text-zinc-500 mb-2">
-                                    <MapPin className="w-3 h-3" /> {game.location}
-                                </div>
-                                <div className="grid grid-cols-2 gap-2 text-xs mb-3">
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="w-3 h-3 text-primary" />
-                                        {new Date(game.date_time).toLocaleDateString()}
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <Clock className="w-3 h-3 text-primary" />
-                                        {game.time}
-                                    </div>
-                                </div>
-                                <Link
-                                    href={`/game/${game.id}`}
-                                    className="block w-full text-center bg-primary text-white text-xs font-bold py-2 rounded-lg hover:bg-primary/90"
-                                >
-                                    View Game
-                                </Link>
+                    // Check if game has real coordinates in the database
+                    if (game.latitude && game.longitude) {
+                        // Use real coordinates from database
+                        gamePos = {
+                            lat: game.latitude,
+                            lng: game.longitude
+                        };
+                    } else {
+                        // Fallback: Use consistent hash-based offset
+                        // This ensures pins stay in the same place for each game
+
+                        // Simple hash function to generate consistent offsets from game ID
+                        const hashString = (str: string) => {
+                            let hash = 0;
+                            for (let i = 0; i < str.length; i++) {
+                                const char = str.charCodeAt(i);
+                                hash = ((hash << 5) - hash) + char;
+                                hash = hash & hash; // Convert to 32bit integer
+                            }
+                            return hash;
+                        };
+
+                        const hash = hashString(game.id);
+                        // Use hash to generate consistent offsets between -0.025 and +0.025 degrees
+                        const latOffset = ((hash % 1000) / 1000 - 0.5) * 0.05;
+                        const lngOffset = (((hash >> 10) % 1000) / 1000 - 0.5) * 0.05;
+
+                        gamePos = {
+                            lat: location.lat + latOffset,
+                            lng: location.lng + lngOffset
+                        };
+                    }
+
+                    return (
+                        <AdvancedMarker
+                            key={game.id}
+                            position={gamePos}
+                            onClick={() => setSelectedGame(game)}
+                        >
+                            <Pin
+                                background="#a855f7"
+                                borderColor="#7e22ce"
+                                glyphColor="#ffffff"
+                            />
+                        </AdvancedMarker>
+                    );
+                })}
+
+                {/* Info Window for selected game */}
+                {selectedGame && (
+                    <InfoWindow
+                        position={{
+                            lat: location.lat + (Math.random() - 0.5) * 0.05,
+                            lng: location.lng + (Math.random() - 0.5) * 0.05
+                        }}
+                        onCloseClick={() => setSelectedGame(null)}
+                    >
+                        <div className="min-w-[200px] p-2 bg-zinc-900 text-white rounded-lg">
+                            <h3 className="font-bold text-lg mb-1">{selectedGame.title}</h3>
+                            <div className="flex items-center gap-2 text-xs text-zinc-400 mb-2">
+                                <MapPin className="w-3 h-3" /> {selectedGame.location}
                             </div>
-                        </Popup>
-                    </Marker>
-                );
-            })}
-        </MapContainer>
+                            <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                                <div className="flex items-center gap-1">
+                                    <Calendar className="w-3 h-3 text-primary" />
+                                    {new Date(selectedGame.date_time).toLocaleDateString()}
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Clock className="w-3 h-3 text-primary" />
+                                    {selectedGame.time}
+                                </div>
+                            </div>
+                            <Link
+                                href={`/game/${selectedGame.id}`}
+                                className="block w-full text-center bg-primary text-white text-xs font-bold py-2 rounded-lg hover:bg-primary/90"
+                            >
+                                View Game
+                            </Link>
+                        </div>
+                    </InfoWindow>
+                )}
+            </Map>
+        </APIProvider>
     );
 }
