@@ -21,11 +21,6 @@ export default function ProfilePage() {
     const [username, setUsername] = useState("");
     const [instagram, setInstagram] = useState("");
 
-    // Derived Verification State
-    const hasAvatar = !!profile?.avatar_url;
-    const hasSocial = !!instagram;
-    const isVerified = hasAvatar && hasSocial;
-
     useEffect(() => {
         getProfile();
     }, []);
@@ -181,40 +176,6 @@ export default function ProfilePage() {
                 </button>
             </div>
 
-            {/* Verification Status Banner */}
-            <div className={`p-4 rounded-2xl border flex items-center justify-between relative overflow-hidden transition-all duration-500 hover-lift ${isVerified ? "bg-emerald-500/10 border-emerald-500/20" : "bg-amber-500/10 border-amber-500/20"}`}>
-                {/* Banner Glow */}
-                <div className={`absolute inset-0 ${isVerified ? 'bg-emerald-500/5' : 'bg-amber-500/5'} blur-xl`} />
-
-                <div className="flex items-center gap-4 relative z-10">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center relative ${isVerified ? "bg-emerald-500 text-white" : "bg-amber-500 text-white"}`}>
-                        <Shield className="w-5 h-5" />
-                        {isVerified && (
-                            <div className="absolute inset-0 rounded-full border-2 border-emerald-400 animate-[pulse-ring_2s_ease-out_infinite]" />
-                        )}
-                    </div>
-                    <div>
-                        <h3 className={`font-bold ${isVerified ? "text-emerald-400" : "text-amber-400"}`}>
-                            {isVerified ? "Verified Baller" : "Verification Pending"}
-                        </h3>
-                        <p className="text-xs text-zinc-400">
-                            {isVerified ? "You are fully verified and ready to host/join." : "Complete your profile to join games."}
-                        </p>
-                    </div>
-                </div>
-
-                {!isVerified && (
-                    <div className="flex gap-3 text-xs font-bold relative z-10">
-                        <span className={`px-3 py-1 rounded-full ${hasAvatar ? "bg-emerald-500/20 text-emerald-400" : "bg-zinc-800 text-zinc-500"}`}>
-                            {hasAvatar ? "✓ Photo" : "○ Photo"}
-                        </span>
-                        <span className={`px-3 py-1 rounded-full ${hasSocial ? "bg-emerald-500/20 text-emerald-400" : "bg-zinc-800 text-zinc-500"}`}>
-                            {hasSocial ? "✓ Social" : "○ Social"}
-                        </span>
-                    </div>
-                )}
-            </div>
-
             {/* Main Player Card */}
             <div className="glass-card-premium rounded-[2.5rem] border-t border-white/10 relative overflow-hidden holographic card-shine">
                 {/* Background Decoration */}
@@ -253,13 +214,6 @@ export default function ProfilePage() {
                         <div className="absolute bottom-1 right-1 bg-zinc-900 border border-white/10 p-2.5 rounded-full cursor-pointer hover:bg-primary/20 hover:border-primary/30 transition-colors shadow-lg group-hover:scale-110">
                             <Camera className="w-4 h-4 text-white" />
                         </div>
-
-                        {/* Verification Badge */}
-                        {isVerified && (
-                            <div className="absolute -top-1 -right-1 w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-zinc-950 shadow-lg animate-bounce-subtle">
-                                <Shield className="w-4 h-4 text-white" />
-                            </div>
-                        )}
                     </div>
 
                     <div className="flex-1 space-y-6 text-center md:text-left w-full">
