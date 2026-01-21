@@ -1,5 +1,7 @@
 import { GameActions } from "@/components/game-actions";
 import { GameRoster } from "@/components/game-roster";
+import { GameStatsForm } from "@/components/game-stats-form";
+import { GameStatsDisplay } from "@/components/game-stats-display";
 import { createClient } from "@/lib/supabase/server";
 import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap } from "lucide-react";
 import Image from "next/image";
@@ -35,8 +37,9 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             id,
             status,
             joined_at,
+            player_id,
             profiles:player_id (
-                username, avatar_url, position, height_ft, height_in, skill_level
+                id, username, avatar_url, position, height_ft, height_in, skill_level
             )
         `)
         .eq('game_id', id);
@@ -44,6 +47,29 @@ export default async function GameDetailsPage({ params }: { params: { id: string
     // Check if current user is host
     const { data: { user } } = await supabase.auth.getUser();
     const isHost = user?.id === game.host_id;
+
+    // Check if user can add stats (completed game + checked in)
+    const userRosterEntry = roster?.find((r: any) => r.player_id === user?.id);
+    const canAddStats = game.status === 'completed' && userRosterEntry?.status === 'checked_in';
+
+    // Fetch game stats if game is completed
+    let gameStats = null;
+    let userStats = null;
+    if (game.status === 'completed') {
+        const { data: stats } = await supabase
+            .from('game_stats')
+            .select(`
+                *,
+                profiles:player_id (
+                    full_name,
+                    avatar_url
+                )
+            `)
+            .eq('game_id', id);
+
+        gameStats = stats || [];
+        userStats = stats?.find((s: any) => s.player_id === user?.id);
+    }
 
     // Default gradient if missing - use warm charcoal gradients instead of purple
     const bgGradient = game.image_gradient?.includes('purple') || game.image_gradient?.includes('indigo')
@@ -153,12 +179,12 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                         gameId={id}
                         userId={user?.id || ''}
                         isHost={isHost}
-                        isJoined={roster?.some((p: any) => p.profiles?.id === user?.id) || false}
+                        isJoined={roster?.some((p: any) => p.player_id === user?.id) || false}
                         currentPlayers={game.current_players}
                         maxPlayers={game.max_players}
                         disabled={!user}
                         houseRules={game.house_rules}
-                        rosterId={roster?.find((p: any) => p.profiles?.id === user?.id)?.id}
+                        rosterId={roster?.find((p: any) => p.player_id === user?.id)?.id}
                         status={game.status}
                     />
                 </div>
@@ -238,6 +264,29 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                     isHost={isHost}
                 />
             </div>
+
+            {/* Game Stats Section (Only for Completed Games) */}
+            {game.status === 'completed' && (
+                <div className="px-4 relative z-10 space-y-8">
+                    {/* Stats Input Form (Only if user can add stats) */}
+                    {canAddStats && user && (
+                        <GameStatsForm
+                            gameId={id}
+                            playerId={user.id}
+                            existingStats={userStats}
+                            onSuccess={() => window.location.reload()}
+                        />
+                    )}
+
+                    {/* Stats Display */}
+                    {gameStats && gameStats.length > 0 && (
+                        <GameStatsDisplay
+                            stats={gameStats}
+                            currentUserId={user?.id}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }
