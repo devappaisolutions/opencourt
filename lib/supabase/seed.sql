@@ -1,14 +1,12 @@
--- Realistic Game Seed Data for OpenCourt
--- Run this in your Supabase SQL Editor
--- Creates 100 games with realistic scenarios over 6 months
+-- ================================================
+-- OpenCourt Test Data Seed Script
+-- Creates realistic test data for development
+-- ================================================
 
--- IMPORTANT: This script uses YOUR existing user as one of the hosts
--- and creates games with that user as the host
+-- ================================================
+-- SEED DATA GENERATION
+-- ================================================
 
--- First, let's get your user ID (the one currently logged in)
--- Replace this with your actual user ID from Supabase Dashboard > Authentication > Users
-
--- Step 1: Get existing user IDs from profiles table
 DO $$
 DECLARE
     existing_users UUID[];
@@ -26,6 +24,8 @@ DECLARE
     game_title TEXT;
     max_p INT;
     current_date_ts TIMESTAMP := NOW();
+    
+    -- Location data
     locations TEXT[] := ARRAY[
         'BGC Activity Center, Taguig',
         'Ronac Art Center, Makati',
@@ -43,24 +43,29 @@ DECLARE
         'Marikina Sports Center',
         'Paranaque Sports Complex'
     ];
+    
+    -- Game configuration arrays
     formats TEXT[] := ARRAY['3v3', '4v4', '5v5', '5v5', '5v5'];
     levels TEXT[] := ARRAY['Casual', 'Casual', 'Competitive', 'Competitive', 'Elite'];
     costs TEXT[] := ARRAY['Free', 'Free', '₱50/head', '₱100/head', '₱150/head'];
     titles_casual TEXT[] := ARRAY['Casual Run', 'Pickup Game', 'Weekend Hoops', 'Friendly Game', 'Morning Run'];
     titles_comp TEXT[] := ARRAY['Competitive Run', 'Serious Runs Only', 'No Excuses Run', 'Elite Practice', 'Draft Night'];
+    
 BEGIN
     -- Get existing user IDs from profiles
     SELECT ARRAY_AGG(id) INTO existing_users FROM profiles LIMIT 20;
     
-    -- If no users exist, we can't proceed
+    -- Check if we have users
     IF existing_users IS NULL OR array_length(existing_users, 1) = 0 THEN
         RAISE NOTICE 'No existing users found in profiles table. Please create at least one user first.';
         RETURN;
     END IF;
     
-    RAISE NOTICE 'Found % existing users', array_length(existing_users, 1);
+    RAISE NOTICE 'Found % existing users. Creating 100 test games...', array_length(existing_users, 1);
     
-    -- Create 100 games spread over 6 months
+    -- ================================================
+    -- CREATE 100 GAMES
+    -- ================================================
     FOR i IN 1..100 LOOP
         -- Use existing users as hosts (cycle through them)
         host_id := existing_users[1 + (i % array_length(existing_users, 1))];
@@ -110,7 +115,7 @@ BEGIN
         -- Insert game
         INSERT INTO games (
             id, host_id, title, location, date_time, format, skill_level, cost, max_players, 
-            status, cancellation_reason, gender_filter, age_range, created_at
+            status, cancellation_reason, gender_filter, age_range, latitude, longitude, created_at
         ) VALUES (
             gen_random_uuid(),
             host_id,
@@ -127,11 +132,15 @@ BEGIN
             ELSE NULL END,
             (ARRAY['Mixed', 'Mens', 'Womens'])[1 + floor(random() * 3)::INT],
             (ARRAY['All Ages', '18+', '21+'])[1 + floor(random() * 3)::INT],
+            14.0693 + (random() * 0.5 - 0.25), -- San Pablo area latitude
+            121.3265 + (random() * 0.5 - 0.25), -- San Pablo area longitude
             game_date - (random() * 14)::INT * INTERVAL '1 day'
         )
         RETURNING id INTO game_id;
         
-        -- Add players to roster (only if more than 1 user exists)
+        -- ================================================
+        -- ADD PLAYERS TO ROSTER
+        -- ================================================
         IF game_status != 'cancelled' AND array_length(existing_users, 1) > 1 THEN
             -- Determine how many players to add
             IF game_status = 'completed' THEN
@@ -192,13 +201,17 @@ BEGIN
     RAISE NOTICE 'Finished creating 100 games!';
 END $$;
 
--- Update current_players count for all games
+-- ================================================
+-- UPDATE CURRENT PLAYERS COUNT
+-- ================================================
 UPDATE games g SET current_players = (
     SELECT COUNT(*) FROM game_roster r 
     WHERE r.game_id = g.id AND r.status IN ('joined', 'checked_in')
 );
 
--- Summary statistics
+-- ================================================
+-- SUMMARY STATISTICS
+-- ================================================
 SELECT 
     'Total Games' as metric, COUNT(*)::TEXT as value FROM games
 UNION ALL
