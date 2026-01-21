@@ -527,4 +527,37 @@
   .glow-border:hover::before {
     opacity: 1;
   }
+
+  /* Slider Styling */
+  .slider-thumb::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--color-primary);
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(217, 98, 59, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .slider-thumb::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(217, 98, 59, 0.8);
+  }
+
+  .slider-thumb::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--color-primary);
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    box-shadow: 0 0 10px rgba(217, 98, 59, 0.5);
+    transition: all 0.2s ease;
+  }
+
+  .slider-thumb::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px rgba(217, 98, 59, 0.8);
+  }
 }

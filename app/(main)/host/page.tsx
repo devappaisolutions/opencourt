@@ -28,6 +28,7 @@ export default function HostGamePage() {
     const [houseRules, setHouseRules] = useState("");
     const [ageRange, setAgeRange] = useState("All Ages");
     const [genderFilter, setGenderFilter] = useState("Mixed");
+    const [maxPlayers, setMaxPlayers] = useState(10);
     const [usualCourts, setUsualCourts] = useState<any[]>([]);
 
     useEffect(() => {
@@ -155,7 +156,7 @@ export default function HostGamePage() {
             skill_level: level,
             cost: cost === "0" || cost === "" ? "Free" : cost,
             image_gradient: randomGradient,
-            max_players: format === "3v3" ? 6 : format === "4v4" ? 10 : 15,
+            max_players: maxPlayers,
             description: description || null,
             house_rules: houseRules || null,
             age_range: ageRange || null,
@@ -356,6 +357,27 @@ export default function HostGamePage() {
                                         {f}
                                     </button>
                                 ))}
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                                <Users className="w-4 h-4 text-primary" /> Max Players: {maxPlayers}
+                            </label>
+                            <input
+                                type="range"
+                                min="10"
+                                max="25"
+                                step="5"
+                                value={maxPlayers}
+                                onChange={(e) => setMaxPlayers(Number(e.target.value))}
+                                className="w-full h-2 bg-zinc-900 rounded-lg appearance-none cursor-pointer slider-thumb"
+                            />
+                            <div className="flex justify-between text-xs text-zinc-500 font-medium">
+                                <span>10</span>
+                                <span>15</span>
+                                <span>20</span>
+                                <span>25</span>
                             </div>
                         </div>
 
