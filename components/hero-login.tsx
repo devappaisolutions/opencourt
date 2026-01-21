@@ -20,9 +20,6 @@ export function HeroLogin() {
         try {
             const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
 
-            // Debug alert - will pause before redirect
-            alert(`🔍 DEBUG INFO:\n\nNEXT_PUBLIC_SITE_URL: ${process.env.NEXT_PUBLIC_SITE_URL}\n\nwindow.location.origin: ${window.location.origin}\n\nFinal redirectUrl: ${redirectUrl}\n\nFull redirect: ${redirectUrl}/auth/callback`);
-
             await supabase.auth.signInWithOAuth({
                 provider: provider as any,
                 options: {
