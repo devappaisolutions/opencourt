@@ -200,6 +200,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                             <button
                                 onClick={goToPrevPage}
                                 disabled={currentPage === 1}
+                                aria-label="Previous page"
                                 className={`fixed left-20 top-1/2 -translate-y-1/2 z-50 w-12 h-24 flex items-center justify-center rounded-2xl transition-all shadow-xl ${currentPage === 1
                                     ? 'bg-[#2A2827]/50 cursor-not-allowed opacity-30'
                                     : 'bg-[#2A2827] border border-white/10 hover:border-primary/50 hover:bg-primary/10 cursor-pointer hover:scale-105'
@@ -212,6 +213,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                             <button
                                 onClick={goToNextPage}
                                 disabled={currentPage === totalPages}
+                                aria-label="Next page"
                                 className={`fixed right-8 top-1/2 -translate-y-1/2 z-50 w-12 h-24 flex items-center justify-center rounded-2xl transition-all shadow-xl ${currentPage === totalPages
                                     ? 'bg-[#2A2827]/50 cursor-not-allowed opacity-30'
                                     : 'bg-[#2A2827] border border-white/10 hover:border-primary/50 hover:bg-primary/10 cursor-pointer hover:scale-105'

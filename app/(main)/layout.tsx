@@ -20,17 +20,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     useEffect(() => {
         const fetchUserAvatar = async () => {
             const { data: { user } } = await supabase.auth.getUser();
-            console.log('Layout - User:', user);
             if (user) {
                 // Check for OAuth avatar from various sources
-                console.log('Layout - user_metadata:', user.user_metadata);
-                console.log('Layout - identities:', user.identities);
                 const oauthAvatar = user.user_metadata?.avatar_url ||
                     user.user_metadata?.picture ||
                     user.identities?.[0]?.identity_data?.avatar_url ||
                     user.identities?.[0]?.identity_data?.picture;
-
-                console.log('Layout - oauthAvatar:', oauthAvatar);
 
                 if (oauthAvatar) {
                     setAvatarUrl(oauthAvatar);
@@ -41,7 +36,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         .select('avatar_url')
                         .eq('id', user.id)
                         .single();
-                    console.log('Layout - profile avatar:', profile?.avatar_url);
                     if (profile?.avatar_url) {
                         setAvatarUrl(profile.avatar_url);
                     }
@@ -76,6 +70,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                         <Link
                             key={item.href}
                             href={item.href}
+                            aria-label={item.label}
                             className={`p-3 rounded-xl transition-all group relative ${pathname === item.href
                                 ? "bg-white/10 text-primary"
                                 : "text-[#B8B0A6] hover:text-[#F5EFEA] hover:bg-white/5"
@@ -119,6 +114,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 {/* Logout Button */}
                 <button
                     onClick={handleLogout}
+                    aria-label="Logout"
                     className="mb-6 p-3 rounded-xl text-[#B8B0A6] hover:text-red-400 hover:bg-red-400/10 transition-all group"
                     title="Logout"
                 >
@@ -170,7 +166,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             alt="Menu"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
-                                console.log('Avatar failed to load:', avatarUrl);
                                 e.currentTarget.style.display = 'none';
                             }}
                             className={`w-6 h-6 rounded-full object-cover ${pathname === '/menu' ? 'ring-2 ring-primary' : ''}`}

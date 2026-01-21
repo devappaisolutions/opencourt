@@ -38,8 +38,6 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                 table: 'game_roster',
                 filter: `game_id=eq.${gameId}`
             }, async (payload: any) => {
-                console.log('Roster change received:', payload);
-
                 // Fetch full data for the new/updated entry (to get profile info)
                 if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
                     const { data: newEntry } = await supabase
@@ -173,7 +171,14 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
 
                 <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 relative overflow-hidden shadow-inner">
                     {entry.profiles?.avatar_url ? (
-                        <Image src={entry.profiles.avatar_url} alt="Player" width={64} height={64} className="object-cover transition-transform duration-500 group-hover:scale-110" />
+                        <Image
+                            src={entry.profiles.avatar_url}
+                            alt={`${entry.profiles?.username || 'Player'} avatar`}
+                            width={64}
+                            height={64}
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            sizes="64px"
+                        />
                     ) : (
                         <UserIcon className="w-7 h-7 text-zinc-600" />
                     )}

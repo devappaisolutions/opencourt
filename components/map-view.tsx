@@ -18,18 +18,14 @@ export default function MapView() {
     useEffect(() => {
         // 1. Get User Location
         if (navigator.geolocation) {
-            console.log("🗺️ Requesting user location...");
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    console.log("✅ Location obtained:", position.coords.latitude, position.coords.longitude);
                     setLocation({
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     });
                 },
                 (error) => {
-                    console.error("❌ Geolocation error:", error.message);
-                    console.log("Using default location (San Pablo, Philippines)");
                     // Silently fail to default location (San Pablo) if denied/timed out
                     setLocation({ lat: 14.0693, lng: 121.3265 });
                 },
@@ -40,7 +36,6 @@ export default function MapView() {
                 }
             );
         } else {
-            console.error("❌ Geolocation is not supported by this browser");
             setLocation({ lat: 14.0693, lng: 121.3265 });
         }
 

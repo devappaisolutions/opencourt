@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@vis.gl/react-google-maps'],
+  },
 };
 
 export default nextConfig;

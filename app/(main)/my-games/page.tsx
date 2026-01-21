@@ -39,8 +39,10 @@ export default async function MyGamesPage() {
         .eq('status', 'joined');
 
     // Flatten joined data - include all games user has joined as player
-    // @ts-ignore
-    const joinedGames = joinedData?.map(item => item.game) || [];
+    interface JoinedGameData {
+        game: any;
+    }
+    const joinedGames = joinedData?.map((item: JoinedGameData) => item.game) || [];
 
     // Sort joined games by date (client-side sort since we fetched via relation)
     joinedGames.sort((a: any, b: any) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime());

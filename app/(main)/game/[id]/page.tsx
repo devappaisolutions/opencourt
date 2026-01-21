@@ -119,7 +119,14 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                             <div className="relative">
                                 <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner transform group-hover/host:scale-105 transition-transform">
                                     {game.profiles?.avatar_url ? (
-                                        <Image src={game.profiles.avatar_url} alt="Host" width={64} height={64} className="object-cover" />
+                                        <Image
+                                            src={game.profiles.avatar_url}
+                                            alt={`${game.profiles.username || 'Host'} avatar`}
+                                            width={64}
+                                            height={64}
+                                            className="object-cover"
+                                            sizes="64px"
+                                        />
                                     ) : (
                                         <UserIcon className="w-8 h-8 text-zinc-600" />
                                     )}

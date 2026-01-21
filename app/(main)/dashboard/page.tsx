@@ -5,14 +5,10 @@ export default async function DashboardPage() {
     const supabase = await createClient();
 
     // Fetch Games from DB
-    const { data: games, error } = await supabase
+    const { data: games } = await supabase
         .from('games')
         .select('*')
         .order('date_time', { ascending: true });
-
-    if (error) {
-        console.error("Error fetching games:", error);
-    }
 
     // Fetch Current User
     const { data: { user } } = await supabase.auth.getUser();

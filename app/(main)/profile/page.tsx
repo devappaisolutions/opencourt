@@ -112,7 +112,6 @@ export default function ProfilePage() {
                 updated_at: new Date().toISOString(),
             };
 
-            console.log('Saving profile with:', updates);
             const { error } = await supabase.from('profiles').upsert(updates);
 
             if (error) {

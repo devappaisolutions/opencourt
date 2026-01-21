@@ -102,8 +102,6 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                 .eq("id", gameId)
                 .select();
 
-            console.log("Cancel result:", { data, error });
-
             if (error) {
                 console.error("Error cancelling game:", JSON.stringify(error, null, 2));
                 alert(`Could not cancel game: ${error.message || error.details || 'Unknown error'}`);
