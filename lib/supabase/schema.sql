@@ -38,6 +38,41 @@ CREATE POLICY "Users can update own profile."
   USING (auth.uid() = id);
 
 -- ================================================
+-- TEAM ASSIGNMENTS TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS team_assignments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
+  player_id UUID REFERENCES profiles(id) NOT NULL,
+  team_number INT NOT NULL, -- 1 or 2 (or more for tournaments)
+  assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  assigned_by UUID REFERENCES profiles(id), -- host who generated teams
+  
+  UNIQUE(game_id, player_id)
+);
+
+-- Team Assignments RLS
+ALTER TABLE team_assignments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Team assignments are viewable by everyone"
+  ON team_assignments FOR SELECT
+  USING (TRUE);
+
+CREATE POLICY "Hosts can manage team assignments"
+  ON team_assignments FOR ALL
+  USING (
+    auth.uid() IN (
+      SELECT host_id FROM games WHERE id = game_id
+    )
+  );
+
+-- ================================================
+-- UPDATE GAMES TABLE FOR TEAM GENERATION
+-- ================================================
+ALTER TABLE games ADD COLUMN IF NOT EXISTS teams_generated BOOLEAN DEFAULT FALSE;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS teams_generated_at TIMESTAMP WITH TIME ZONE;
+
+-- ================================================
 -- GAMES TABLE
 -- ================================================
 CREATE TABLE IF NOT EXISTS games (
@@ -167,6 +202,8 @@ CREATE INDEX IF NOT EXISTS idx_games_host_id ON games(host_id);
 CREATE INDEX IF NOT EXISTS idx_games_status ON games(status);
 CREATE INDEX IF NOT EXISTS idx_game_roster_game_id ON game_roster(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_roster_player_id ON game_roster(player_id);
+CREATE INDEX IF NOT EXISTS idx_team_assignments_game_id ON team_assignments(game_id);
+CREATE INDEX IF NOT EXISTS idx_team_assignments_player_id ON team_assignments(player_id);
 
 -- ================================================
 -- COMMENTS
@@ -175,6 +212,7 @@ CREATE INDEX IF NOT EXISTS idx_game_roster_player_id ON game_roster(player_id);
 COMMENT ON TABLE profiles IS 'User profiles with basketball-specific information';
 COMMENT ON TABLE games IS 'Basketball games/runs hosted by users';
 COMMENT ON TABLE game_roster IS 'Players who have joined games';
+COMMENT ON TABLE team_assignments IS 'Team assignments for balanced matchups';
 
 COMMENT ON COLUMN games.latitude IS 'Latitude coordinate for game location (-90 to 90)';
 COMMENT ON COLUMN games.longitude IS 'Longitude coordinate for game location (-180 to 180)';
