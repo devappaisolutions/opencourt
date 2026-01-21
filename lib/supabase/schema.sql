@@ -67,6 +67,58 @@ CREATE POLICY "Hosts can manage team assignments"
   );
 
 -- ================================================
+-- GAME STATS TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS game_stats (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
+  player_id UUID REFERENCES profiles(id) NOT NULL,
+  
+  -- Basketball stats
+  points INT DEFAULT 0 CHECK (points >= 0 AND points <= 100),
+  rebounds INT DEFAULT 0 CHECK (rebounds >= 0 AND rebounds <= 50),
+  assists INT DEFAULT 0 CHECK (assists >= 0 AND assists <= 50),
+  steals INT DEFAULT 0 CHECK (steals >= 0 AND steals <= 20),
+  blocks INT DEFAULT 0 CHECK (blocks >= 0 AND blocks <= 20),
+  turnovers INT DEFAULT 0 CHECK (turnovers >= 0 AND turnovers <= 20),
+  
+  -- Metadata
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  UNIQUE(game_id, player_id)
+);
+
+-- Game Stats RLS
+ALTER TABLE game_stats ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Game stats are viewable by everyone"
+  ON game_stats FOR SELECT
+  USING (TRUE);
+
+CREATE POLICY "Players can insert their own stats for completed games"
+  ON game_stats FOR INSERT
+  WITH CHECK (
+    auth.uid() = player_id AND
+    -- Game must be completed
+    EXISTS (
+      SELECT 1 FROM games 
+      WHERE id = game_id AND status = 'completed'
+    ) AND
+    -- Player must have checked in
+    EXISTS (
+      SELECT 1 FROM game_roster
+      WHERE game_id = game_stats.game_id 
+      AND player_id = game_stats.player_id
+      AND status = 'checked_in'
+    )
+  );
+
+CREATE POLICY "Players can update their own stats"
+  ON game_stats FOR UPDATE
+  USING (auth.uid() = player_id);
+
+-- ================================================
 -- UPDATE GAMES TABLE FOR TEAM GENERATION
 -- ================================================
 ALTER TABLE games ADD COLUMN IF NOT EXISTS teams_generated BOOLEAN DEFAULT FALSE;
@@ -204,6 +256,8 @@ CREATE INDEX IF NOT EXISTS idx_game_roster_game_id ON game_roster(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_roster_player_id ON game_roster(player_id);
 CREATE INDEX IF NOT EXISTS idx_team_assignments_game_id ON team_assignments(game_id);
 CREATE INDEX IF NOT EXISTS idx_team_assignments_player_id ON team_assignments(player_id);
+CREATE INDEX IF NOT EXISTS idx_game_stats_game_id ON game_stats(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_stats_player_id ON game_stats(player_id);
 
 -- ================================================
 -- COMMENTS
@@ -213,6 +267,7 @@ COMMENT ON TABLE profiles IS 'User profiles with basketball-specific information
 COMMENT ON TABLE games IS 'Basketball games/runs hosted by users';
 COMMENT ON TABLE game_roster IS 'Players who have joined games';
 COMMENT ON TABLE team_assignments IS 'Team assignments for balanced matchups';
+COMMENT ON TABLE game_stats IS 'Player statistics for completed games';
 
 COMMENT ON COLUMN games.latitude IS 'Latitude coordinate for game location (-90 to 90)';
 COMMENT ON COLUMN games.longitude IS 'Longitude coordinate for game location (-180 to 180)';

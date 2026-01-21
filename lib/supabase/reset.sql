@@ -10,6 +10,7 @@ SET session_replication_role = 'replica';
 -- DELETE ALL DATA (in correct order due to foreign keys)
 -- ================================================
 
+TRUNCATE TABLE game_stats CASCADE;
 TRUNCATE TABLE team_assignments CASCADE;
 TRUNCATE TABLE game_roster CASCADE;
 TRUNCATE TABLE games CASCADE;
@@ -29,7 +30,9 @@ SET session_replication_role = 'origin';
 -- ================================================
 
 SELECT 
-  'team_assignments' as table_name, COUNT(*) as row_count FROM team_assignments
+  'game_stats' as table_name, COUNT(*) as row_count FROM game_stats
+UNION ALL
+SELECT 'team_assignments', COUNT(*) FROM team_assignments
 UNION ALL
 SELECT 'game_roster', COUNT(*) FROM game_roster
 UNION ALL
