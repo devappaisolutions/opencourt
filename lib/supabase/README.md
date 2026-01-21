@@ -6,7 +6,7 @@ This directory contains all database scripts for the OpenCourt application.
 
 ### 1. **schema.sql** - Complete Database Schema
 Creates the entire database structure including:
-- Tables: `profiles`, `games`, `game_roster`, `usual_courts`, `peer_reviews`
+- Tables: `profiles`, `games`, `game_roster`
 - Row Level Security (RLS) policies
 - Triggers for reliability scoring and player count updates
 - Indexes for performance
@@ -79,10 +79,8 @@ supabase db reset
 
 ```
 profiles (users)
-  ├── games (hosted by users)
-  │   ├── game_roster (players in games)
-  │   └── peer_reviews (reviews after games)
-  └── usual_courts (saved court locations)
+  └── games (hosted by users)
+      └── game_roster (players in games)
 ```
 
 ## Key Features

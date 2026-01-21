@@ -127,57 +127,6 @@ CREATE POLICY "Hosts can update roster status."
   );
 
 -- ================================================
--- USUAL COURTS TABLE
--- ================================================
-CREATE TABLE IF NOT EXISTS usual_courts (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  host_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  name TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Usual Courts RLS
-ALTER TABLE usual_courts ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Users can view their own courts."
-  ON usual_courts FOR SELECT
-  USING (auth.uid() = host_id);
-
-CREATE POLICY "Users can insert their own courts."
-  ON usual_courts FOR INSERT
-  WITH CHECK (auth.uid() = host_id);
-
-CREATE POLICY "Users can delete their own courts."
-  ON usual_courts FOR DELETE
-  USING (auth.uid() = host_id);
-
--- ================================================
--- PEER REVIEWS TABLE
--- ================================================
-CREATE TABLE IF NOT EXISTS peer_reviews (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
-  reviewer_id UUID REFERENCES profiles(id) NOT NULL,
-  reviewee_id UUID REFERENCES profiles(id) NOT NULL,
-  rating INT CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  UNIQUE(game_id, reviewer_id, reviewee_id)
-);
-
--- Peer Reviews RLS
-ALTER TABLE peer_reviews ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Reviews are viewable by everyone."
-  ON peer_reviews FOR SELECT
-  USING (TRUE);
-
-CREATE POLICY "Players can create reviews."
-  ON peer_reviews FOR INSERT
-  WITH CHECK (auth.uid() = reviewer_id);
-
--- ================================================
 -- RELIABILITY SYSTEM
 -- ================================================
 
@@ -218,8 +167,6 @@ CREATE INDEX IF NOT EXISTS idx_games_host_id ON games(host_id);
 CREATE INDEX IF NOT EXISTS idx_games_status ON games(status);
 CREATE INDEX IF NOT EXISTS idx_game_roster_game_id ON game_roster(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_roster_player_id ON game_roster(player_id);
-CREATE INDEX IF NOT EXISTS idx_peer_reviews_game_id ON peer_reviews(game_id);
-CREATE INDEX IF NOT EXISTS idx_peer_reviews_reviewee_id ON peer_reviews(reviewee_id);
 
 -- ================================================
 -- COMMENTS
@@ -228,8 +175,6 @@ CREATE INDEX IF NOT EXISTS idx_peer_reviews_reviewee_id ON peer_reviews(reviewee
 COMMENT ON TABLE profiles IS 'User profiles with basketball-specific information';
 COMMENT ON TABLE games IS 'Basketball games/runs hosted by users';
 COMMENT ON TABLE game_roster IS 'Players who have joined games';
-COMMENT ON TABLE usual_courts IS 'Frequently used court locations saved by hosts';
-COMMENT ON TABLE peer_reviews IS 'Player reviews after completed games';
 
 COMMENT ON COLUMN games.latitude IS 'Latitude coordinate for game location (-90 to 90)';
 COMMENT ON COLUMN games.longitude IS 'Longitude coordinate for game location (-180 to 180)';
