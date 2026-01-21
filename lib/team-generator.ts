@@ -4,6 +4,8 @@ export interface Player {
     id: string;
     full_name: string | null;
     position: string | null;
+    height_ft: number | null;
+    height_in: number | null;
     skill_level: string | null;
     reliability_score: number;
 }
@@ -47,6 +49,8 @@ export async function generateTeams(gameId: string, hostId: string) {
         id,
         full_name,
         position,
+        height_ft,
+        height_in,
         skill_level,
         reliability_score
       )
@@ -107,49 +111,100 @@ export async function generateTeams(gameId: string, hostId: string) {
 }
 
 /**
- * Balance players into two teams using snake draft algorithm
+ * Balance players into two teams using enhanced algorithm
+ * Considers: position, height, skill level, and reliability
  * @param players - Array of players to balance
  * @returns Two balanced teams
  */
 function balanceTeams(players: Player[]): TeamAssignment[] {
-    // Sort players by skill level and reliability
-    const sortedPlayers = [...players].sort((a, b) => {
-        const skillOrder = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
-        const aSkill = skillOrder[a.skill_level as keyof typeof skillOrder] || 0;
-        const bSkill = skillOrder[b.skill_level as keyof typeof skillOrder] || 0;
+    // Helper: Calculate height in inches
+    const getHeightInInches = (player: Player): number => {
+        const ft = player.height_ft || 0;
+        const inches = player.height_in || 0;
+        return ft * 12 + inches;
+    };
 
-        if (aSkill !== bSkill) return bSkill - aSkill;
-        return (b.reliability_score || 0) - (a.reliability_score || 0);
+    // Helper: Get numeric skill value
+    const getSkillValue = (skillLevel: string | null): number => {
+        const skillOrder = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
+        return skillOrder[skillLevel as keyof typeof skillOrder] || 0;
+    };
+
+    // Helper: Normalize position
+    const normalizePosition = (position: string | null): string => {
+        if (!position) return 'Unknown';
+        const pos = position.toLowerCase();
+        if (pos.includes('guard') || pos.includes('pg') || pos.includes('sg')) return 'Guard';
+        if (pos.includes('forward') || pos.includes('sf') || pos.includes('pf')) return 'Forward';
+        if (pos.includes('center') || pos.includes('c')) return 'Center';
+        return 'Unknown';
+    };
+
+    // Calculate composite score for each player
+    const playersWithScores = players.map(player => {
+        const skillValue = getSkillValue(player.skill_level);
+        const reliabilityScore = player.reliability_score || 100;
+        const heightInches = getHeightInInches(player);
+
+        // Composite score: skill (60%) + reliability (30%) + height factor (10%)
+        // Height factor: normalized to 0-4 range (assuming 60-84 inches)
+        const heightFactor = Math.min(4, Math.max(0, (heightInches - 60) / 6));
+        const compositeScore = (skillValue * 0.6) + (reliabilityScore / 100 * 4 * 0.3) + (heightFactor * 0.1);
+
+        return {
+            ...player,
+            position: normalizePosition(player.position),
+            compositeScore,
+            skillValue,
+            heightInches
+        };
     });
+
+    // Group players by position
+    const guards = playersWithScores.filter(p => p.position === 'Guard');
+    const forwards = playersWithScores.filter(p => p.position === 'Forward');
+    const centers = playersWithScores.filter(p => p.position === 'Center');
+    const unknown = playersWithScores.filter(p => p.position === 'Unknown');
+
+    // Sort each position group by composite score (descending)
+    const sortByScore = (a: any, b: any) => b.compositeScore - a.compositeScore;
+    guards.sort(sortByScore);
+    forwards.sort(sortByScore);
+    centers.sort(sortByScore);
+    unknown.sort(sortByScore);
 
     const team1: Player[] = [];
     const team2: Player[] = [];
 
-    // Snake draft: 1-2-2-1-1-2-2-1...
-    let pickForTeam1 = true;
-    let consecutivePicks = 1;
+    // Snake draft within each position group
+    const snakeDraft = (positionGroup: any[]) => {
+        let pickForTeam1 = true;
 
-    sortedPlayers.forEach((player, index) => {
-        if (pickForTeam1) {
-            team1.push(player);
-        } else {
-            team2.push(player);
-        }
+        positionGroup.forEach((player, index) => {
+            if (pickForTeam1) {
+                team1.push(player);
+            } else {
+                team2.push(player);
+            }
 
-        consecutivePicks--;
-        if (consecutivePicks === 0) {
-            pickForTeam1 = !pickForTeam1;
-            consecutivePicks = index === 0 ? 2 : pickForTeam1 ? 1 : 2;
-        }
-    });
+            // Alternate picks (1-2-2-1 pattern for snake draft)
+            if (index === 0 || (index > 0 && positionGroup.length > 2)) {
+                pickForTeam1 = !pickForTeam1;
+            }
+        });
+    };
+
+    // Draft players by position to ensure balanced position distribution
+    snakeDraft(guards);
+    snakeDraft(forwards);
+    snakeDraft(centers);
+    snakeDraft(unknown);
 
     // Calculate average skill levels
     const calculateAvgSkill = (team: Player[]) => {
-        const skillValues = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
-        const total = team.reduce((sum, p) => {
-            return sum + (skillValues[p.skill_level as keyof typeof skillValues] || 0);
-        }, 0);
-        return team.length > 0 ? total / team.length : 0;
+        if (team.length === 0) return 0;
+        const total = team.reduce((sum, p) => sum + getSkillValue(p.skill_level), 0);
+        return total / team.length;
     };
 
     return [
@@ -165,3 +220,4 @@ function balanceTeams(players: Player[]): TeamAssignment[] {
         },
     ];
 }
+

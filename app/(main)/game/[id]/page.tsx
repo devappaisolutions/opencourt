@@ -2,6 +2,7 @@ import { GameActions } from "@/components/game-actions";
 import { GameRoster } from "@/components/game-roster";
 import { GameStatsForm } from "@/components/game-stats-form";
 import { GameStatsDisplay } from "@/components/game-stats-display";
+import { TeamGenerator } from "@/components/team-generator";
 import { createClient } from "@/lib/supabase/server";
 import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap } from "lucide-react";
 import Image from "next/image";
@@ -69,6 +70,63 @@ export default async function GameDetailsPage({ params }: { params: { id: string
 
         gameStats = stats || [];
         userStats = stats?.find((s: any) => s.player_id === user?.id);
+    }
+
+    // Fetch team assignments if teams have been generated
+    let existingTeams = null;
+    if (game.teams_generated) {
+        const { data: assignments } = await supabase
+            .from('team_assignments')
+            .select(`
+                team_number,
+                profiles:player_id (
+                    id,
+                    full_name,
+                    position,
+                    height_ft,
+                    height_in,
+                    skill_level,
+                    reliability_score,
+                    avatar_url
+                )
+            `)
+            .eq('game_id', id)
+            .order('team_number');
+
+        if (assignments && assignments.length > 0) {
+            // Group by team number
+            const team1Players = assignments
+                .filter((a: any) => a.team_number === 1)
+                .map((a: any) => a.profiles);
+            const team2Players = assignments
+                .filter((a: any) => a.team_number === 2)
+                .map((a: any) => a.profiles);
+
+            // Calculate average skill
+            const getSkillValue = (skill: string | null) => {
+                const skillOrder = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
+                return skillOrder[skill as keyof typeof skillOrder] || 0;
+            };
+
+            const calculateAvgSkill = (players: any[]) => {
+                if (players.length === 0) return 0;
+                const total = players.reduce((sum, p) => sum + getSkillValue(p.skill_level), 0);
+                return total / players.length;
+            };
+
+            existingTeams = [
+                {
+                    team_number: 1,
+                    players: team1Players,
+                    avg_skill: calculateAvgSkill(team1Players),
+                },
+                {
+                    team_number: 2,
+                    players: team2Players,
+                    avg_skill: calculateAvgSkill(team2Players),
+                },
+            ];
+        }
     }
 
     // Default gradient if missing - use warm charcoal gradients instead of purple
@@ -262,6 +320,17 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                     gameId={id}
                     maxPlayers={game.max_players}
                     isHost={isHost}
+                />
+            </div>
+
+            {/* Team Generator Section */}
+            <div className="px-4 relative z-10">
+                <TeamGenerator
+                    gameId={id}
+                    isHost={isHost}
+                    gameStatus={game.status}
+                    teamsGenerated={game.teams_generated || false}
+                    existingTeams={existingTeams || undefined}
                 />
             </div>
 

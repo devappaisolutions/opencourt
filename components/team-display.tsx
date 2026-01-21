@@ -7,6 +7,8 @@ interface Player {
     id: string;
     full_name: string | null;
     position: string | null;
+    height_ft: number | null;
+    height_in: number | null;
     skill_level: string | null;
     reliability_score: number;
     avatar_url?: string | null;
@@ -84,6 +86,14 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                                 </p>
                                 <div className="flex items-center gap-2 text-xs">
                                     <span className="text-zinc-500">{player.position || "No Position"}</span>
+                                    {(player.height_ft || player.height_in) && (
+                                        <>
+                                            <span className="text-zinc-700">•</span>
+                                            <span className="text-zinc-500">
+                                                {player.height_ft || 0}'{player.height_in || 0}"
+                                            </span>
+                                        </>
+                                    )}
                                     <span className="text-zinc-700">•</span>
                                     <span className={getSkillColor(player.skill_level)}>
                                         {player.skill_level || "No Level"}
