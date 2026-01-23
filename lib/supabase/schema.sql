@@ -25,104 +25,20 @@ CREATE TABLE IF NOT EXISTS profiles (
 -- Profiles RLS
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON profiles;
 CREATE POLICY "Public profiles are viewable by everyone."
   ON profiles FOR SELECT
   USING (TRUE);
 
+DROP POLICY IF EXISTS "Users can insert their own profile." ON profiles;
 CREATE POLICY "Users can insert their own profile."
   ON profiles FOR INSERT
   WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can update own profile." ON profiles;
 CREATE POLICY "Users can update own profile."
   ON profiles FOR UPDATE
   USING (auth.uid() = id);
-
--- ================================================
--- TEAM ASSIGNMENTS TABLE
--- ================================================
-CREATE TABLE IF NOT EXISTS team_assignments (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
-  player_id UUID REFERENCES profiles(id) NOT NULL,
-  team_number INT NOT NULL, -- 1 or 2 (or more for tournaments)
-  assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  assigned_by UUID REFERENCES profiles(id), -- host who generated teams
-  
-  UNIQUE(game_id, player_id)
-);
-
--- Team Assignments RLS
-ALTER TABLE team_assignments ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Team assignments are viewable by everyone"
-  ON team_assignments FOR SELECT
-  USING (TRUE);
-
-CREATE POLICY "Hosts can manage team assignments"
-  ON team_assignments FOR ALL
-  USING (
-    auth.uid() IN (
-      SELECT host_id FROM games WHERE id = game_id
-    )
-  );
-
--- ================================================
--- GAME STATS TABLE
--- ================================================
-CREATE TABLE IF NOT EXISTS game_stats (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
-  player_id UUID REFERENCES profiles(id) NOT NULL,
-  
-  -- Basketball stats
-  points INT DEFAULT 0 CHECK (points >= 0 AND points <= 100),
-  rebounds INT DEFAULT 0 CHECK (rebounds >= 0 AND rebounds <= 50),
-  assists INT DEFAULT 0 CHECK (assists >= 0 AND assists <= 50),
-  steals INT DEFAULT 0 CHECK (steals >= 0 AND steals <= 20),
-  blocks INT DEFAULT 0 CHECK (blocks >= 0 AND blocks <= 20),
-  turnovers INT DEFAULT 0 CHECK (turnovers >= 0 AND turnovers <= 20),
-  
-  -- Metadata
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  
-  UNIQUE(game_id, player_id)
-);
-
--- Game Stats RLS
-ALTER TABLE game_stats ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Game stats are viewable by everyone"
-  ON game_stats FOR SELECT
-  USING (TRUE);
-
-CREATE POLICY "Players can insert their own stats for completed games"
-  ON game_stats FOR INSERT
-  WITH CHECK (
-    auth.uid() = player_id AND
-    -- Game must be completed
-    EXISTS (
-      SELECT 1 FROM games 
-      WHERE id = game_id AND status = 'completed'
-    ) AND
-    -- Player must have checked in
-    EXISTS (
-      SELECT 1 FROM game_roster
-      WHERE game_id = game_stats.game_id 
-      AND player_id = game_stats.player_id
-      AND status = 'checked_in'
-    )
-  );
-
-CREATE POLICY "Players can update their own stats"
-  ON game_stats FOR UPDATE
-  USING (auth.uid() = player_id);
-
--- ================================================
--- UPDATE GAMES TABLE FOR TEAM GENERATION
--- ================================================
-ALTER TABLE games ADD COLUMN IF NOT EXISTS teams_generated BOOLEAN DEFAULT FALSE;
-ALTER TABLE games ADD COLUMN IF NOT EXISTS teams_generated_at TIMESTAMP WITH TIME ZONE;
 
 -- ================================================
 -- GAMES TABLE
@@ -158,6 +74,10 @@ CREATE TABLE IF NOT EXISTS games (
   
   image_gradient TEXT, -- CSS class string for card background
   
+  -- Team generation fields
+  teams_generated BOOLEAN DEFAULT FALSE,
+  teams_generated_at TIMESTAMP WITH TIME ZONE,
+  
   CONSTRAINT valid_latitude CHECK (latitude >= -90 AND latitude <= 90),
   CONSTRAINT valid_longitude CHECK (longitude >= -180 AND longitude <= 180)
 );
@@ -165,14 +85,17 @@ CREATE TABLE IF NOT EXISTS games (
 -- Games RLS
 ALTER TABLE games ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Games are viewable by everyone." ON games;
 CREATE POLICY "Games are viewable by everyone."
   ON games FOR SELECT
   USING (TRUE);
 
+DROP POLICY IF EXISTS "Authenticated users can create games." ON games;
 CREATE POLICY "Authenticated users can create games."
   ON games FOR INSERT
   WITH CHECK (auth.uid() = host_id);
 
+DROP POLICY IF EXISTS "Hosts can update their own games." ON games;
 CREATE POLICY "Hosts can update their own games."
   ON games FOR UPDATE
   USING (auth.uid() = host_id);
@@ -193,18 +116,22 @@ CREATE TABLE IF NOT EXISTS game_roster (
 -- Game Roster RLS
 ALTER TABLE game_roster ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Rosters are viewable by everyone." ON game_roster;
 CREATE POLICY "Rosters are viewable by everyone."
   ON game_roster FOR SELECT
   USING (TRUE);
 
+DROP POLICY IF EXISTS "Players can join games (insert self)." ON game_roster;
 CREATE POLICY "Players can join games (insert self)."
   ON game_roster FOR INSERT
   WITH CHECK (auth.uid() = player_id);
 
+DROP POLICY IF EXISTS "Players can leave games (delete self)." ON game_roster;
 CREATE POLICY "Players can leave games (delete self)."
   ON game_roster FOR DELETE
   USING (auth.uid() = player_id);
 
+DROP POLICY IF EXISTS "Hosts can update roster status." ON game_roster;
 CREATE POLICY "Hosts can update roster status."
   ON game_roster FOR UPDATE
   USING (
@@ -212,6 +139,92 @@ CREATE POLICY "Hosts can update roster status."
       SELECT host_id FROM games WHERE id = game_id
     )
   );
+
+-- ================================================
+-- TEAM ASSIGNMENTS TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS team_assignments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
+  player_id UUID REFERENCES profiles(id) NOT NULL,
+  team_number INT NOT NULL, -- 1 or 2 (or more for tournaments)
+  assigned_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  assigned_by UUID REFERENCES profiles(id), -- host who generated teams
+  
+  UNIQUE(game_id, player_id)
+);
+
+-- Team Assignments RLS
+ALTER TABLE team_assignments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Team assignments are viewable by everyone" ON team_assignments;
+CREATE POLICY "Team assignments are viewable by everyone"
+  ON team_assignments FOR SELECT
+  USING (TRUE);
+
+DROP POLICY IF EXISTS "Hosts can manage team assignments" ON team_assignments;
+CREATE POLICY "Hosts can manage team assignments"
+  ON team_assignments FOR ALL
+  USING (
+    auth.uid() IN (
+      SELECT host_id FROM games WHERE id = game_id
+    )
+  );
+
+-- ================================================
+-- GAME STATS TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS game_stats (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
+  player_id UUID REFERENCES profiles(id) NOT NULL,
+  
+  -- Basketball stats
+  points INT DEFAULT 0 CHECK (points >= 0 AND points <= 100),
+  rebounds INT DEFAULT 0 CHECK (rebounds >= 0 AND rebounds <= 50),
+  assists INT DEFAULT 0 CHECK (assists >= 0 AND assists <= 50),
+  steals INT DEFAULT 0 CHECK (steals >= 0 AND steals <= 20),
+  blocks INT DEFAULT 0 CHECK (blocks >= 0 AND blocks <= 20),
+  turnovers INT DEFAULT 0 CHECK (turnovers >= 0 AND turnovers <= 20),
+  
+  -- Metadata
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  
+  UNIQUE(game_id, player_id)
+);
+
+-- Game Stats RLS
+ALTER TABLE game_stats ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Game stats are viewable by everyone" ON game_stats;
+CREATE POLICY "Game stats are viewable by everyone"
+  ON game_stats FOR SELECT
+  USING (TRUE);
+
+DROP POLICY IF EXISTS "Players can insert their own stats for completed games" ON game_stats;
+CREATE POLICY "Players can insert their own stats for completed games"
+  ON game_stats FOR INSERT
+  WITH CHECK (
+    auth.uid() = player_id AND
+    -- Game must be completed
+    EXISTS (
+      SELECT 1 FROM games 
+      WHERE id = game_id AND status = 'completed'
+    ) AND
+    -- Player must have checked in
+    EXISTS (
+      SELECT 1 FROM game_roster
+      WHERE game_id = game_stats.game_id 
+      AND player_id = game_stats.player_id
+      AND status = 'checked_in'
+    )
+  );
+
+DROP POLICY IF EXISTS "Players can update their own stats" ON game_stats;
+CREATE POLICY "Players can update their own stats"
+  ON game_stats FOR UPDATE
+  USING (auth.uid() = player_id);
 
 -- ================================================
 -- RELIABILITY SYSTEM

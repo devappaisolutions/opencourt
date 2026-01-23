@@ -9,7 +9,6 @@ import { useEffect, useRef, useState } from "react";
 export default function HostGamePage() {
     const router = useRouter();
     const supabase = createClient();
-    const [verificationMissing, setVerificationMissing] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
 
     // State previously removed by accident
@@ -51,13 +50,6 @@ export default function HostGamePage() {
                 return;
             }
 
-            const missing = [];
-            if (!profile.avatar_url) missing.push("Profile Photo");
-            if (!profile.instagram_handle) missing.push("Instagram Handle");
-
-            if (missing.length > 0) {
-                setVerificationMissing(missing);
-            }
             setLoading(false);
 
             // Fetch Usual Courts
@@ -81,41 +73,7 @@ export default function HostGamePage() {
         </div>
     );
 
-    if (verificationMissing.length > 0) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4">
-                <div className="w-20 h-20 rounded-full bg-amber-500/10 text-amber-500 flex items-center justify-center border border-amber-500/20 relative">
-                    <Users className="w-10 h-10" />
-                    <div className="absolute inset-0 rounded-full border-2 border-amber-500/30 animate-[pulse-ring_2s_ease-out_infinite]" />
-                </div>
-                <div className="space-y-2 max-w-md">
-                    <h1 className="text-3xl font-bold text-white">Verification Required</h1>
-                    <p className="text-zinc-400">
-                        To host a run, we need to know who you are. This keeps our community safe and reliable.
-                    </p>
-                </div>
 
-                <div className="w-full max-w-sm glass-card-premium border border-white/10 rounded-2xl p-6 text-left">
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">You are missing:</p>
-                    <ul className="space-y-3">
-                        {verificationMissing.map((req) => (
-                            <li key={req} className="flex items-center gap-3 text-rose-400 font-medium">
-                                <div className="w-6 h-6 rounded-full bg-rose-500/10 flex items-center justify-center text-xs border border-rose-500/20">❌</div>
-                                {req}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <Link
-                    href="/profile"
-                    className="w-full max-w-sm bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all hover:scale-[1.02] shadow-lg shadow-primary/20 shimmer-btn btn-glow text-center"
-                >
-                    Complete My Profile
-                </Link>
-            </div>
-        );
-    }
 
     const handleNext = () => setStep(step + 1);
     const handleBack = () => setStep(step - 1);

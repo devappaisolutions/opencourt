@@ -4,6 +4,48 @@
 -- ================================================
 
 -- ================================================
+-- CREATE SAMPLE USER IF NONE EXISTS
+-- ================================================
+
+DO $$
+DECLARE
+    sample_user_id UUID;
+    existing_count INT;
+BEGIN
+    -- Check if any profiles exist
+    SELECT COUNT(*) INTO existing_count FROM profiles;
+    
+    IF existing_count = 0 THEN
+        RAISE NOTICE 'No existing users found. Creating sample user...';
+        
+        -- Create a sample user ID (this would normally come from auth.users)
+        -- Note: In production, users must be created via Supabase Auth
+        -- This is just for testing purposes
+        sample_user_id := gen_random_uuid();
+        
+        -- Insert sample profile
+        INSERT INTO profiles (
+            id, username, full_name, avatar_url, position, 
+            height_ft, height_in, skill_level, reliability_score
+        ) VALUES (
+            sample_user_id,
+            'sample_host',
+            'Sample Host User',
+            NULL,
+            'Point Guard',
+            6,
+            0,
+            'Competitive',
+            100
+        );
+        
+        RAISE NOTICE 'Created sample user with ID: %', sample_user_id;
+    ELSE
+        RAISE NOTICE 'Found % existing users. Skipping sample user creation.', existing_count;
+    END IF;
+END $$;
+
+-- ================================================
 -- SEED DATA GENERATION
 -- ================================================
 
@@ -22,10 +64,13 @@ DECLARE
     game_cost TEXT;
     game_location TEXT;
     game_title TEXT;
+    game_desc TEXT;
+    game_rules TEXT;
+    game_gradient TEXT;
     max_p INT;
     current_date_ts TIMESTAMP := NOW();
     
-    -- Location data
+    -- Location data (Metro Manila)
     locations TEXT[] := ARRAY[
         'BGC Activity Center, Taguig',
         'Ronac Art Center, Makati',
@@ -51,14 +96,37 @@ DECLARE
     titles_casual TEXT[] := ARRAY['Casual Run', 'Pickup Game', 'Weekend Hoops', 'Friendly Game', 'Morning Run'];
     titles_comp TEXT[] := ARRAY['Competitive Run', 'Serious Runs Only', 'No Excuses Run', 'Elite Practice', 'Draft Night'];
     
+    descriptions TEXT[] := ARRAY[
+        'Looking for players to run some hoops! All skill levels welcome.',
+        'Competitive game for serious ballers. Come ready to play hard.',
+        'Friendly pickup game. Just here to have fun and get some exercise.',
+        'Elite level run. Must have good fundamentals and game IQ.',
+        'Weekend warriors unite! Let''s get a good sweat in.'
+    ];
+    
+    house_rules_list TEXT[] := ARRAY[
+        'Call your own fouls. Winners stay on court.',
+        'No cherry picking. Play defense. Respect the game.',
+        'First team to 21 wins. Win by 2. Make it take it.',
+        'Subs rotate in after each game. Everyone gets playing time.',
+        'Be on time or lose your spot. No shows will be marked absent.'
+    ];
+    
+    gradients TEXT[] := ARRAY[
+        'from-blue-500 to-purple-600',
+        'from-orange-500 to-red-600',
+        'from-green-500 to-teal-600',
+        'from-pink-500 to-rose-600',
+        'from-indigo-500 to-blue-600'
+    ];
+    
 BEGIN
     -- Get existing user IDs from profiles
     SELECT ARRAY_AGG(id) INTO existing_users FROM profiles LIMIT 20;
     
     -- Check if we have users
     IF existing_users IS NULL OR array_length(existing_users, 1) = 0 THEN
-        RAISE NOTICE 'No existing users found in profiles table. Please create at least one user first.';
-        RETURN;
+        RAISE EXCEPTION 'No users found in profiles table after sample user creation. Cannot proceed.';
     END IF;
     
     RAISE NOTICE 'Found % existing users. Creating 100 test games...', array_length(existing_users, 1);
@@ -96,6 +164,9 @@ BEGIN
         game_level := levels[1 + floor(random() * 5)::INT];
         game_cost := costs[1 + floor(random() * 5)::INT];
         game_location := locations[1 + floor(random() * 15)::INT];
+        game_desc := descriptions[1 + floor(random() * 5)::INT];
+        game_rules := house_rules_list[1 + floor(random() * 5)::INT];
+        game_gradient := gradients[1 + floor(random() * 5)::INT];
         
         -- Title based on format and level
         IF game_level = 'Casual' THEN
@@ -115,7 +186,8 @@ BEGIN
         -- Insert game
         INSERT INTO games (
             id, host_id, title, location, date_time, format, skill_level, cost, max_players, 
-            status, cancellation_reason, gender_filter, age_range, latitude, longitude, created_at
+            status, cancellation_reason, gender_filter, age_range, description, house_rules,
+            image_gradient, latitude, longitude, created_at
         ) VALUES (
             gen_random_uuid(),
             host_id,
@@ -132,8 +204,11 @@ BEGIN
             ELSE NULL END,
             (ARRAY['Mixed', 'Mens', 'Womens'])[1 + floor(random() * 3)::INT],
             (ARRAY['All Ages', '18+', '21+'])[1 + floor(random() * 3)::INT],
-            14.0693 + (random() * 0.5 - 0.25), -- San Pablo area latitude
-            121.3265 + (random() * 0.5 - 0.25), -- San Pablo area longitude
+            game_desc,
+            game_rules,
+            game_gradient,
+            14.5995 + (random() * 0.3 - 0.15), -- Metro Manila latitude
+            120.9842 + (random() * 0.3 - 0.15), -- Metro Manila longitude
             game_date - (random() * 14)::INT * INTERVAL '1 day'
         )
         RETURNING id INTO game_id;
