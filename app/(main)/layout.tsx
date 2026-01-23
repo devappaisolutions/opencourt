@@ -19,27 +19,37 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     };
     useEffect(() => {
         const fetchUserAvatar = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                // Check for OAuth avatar from various sources
-                const oauthAvatar = user.user_metadata?.avatar_url ||
-                    user.user_metadata?.picture ||
-                    user.identities?.[0]?.identity_data?.avatar_url ||
-                    user.identities?.[0]?.identity_data?.picture;
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    // Check for OAuth avatar from various sources
+                    const oauthAvatar = user.user_metadata?.avatar_url ||
+                        user.user_metadata?.picture ||
+                        user.identities?.[0]?.identity_data?.avatar_url ||
+                        user.identities?.[0]?.identity_data?.picture;
 
-                if (oauthAvatar) {
-                    setAvatarUrl(oauthAvatar);
-                } else {
-                    // Check profile table as fallback
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('avatar_url')
-                        .eq('id', user.id)
-                        .single();
-                    if (profile?.avatar_url) {
-                        setAvatarUrl(profile.avatar_url);
+                    if (oauthAvatar) {
+                        setAvatarUrl(oauthAvatar);
+                    } else {
+                        // Check profile table as fallback
+                        try {
+                            const { data: profile } = await supabase
+                                .from('profiles')
+                                .select('avatar_url')
+                                .eq('id', user.id)
+                                .single();
+                            if (profile?.avatar_url) {
+                                setAvatarUrl(profile.avatar_url);
+                            }
+                        } catch (profileError) {
+                            // Silently fail if profiles table doesn't exist yet
+                            console.warn('Could not fetch profile avatar:', profileError);
+                        }
                     }
                 }
+            } catch (error) {
+                // Silently fail - user might not be logged in or database might not be set up
+                console.warn('Error fetching user avatar:', error);
             }
         };
         fetchUserAvatar();

@@ -12,31 +12,49 @@ export default async function MyGamesPage() {
         redirect("/login");
     }
 
-    // Fetch Hosted Games
-    const { data: hostedGames } = await supabase
-        .from('games')
-        .select('*')
-        .eq('host_id', user.id)
-        .order('date_time', { ascending: true });
+    // Fetch Hosted Games with error handling
+    let hostedGames: any[] = [];
+    try {
+        const { data } = await supabase
+            .from('games')
+            .select('*')
+            .eq('host_id', user.id)
+            .order('date_time', { ascending: true });
+        hostedGames = data || [];
+    } catch (error) {
+        console.warn('Could not fetch hosted games:', error);
+    }
 
     // Check which hosted games the host has also joined as player
-    const hostedGameIds = (hostedGames || []).map(g => g.id);
-    const { data: hostRosterEntries } = await supabase
-        .from('game_roster')
-        .select('game_id')
-        .eq('player_id', user.id)
-        .in('game_id', hostedGameIds.length > 0 ? hostedGameIds : ['_none_']);
+    const hostedGameIds = hostedGames.map(g => g.id);
+    let hostRosterEntries: any[] = [];
+    try {
+        const { data } = await supabase
+            .from('game_roster')
+            .select('game_id')
+            .eq('player_id', user.id)
+            .in('game_id', hostedGameIds.length > 0 ? hostedGameIds : ['_none_']);
+        hostRosterEntries = data || [];
+    } catch (error) {
+        console.warn('Could not fetch host roster entries:', error);
+    }
 
-    const hostJoinedGameIds = new Set((hostRosterEntries || []).map(e => e.game_id));
+    const hostJoinedGameIds = new Set(hostRosterEntries.map(e => e.game_id));
 
     // Fetch Joined Games (all games user has joined as player, including own hosted games)
-    const { data: joinedData } = await supabase
-        .from('game_roster')
-        .select(`
-            game:games (*)
-        `)
-        .eq('player_id', user.id)
-        .eq('status', 'joined');
+    let joinedData: any[] = [];
+    try {
+        const { data } = await supabase
+            .from('game_roster')
+            .select(`
+                game:games (*)
+            `)
+            .eq('player_id', user.id)
+            .eq('status', 'joined');
+        joinedData = data || [];
+    } catch (error) {
+        console.warn('Could not fetch joined games:', error);
+    }
 
     // Flatten joined data - include all games user has joined as player
     interface JoinedGameData {

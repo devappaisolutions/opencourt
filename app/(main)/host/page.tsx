@@ -32,32 +32,47 @@ export default function HostGamePage() {
 
     useEffect(() => {
         const checkUserAndProfile = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    router.push("/login");
+                    return;
+                }
+                setUser(user);
+
+                try {
+                    const { data: profile, error } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (!profile || error) {
+                        // Profile doesn't exist or error occurred - allow user to continue anyway
+                        console.warn('Profile not found or error:', error);
+                    }
+                } catch (profileError) {
+                    // Silently fail if profiles table doesn't exist yet
+                    console.warn('Could not fetch profile:', profileError);
+                }
+
+                setLoading(false);
+
+                // Fetch Usual Courts (optional feature)
+                try {
+                    const { data: courts } = await supabase
+                        .from('usual_courts')
+                        .select('*')
+                        .eq('host_id', user.id);
+                    if (courts) setUsualCourts(courts);
+                } catch (courtsError) {
+                    // Silently fail if usual_courts table doesn't exist
+                    console.warn('Could not fetch usual courts:', courtsError);
+                }
+            } catch (error) {
+                console.error('Error checking user:', error);
                 router.push("/login");
-                return;
             }
-            setUser(user);
-
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', user.id)
-                .single();
-
-            if (!profile || error) {
-                router.push("/profile");
-                return;
-            }
-
-            setLoading(false);
-
-            // Fetch Usual Courts
-            const { data: courts } = await supabase
-                .from('usual_courts')
-                .select('*')
-                .eq('host_id', user.id);
-            if (courts) setUsualCourts(courts);
         };
         checkUserAndProfile();
     }, [supabase, router]);
