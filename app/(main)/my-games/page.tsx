@@ -97,7 +97,7 @@ export default async function MyGamesPage() {
                         <Calendar className="w-4 h-4 text-primary animate-bounce-subtle" />
                         <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Your Court Time</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-white uppercase italic tracking-tight">Your <span className="gradient-text-animated">Schedule</span></h1>
+                    <h1 className="text-3xl font-bold font-heading gradient-text text-white uppercase italic tracking-tight">Your <span className="gradient-text-animated">Schedule</span></h1>
                     <p className="text-zinc-500 font-medium tracking-tight">Manage your player itinerary and tracks.</p>
                 </div>
                 <NextLink
@@ -121,11 +121,11 @@ export default async function MyGamesPage() {
                             <div className="absolute inset-0 rounded-xl bg-primary/20 animate-pulse-slow" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-tight">Upcoming Runs</h2>
+                            <h2 className="text-xl font-bold font-heading gradient-text text-white uppercase tracking-tight">Upcoming Runs</h2>
                             <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Games you're joining</p>
                         </div>
                     </div>
-                    <span className="px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                    <span className="badge-premium px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                         <Zap className="w-3 h-3 text-primary" />
                         {displayJoined.length} Joined
                     </span>
@@ -153,7 +153,7 @@ export default async function MyGamesPage() {
                         {displayJoined.map((game: any, idx: number) => (
                             <div
                                 key={game.id}
-                                className="relative group opacity-0 animate-card-entrance"
+                                className="relative group opacity-0 animate-card-entrance hover-lift card-shine"
                                 style={{ animationDelay: `${idx * 0.15}s`, animationFillMode: 'forwards' }}
                             >
                                 {/* Timeline Node */}
@@ -186,11 +186,11 @@ export default async function MyGamesPage() {
                             <div className="absolute inset-0 rounded-xl bg-amber-500/10 animate-pulse-slow" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-tight">Hosted by You</h2>
+                            <h2 className="text-xl font-bold font-heading gradient-text text-white uppercase tracking-tight">Hosted by You</h2>
                             <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Games you're running</p>
                         </div>
                     </div>
-                    <span className="px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+                    <span className="badge-premium px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
                         <Crown className="w-3 h-3 text-amber-500" />
                         {displayHosted.length} Created
                     </span>
@@ -215,7 +215,7 @@ export default async function MyGamesPage() {
                         {displayHosted.map((game: any, idx: number) => (
                             <div
                                 key={game.id}
-                                className="opacity-0 animate-card-entrance"
+                                className="opacity-0 animate-card-entrance hover-lift card-shine"
                                 style={{ animationDelay: `${idx * 0.15}s`, animationFillMode: 'forwards' }}
                             >
                                 <GameCard game={game} currentUserId={user.id} role="host" />

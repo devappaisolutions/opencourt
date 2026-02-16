@@ -78,25 +78,32 @@ export default function LoginPage() {
                         src="/hero-court.png"
                         alt="Basketball Court"
                         fill
-                        className="object-cover opacity-40"
+                        className="object-cover opacity-30"
                         priority
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1F1D1D]/80 via-[#1F1D1D]/50 to-[#1F1D1D]" />
                     <div className="absolute inset-0 bg-gradient-to-r from-[#1F1D1D] via-transparent to-[#1F1D1D] opacity-60" />
                 </div>
 
+                {/* Aurora Overlay */}
+                <div className="absolute inset-0 aurora-bg opacity-80 z-[1]" />
+
+                {/* Floating Blobs */}
+                <div className="absolute top-1/4 left-1/6 w-72 h-72 rounded-full bg-primary/15 blur-3xl animate-float pointer-events-none z-[1]" />
+                <div className="absolute bottom-1/3 right-1/6 w-56 h-56 rounded-full bg-accent/10 blur-3xl animate-float pointer-events-none z-[1]" style={{ animationDelay: '-3s' }} />
+
                 {/* Content */}
                 <div className="relative z-10 container mx-auto px-4 text-center max-w-md">
                     <div className="space-y-8 animate-slide-up">
                         {/* Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full badge-premium text-primary text-xs font-bold tracking-widest uppercase">
                             <Zap className="w-3.5 h-3.5 fill-current" />
-                            Elite Access
+                            Elite Pickup Basketball
                         </div>
 
                         {/* Main Heading */}
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase italic">
-                            <span className="text-[#F5EFEA]">OPEN</span>
+                        <h1 className="font-heading text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase italic">
+                            <span className="gradient-text">OPEN</span>
                             <br />
                             <span className="text-primary">COURT</span>
                         </h1>
@@ -109,7 +116,7 @@ export default function LoginPage() {
 
                     {/* Login Card */}
                     <div
-                        className="mt-10 p-8 rounded-3xl bg-[#2A2827]/80 backdrop-blur-xl border border-white/10 shadow-2xl animate-slide-up"
+                        className="mt-10 p-8 rounded-3xl glass-card-premium animate-slide-up"
                         style={{ animationDelay: '0.2s' }}
                     >
                         <div className="space-y-5">
@@ -118,7 +125,7 @@ export default function LoginPage() {
                                     <button
                                         onClick={() => handleLogin("google")}
                                         disabled={isLoading}
-                                        className="w-full h-14 rounded-2xl bg-[#F5EFEA] text-[#1F1D1D] font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-white transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full h-14 rounded-2xl bg-[#F5EFEA] text-[#1F1D1D] font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-white transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-50 shimmer-btn"
                                     >
                                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                                             <path
@@ -144,7 +151,7 @@ export default function LoginPage() {
                                     <button
                                         onClick={() => handleLogin("facebook")}
                                         disabled={isLoading}
-                                        className="w-full h-14 rounded-2xl bg-[#1877F2] text-white font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-[#1877F2]/90 transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full h-14 rounded-2xl bg-[#1877F2] text-white font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 hover:bg-[#1877F2]/90 transition-all duration-300 shadow-lg active:scale-[0.98] disabled:opacity-50 shimmer-btn"
                                     >
                                         <Facebook className="w-5 h-5" />
                                         Continue with Facebook
@@ -159,21 +166,21 @@ export default function LoginPage() {
                                     <button
                                         onClick={() => setShowEmail(true)}
                                         disabled={isLoading}
-                                        className="w-full h-14 rounded-2xl bg-[#1F1D1D] text-[#F5EFEA] font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 border border-white/10 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full h-14 rounded-2xl glass-button text-[#F5EFEA] font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-3 hover:border-primary/30 transition-all duration-300 active:scale-[0.98] disabled:opacity-50"
                                     >
                                         <Mail className="w-5 h-5" />
                                         Continue with Email
                                     </button>
                                 </>
                             ) : isVerificationSent ? (
-                                <div className="space-y-6 py-4 text-center animate-in fade-in zoom-in-95 duration-300">
+                                <div className="space-y-6 py-4 text-center animate-slide-up">
                                     <div className="w-16 h-16 bg-emerald-500/10 rounded-full flex items-center justify-center mx-auto border border-emerald-500/20">
                                         <svg className="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                         </svg>
                                     </div>
                                     <div className="space-y-2">
-                                        <h3 className="text-xl font-bold uppercase italic tracking-wide text-emerald-400">Check Your Email</h3>
+                                        <h3 className="text-xl font-heading font-bold uppercase italic tracking-wide text-emerald-400">Check Your Email</h3>
                                         <p className="text-[#B8B0A6] text-sm">
                                             We sent a verification link to<br />
                                             <span className="text-[#F5EFEA] font-bold">{email}</span>
@@ -181,13 +188,13 @@ export default function LoginPage() {
                                     </div>
                                     <button
                                         onClick={() => { setIsVerificationSent(false); setShowEmail(false); setMode("login"); }}
-                                        className="w-full h-12 rounded-2xl bg-[#1F1D1D] text-[#B8B0A6] font-bold text-xs tracking-widest uppercase border border-white/5 hover:text-[#F5EFEA] transition-all"
+                                        className="w-full h-12 rounded-2xl glass-button text-[#B8B0A6] font-bold text-xs tracking-widest uppercase hover:text-[#F5EFEA] transition-all"
                                     >
                                         Back to Login
                                     </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleAuth} className="space-y-4 animate-in fade-in zoom-in-95 duration-300">
+                                <form onSubmit={handleAuth} className="space-y-4 animate-slide-up">
                                     <div className="space-y-3">
                                         <input
                                             type="email"
@@ -195,7 +202,7 @@ export default function LoginPage() {
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             required
-                                            className="w-full h-14 rounded-2xl bg-[#1F1D1D] border border-white/10 px-5 text-sm font-medium placeholder:text-[#B8B0A6]/50 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+                                            className="w-full h-14 rounded-2xl bg-[#1F1D1D] border border-white/10 px-5 text-sm font-medium placeholder:text-[#B8B0A6]/50 focus:outline-none focus:border-primary/50 input-premium transition-all"
                                         />
                                         <input
                                             type="password"
@@ -203,14 +210,14 @@ export default function LoginPage() {
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            className="w-full h-14 rounded-2xl bg-[#1F1D1D] border border-white/10 px-5 text-sm font-medium placeholder:text-[#B8B0A6]/50 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+                                            className="w-full h-14 rounded-2xl bg-[#1F1D1D] border border-white/10 px-5 text-sm font-medium placeholder:text-[#B8B0A6]/50 focus:outline-none focus:border-primary/50 input-premium transition-all"
                                         />
                                     </div>
 
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="w-full h-14 rounded-2xl bg-primary text-white font-bold text-xs tracking-widest uppercase shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full h-14 rounded-2xl bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-xs tracking-widest uppercase shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-[0.98] disabled:opacity-50 shimmer-btn btn-glow"
                                     >
                                         {isLoading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}
                                     </button>

@@ -49,7 +49,7 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${color.replace('border', 'bg')}`} />
-                        <h3 className="font-bold text-white uppercase tracking-wider">
+                        <h3 className="font-bold text-white uppercase tracking-wider font-heading">
                             Team {team.team_number}
                         </h3>
                     </div>
@@ -62,7 +62,7 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                     {team.players.map((player) => (
                         <div
                             key={player.id}
-                            className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5"
+                            className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5 hover-lift"
                         >
                             <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
                                 {player.avatar_url ? (
@@ -115,7 +115,7 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
         <div className="space-y-4">
             <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
-                <h2 className="text-lg font-bold text-white uppercase tracking-wider">
+                <h2 className="text-lg font-bold text-white uppercase tracking-wider font-heading">
                     Team Matchups
                 </h2>
             </div>

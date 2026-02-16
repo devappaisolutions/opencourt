@@ -160,7 +160,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
 
         return (
             <div
-                className={`relative glass-card p-5 rounded-[1.5rem] flex items-center gap-5 border transition-all duration-500 overflow-hidden group ${isCheckedIn ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.1)]" :
+                className={`relative glass-card p-5 rounded-[1.5rem] flex items-center gap-5 border transition-all duration-500 overflow-hidden group hover-lift ${isCheckedIn ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.1)]" :
                     isAbsent ? "border-rose-500/30 bg-rose-500/5 blur-[0.5px] grayscale opacity-60 hover:filter-none hover:opacity-100" :
                         isWaitlist ? "border-amber-500/20 bg-amber-500/5" :
                             "border-white/5 hover:border-white/10 hover:shadow-2xl"
@@ -185,12 +185,12 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
 
                     {/* Status Indicator Badge */}
                     {isCheckedIn && (
-                        <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-lg p-1 border-2 border-black shadow-lg">
+                        <div className="absolute -bottom-1 -right-1 bg-emerald-500 text-white rounded-lg p-1 border-2 border-black shadow-lg badge-premium">
                             <CheckCircle2 className="w-4 h-4" />
                         </div>
                     )}
                     {isAbsent && (
-                        <div className="absolute -bottom-1 -right-1 bg-rose-500 text-white rounded-lg p-1 border-2 border-black shadow-lg">
+                        <div className="absolute -bottom-1 -right-1 bg-rose-500 text-white rounded-lg p-1 border-2 border-black shadow-lg badge-premium">
                             <XCircle className="w-4 h-4" />
                         </div>
                     )}
@@ -280,7 +280,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                         </span>
 
                         {isWaitlist && (
-                            <span className="ml-auto px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20">
+                            <span className="ml-auto px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-500 font-bold border border-amber-500/20 badge-premium">
                                 WAITLIST
                             </span>
                         )}

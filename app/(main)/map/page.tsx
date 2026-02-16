@@ -24,7 +24,7 @@ export default function MapPage() {
     ), []);
 
     return (
-        <div className="h-[calc(100vh-100px)] w-full rounded-[2rem] overflow-hidden border border-white/10 relative shadow-2xl">
+        <div className="h-[calc(100vh-100px)] w-full glass-card-premium rounded-2xl overflow-hidden border border-white/10 relative shadow-2xl">
             {/* Header Badge */}
             <div className="absolute top-6 left-6 z-[1000] glass-card-premium px-5 py-3 rounded-2xl border-t border-white/20 shadow-2xl flex items-center gap-3 group animate-in fade-in slide-in-from-left-4 duration-1000">
                 {/* Pulsing Live Indicator */}
@@ -33,7 +33,7 @@ export default function MapPage() {
                     <div className="absolute inset-0 w-3 h-3 rounded-full bg-emerald-500 animate-ping" />
                 </div>
                 <div>
-                    <h1 className="text-xs font-bold text-white uppercase italic tracking-widest">Live Map</h1>
+                    <h1 className="text-xs font-bold font-heading gradient-text text-white uppercase italic tracking-widest">Live Map</h1>
                     <p className="text-[9px] text-zinc-500 uppercase tracking-wider">Real-time game locations</p>
                 </div>
                 <Radio className="w-4 h-4 text-emerald-500 animate-pulse ml-2" />

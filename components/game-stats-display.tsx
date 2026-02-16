@@ -39,14 +39,14 @@ export function GameStatsDisplay({ stats, currentUserId }: GameStatsDisplayProps
         <div className="space-y-4">
             <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+                <h3 className="text-lg font-bold text-white uppercase tracking-wider font-heading">
                     Game Stats
                 </h3>
             </div>
 
             <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
                 {/* Header */}
-                <div className="grid grid-cols-7 gap-2 p-4 bg-zinc-900/50 border-b border-white/5 text-xs font-bold uppercase tracking-wider text-zinc-500">
+                <div className="grid grid-cols-7 gap-2 p-4 bg-zinc-900/50 border-b border-white/5 text-xs font-bold uppercase tracking-wider text-zinc-500 font-heading">
                     <div className="col-span-2">Player</div>
                     <div className="text-center">PTS</div>
                     <div className="text-center">REB</div>
@@ -64,7 +64,7 @@ export function GameStatsDisplay({ stats, currentUserId }: GameStatsDisplayProps
                         return (
                             <div
                                 key={stat.player_id}
-                                className={`grid grid-cols-7 gap-2 p-4 transition-colors ${isCurrentUser ? "bg-primary/10" : "hover:bg-white/5"
+                                className={`grid grid-cols-7 gap-2 p-4 transition-colors ${isCurrentUser ? "bg-primary/10 shadow-[inset_0_0_20px_rgba(var(--color-primary),0.1)]" : "hover:bg-white/5"
                                     }`}
                             >
                                 <div className="col-span-2 flex items-center gap-3">

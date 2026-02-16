@@ -159,13 +159,13 @@ export default function ProfilePage() {
                         <Star className="w-4 h-4 text-primary animate-spin-slow" />
                         <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Player Card</span>
                     </div>
-                    <h1 className="text-3xl font-bold text-white uppercase italic tracking-tight">Your <span className="gradient-text-animated">Locker</span></h1>
+                    <h1 className="text-3xl font-bold font-heading gradient-text text-white uppercase italic tracking-tight">Your <span className="gradient-text-animated">Locker</span></h1>
                     <p className="text-zinc-500 font-medium tracking-tight">Manage your player card and stats.</p>
                 </div>
                 <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex items-center gap-2 bg-primary text-white font-bold px-6 py-2.5 rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 shimmer-btn btn-glow"
+                    className="flex items-center gap-2 bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold px-6 py-2.5 rounded-xl hover:opacity-90 transition-all disabled:opacity-50 shimmer-btn btn-glow"
                 >
                     <Save className="w-4 h-4" />
                     {saving ? "Saving..." : "Save Changes"}
@@ -188,7 +188,7 @@ export default function ProfilePage() {
                         {/* Outer Glow Ring */}
                         <div className="absolute inset-[-8px] rounded-full bg-gradient-to-br from-primary to-indigo-500 opacity-30 blur-lg group-hover:opacity-50 transition-opacity" />
 
-                        <div className="w-32 h-32 rounded-full bg-zinc-800 border-4 border-white/10 flex items-center justify-center overflow-hidden relative shadow-2xl group-hover:border-primary/30 transition-all">
+                        <div className="w-32 h-32 rounded-full bg-zinc-800 border-4 border-white/10 flex items-center justify-center overflow-hidden relative shadow-2xl group-hover:border-primary/30 transition-all active-glow-ring">
                             {profile?.avatar_url ? (
                                 <Image
                                     src={profile.avatar_url}
@@ -223,7 +223,7 @@ export default function ProfilePage() {
                         </div>
 
                         {/* Reliability Score Badge */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-sm">
+                        <div className="badge-premium inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-sm">
                             <Shield className="w-4 h-4" />
                             <span className="text-2xl font-black">{profile?.reliability_score || 100}</span>
                             <span className="text-[10px] uppercase tracking-wider">% Reliability</span>
@@ -248,7 +248,7 @@ export default function ProfilePage() {
                                         key={pos}
                                         onClick={() => setPosition(pos)}
                                         className={`py-3 rounded-xl text-sm font-bold border transition-all duration-300 ${position === pos
-                                            ? "bg-white text-black border-white shadow-lg shadow-white/20 scale-105"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40 shadow-lg shadow-primary/10 scale-105"
                                             : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
                                             }`}
                                     >
@@ -269,7 +269,7 @@ export default function ProfilePage() {
                                         key={lvl}
                                         onClick={() => setSkillLevel(lvl)}
                                         className={`px-4 py-3 rounded-xl text-sm font-medium border text-left transition-all flex items-center justify-between group ${skillLevel === lvl
-                                            ? "bg-primary/20 text-primary border-primary/50 shadow-lg shadow-primary/10"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40 shadow-lg shadow-primary/10"
                                             : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20 hover:text-white"
                                             }`}
                                     >
@@ -289,7 +289,7 @@ export default function ProfilePage() {
                         <label className="text-sm font-medium text-white flex items-center gap-2">
                             <Ruler className="w-4 h-4 text-primary" /> Height
                         </label>
-                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all max-w-md">
+                        <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-xl border border-white/5 hover:border-white/10 transition-all max-w-md input-premium">
                             <div className="flex-1">
                                 <label className="text-xs text-zinc-500 mb-1 block">Feet</label>
                                 <select

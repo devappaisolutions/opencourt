@@ -162,7 +162,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                 {isJoined && (
                     <button
                         onClick={() => setShowReviewModal(true)}
-                        className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95"
+                        className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 shimmer-btn btn-glow"
                     >
                         <Trophy className="w-4 h-4" /> REVIEW SQUAD
                     </button>
@@ -273,7 +273,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                 disabled={loading || disabled || (!userId && !loading)}
                 className={`flex items-center gap-2 px-10 py-5 rounded-[2rem] font-bold text-xs tracking-[0.2em] uppercase transition-all duration-500 active:scale-95 disabled:opacity-50 italic ${isFull
                     ? "bg-zinc-900 text-amber-500 border border-amber-500/20"
-                    : "bg-primary text-white shadow-xl shadow-primary/20 hover:bg-primary/90"
+                    : "bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 shimmer-btn btn-glow"
                     }`}
             >
                 {loading ? "PROCESSING..." : (
@@ -315,7 +315,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                                 <button
                                     onClick={handleJoin}
                                     disabled={loading}
-                                    className="w-full bg-primary text-white font-bold py-5 rounded-[2rem] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl shadow-primary/20 uppercase tracking-[0.2em] text-xs italic"
+                                    className="w-full bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold py-5 rounded-[2rem] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl shadow-primary/20 uppercase tracking-[0.2em] text-xs italic shimmer-btn btn-glow"
                                 >
                                     {loading ? "PROCESSING..." : (
                                         <>

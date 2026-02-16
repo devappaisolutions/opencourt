@@ -22,7 +22,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             try {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (user) {
-                    // Check for OAuth avatar from various sources
                     const oauthAvatar = user.user_metadata?.avatar_url ||
                         user.user_metadata?.picture ||
                         user.identities?.[0]?.identity_data?.avatar_url ||
@@ -31,7 +30,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                     if (oauthAvatar) {
                         setAvatarUrl(oauthAvatar);
                     } else {
-                        // Check profile table as fallback
                         try {
                             const { data: profile } = await supabase
                                 .from('profiles')
@@ -42,13 +40,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                                 setAvatarUrl(profile.avatar_url);
                             }
                         } catch (profileError) {
-                            // Silently fail if profiles table doesn't exist yet
                             console.warn('Could not fetch profile avatar:', profileError);
                         }
                     }
                 }
             } catch (error) {
-                // Silently fail - user might not be logged in or database might not be set up
                 console.warn('Error fetching user avatar:', error);
             }
         };
@@ -63,26 +59,33 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     ];
 
     return (
-        <div className="min-h-screen bg-[#1F1D1D] pb-24 md:pb-0 md:pl-20 relative">
-            {/* Background */}
-            <div className="fixed inset-0 mesh-gradient opacity-40 pointer-events-none z-0" />
+        <div className="min-h-screen bg-[#1F1D1D] pb-28 md:pb-0 md:pl-24 relative">
+            {/* Aurora Background */}
+            <div className="fixed inset-0 aurora-bg pointer-events-none z-0" />
 
-            {/* Desktop Sidebar */}
-            <aside className="hidden md:flex fixed left-0 top-0 h-screen w-20 flex-col items-center py-8 bg-[#1F1D1D]/90 backdrop-blur-xl border-r border-white/5 z-50">
+            {/* Floating Blobs */}
+            <div className="fixed top-1/4 left-1/4 w-64 sm:w-96 h-64 sm:h-96 rounded-full bg-primary/8 blur-3xl animate-float pointer-events-none z-0" />
+            <div className="fixed bottom-1/4 right-1/4 w-52 sm:w-80 h-52 sm:h-80 rounded-full bg-accent/5 blur-3xl animate-float pointer-events-none z-0" style={{ animationDelay: '-3s' }} />
+
+            {/* Desktop Sidebar - Floating Glass */}
+            <aside className="hidden md:flex fixed left-4 top-4 bottom-4 w-[72px] flex-col items-center py-6 bg-[#1F1D1D]/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50"
+                style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
                 {/* Logo */}
-                <Link href="/dashboard" className="mb-10 group">
-                    <div className="w-9 h-9 rounded-full bg-primary group-hover:scale-110 transition-transform" />
+                <Link href="/dashboard" className="mb-8 group">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#E8A966] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">
+                        <span className="text-white font-heading font-bold text-sm">OC</span>
+                    </div>
                 </Link>
 
                 {/* Nav Items */}
-                <nav className="flex-1 flex flex-col gap-4 w-full items-center">
+                <nav className="flex-1 flex flex-col gap-3 w-full items-center">
                     {navItems.map((item) => (
                         <Link
                             key={item.href}
                             href={item.href}
                             aria-label={item.label}
                             className={`p-3 rounded-xl transition-all group relative ${pathname === item.href
-                                ? "bg-white/10 text-primary"
+                                ? "bg-white/10 text-primary active-glow-ring"
                                 : "text-[#B8B0A6] hover:text-[#F5EFEA] hover:bg-white/5"
                                 }`}
                         >
@@ -90,11 +93,11 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
 
                             {/* Active Indicator */}
                             {pathname === item.href && (
-                                <span className="absolute -right-[10px] top-1/2 -translate-y-1/2 w-1 h-5 bg-primary rounded-l-full" />
+                                <span className="absolute -right-[1px] top-1/2 -translate-y-1/2 w-[3px] h-5 bg-primary rounded-l-full" />
                             )}
 
                             {/* Tooltip */}
-                            <span className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-[#2A2827] text-[#F5EFEA] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10 pointer-events-none">
+                            <span className="absolute left-full ml-4 px-3 py-1.5 rounded-xl bg-[#2A2827]/95 backdrop-blur-md text-[#F5EFEA] text-[10px] font-bold uppercase tracking-wider opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-white/10 pointer-events-none shadow-xl">
                                 {item.label}
                             </span>
                         </Link>
@@ -104,7 +107,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 {/* Menu (User Avatar) */}
                 <Link
                     href="/menu"
-                    className={`mt-auto mb-6 p-1.5 rounded-full transition-all group ${pathname === '/menu' ? 'ring-2 ring-primary' : 'hover:ring-2 hover:ring-white/20'}`}
+                    className={`mt-auto mb-4 p-1.5 rounded-full transition-all group ${pathname === '/menu' ? 'ring-2 ring-primary shadow-lg shadow-primary/20' : 'hover:ring-2 hover:ring-white/20'}`}
                     title="Menu"
                 >
                     {avatarUrl ? (
@@ -125,7 +128,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 <button
                     onClick={handleLogout}
                     aria-label="Logout"
-                    className="mb-6 p-3 rounded-xl text-[#B8B0A6] hover:text-red-400 hover:bg-red-400/10 transition-all group"
+                    className="mb-2 p-3 rounded-xl text-[#B8B0A6] hover:text-red-400 hover:bg-red-400/10 transition-all group"
                     title="Logout"
                 >
                     <LogOut className="w-5 h-5 group-hover:scale-105 transition-all" />
@@ -137,8 +140,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 {children}
             </main>
 
-            {/* Mobile Bottom Nav */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-[#1F1D1D]/95 backdrop-blur-xl border-t border-white/5 z-50 px-6 flex items-center justify-between safe-area-bottom">
+            {/* Mobile Bottom Nav - Floating Glass */}
+            <nav className="md:hidden fixed bottom-4 left-4 right-4 h-20 bg-[#1F1D1D]/85 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-50 px-6 flex items-center justify-between"
+                style={{ boxShadow: '0 -4px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
                 {navItems.map((item) => (
                     <Link
                         key={item.href}
@@ -151,7 +155,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                             }`}
                     >
                         {item.primary ? (
-                            <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-[#1F1D1D]">
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-[#E8A966] flex items-center justify-center shadow-lg shadow-primary/30 border-4 border-[#1F1D1D] btn-glow">
                                 <PlusCircle className="w-7 h-7 text-white" />
                             </div>
                         ) : (
@@ -191,4 +195,3 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </div>
     );
 }
-

@@ -164,8 +164,8 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6 relative z-10">
                 <div className="space-y-1">
                     <span className="text-xs font-bold tracking-widest uppercase text-primary">Live Games</span>
-                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#F5EFEA] uppercase italic leading-none">
-                        Find Your <span className="text-primary">Run</span>
+                    <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#F5EFEA] uppercase italic leading-none font-heading gradient-text">
+                        Find Your Run
                     </h1>
                     <p className="text-[#B8B0A6] text-sm font-medium">
                         <span className="text-[#F5EFEA] font-bold">{filteredGames.length}</span> games happening near you this week
@@ -178,9 +178,9 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                         <button
                             key={f.label}
                             onClick={() => f.label === "Near Me" ? handleNearMe() : setFilter(f.label)}
-                            className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all flex items-center gap-2 whitespace-nowrap ${filter === f.label
-                                ? "bg-primary text-white border-primary"
-                                : "bg-[#2A2827] text-[#B8B0A6] border-white/5 hover:border-white/15 hover:text-[#F5EFEA]"
+                            className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all flex items-center gap-2 whitespace-nowrap ${filter === f.label
+                                ? "bg-primary/15 text-primary border-primary/30 active-glow-ring"
+                                : "bg-white/5 text-[#B8B0A6] border-white/10 hover:bg-white/10"
                                 }`}
                         >
                             {f.icon && <span className={filter === f.label ? "text-white" : "text-primary"}>{f.icon}</span>}

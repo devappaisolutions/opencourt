@@ -148,10 +148,10 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                     <div className="space-y-8 flex-1">
                         {/* Badges */}
                         <div className="flex flex-wrap gap-3">
-                            <span className="px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl">
+                            <span className="badge-premium px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl">
                                 {game.format}
                             </span>
-                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase backdrop-blur-xl border shadow-2xl flex items-center gap-1.5 ${game.skill_level === 'Elite'
+                            <span className={`badge-premium px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase backdrop-blur-xl border shadow-2xl flex items-center gap-1.5 ${game.skill_level === 'Elite'
                                 ? 'bg-primary/20 text-primary border-primary/30'
                                 : 'bg-primary/20 text-primary border-primary/30'
                                 }`}>
@@ -162,7 +162,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
 
                         {/* Title & Info */}
                         <div className="space-y-4">
-                            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight uppercase italic">
+                            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight uppercase italic font-heading">
                                 {game.title}
                             </h1>
                             <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4">
@@ -197,7 +197,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                         {/* Card Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/15 blur-[60px] rounded-full transition-opacity group-hover/host:opacity-100 opacity-30" />
 
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-6 relative z-10">Hosted By</p>
+                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-6 relative z-10 font-heading">Hosted By</p>
                         <div className="flex items-center gap-4 relative z-10">
                             {/* Avatar */}
                             <div className="relative">
@@ -253,7 +253,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                 <div className="lg:col-span-2 space-y-8">
                     {game.description && (
                         <div className="glass-card-premium p-8 rounded-[2rem] border-t border-white/10 space-y-4 hover-lift transition-all duration-500">
-                            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 <Sparkles className="w-3 h-3 text-primary" />
                                 The Run
                             </h2>
@@ -265,7 +265,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
 
                     {game.house_rules && (
                         <div className="glass-card-premium p-8 rounded-[2rem] border-t border-white/10 space-y-4 hover-lift transition-all duration-500">
-                            <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 📜 House Rules
                             </h2>
                             <div className="prose prose-invert max-w-none">
@@ -281,7 +281,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                     {/* Game Metadata Card */}
                     <div className="glass-card-premium p-8 rounded-[2.5rem] border-t border-white/10 space-y-6 relative overflow-hidden group hover-lift transition-all duration-500">
                         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        <h2 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-2 relative z-10">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 relative z-10 font-heading gradient-text">
                             <Zap className="w-3 h-3 text-primary" />
                             Run Intel
                         </h2>

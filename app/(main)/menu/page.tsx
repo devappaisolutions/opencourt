@@ -94,7 +94,7 @@ export default function MenuPage() {
         <div className="max-w-2xl mx-auto space-y-6 pb-8 animate-in fade-in duration-500">
             {/* Header */}
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold text-white">Menu</h1>
+                <h1 className="text-3xl font-bold font-heading text-white">Menu</h1>
                 <button className="p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors">
                     <Settings className="w-5 h-5 text-[#B8B0A6]" />
                 </button>
@@ -102,7 +102,7 @@ export default function MenuPage() {
 
             {/* Profile Card */}
             <Link href="/profile" className="block">
-                <div className="flex items-center gap-4 p-4 rounded-2xl bg-[#2A2827] border border-white/5 hover:border-primary/30 transition-all group">
+                <div className="flex items-center gap-4 p-4 rounded-2xl glass-card-premium holographic border border-white/5 hover:border-primary/30 transition-all group">
                     {/* Avatar */}
                     <div className="relative">
                         {user?.avatar_url ? (
@@ -132,7 +132,7 @@ export default function MenuPage() {
 
             {/* Quick Shortcuts */}
             <div className="space-y-3">
-                <h3 className="text-xs font-bold text-[#B8B0A6] uppercase tracking-wider px-1">
+                <h3 className="text-xs font-bold font-heading text-[#B8B0A6] uppercase tracking-wider px-1">
                     Your Shortcuts
                 </h3>
                 <div className="grid grid-cols-4 gap-3">
@@ -140,7 +140,7 @@ export default function MenuPage() {
                         <Link
                             key={item.href}
                             href={item.href}
-                            className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-[#2A2827] border border-white/5 hover:border-primary/30 hover:bg-[#2A2827]/80 transition-all group"
+                            className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-[#2A2827] border border-white/5 hover:border-primary/30 hover:bg-[#2A2827]/80 transition-all group hover-lift"
                         >
                             <div className={`p-3 rounded-xl bg-white/5 ${item.color} group-hover:scale-110 transition-all`}>
                                 <item.icon className="w-5 h-5" />
@@ -159,7 +159,7 @@ export default function MenuPage() {
                     <Link
                         key={item.label}
                         href={item.href}
-                        className="flex items-start gap-3 p-4 rounded-2xl bg-[#2A2827] border border-white/5 hover:border-primary/30 transition-all group"
+                        className="flex items-start gap-3 p-4 rounded-2xl bg-[#2A2827] border border-white/5 hover:border-primary/30 transition-all group card-shine hover-lift"
                     >
                         <div className="p-2 rounded-xl bg-white/5 text-primary group-hover:scale-110 transition-all">
                             <item.icon className="w-5 h-5" />
@@ -180,7 +180,7 @@ export default function MenuPage() {
                     <Link
                         key={item.label}
                         href={item.href}
-                        className="flex items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-all group"
+                        className="flex items-center gap-3 p-4 rounded-xl hover:bg-white/5 transition-all group glass-card"
                     >
                         <item.icon className="w-5 h-5 text-[#B8B0A6] group-hover:text-primary transition-colors" />
                         <span className="text-sm font-medium text-[#F5EFEA]">{item.label}</span>
@@ -192,14 +192,14 @@ export default function MenuPage() {
             {/* Logout */}
             <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 transition-all font-bold"
+                className="w-full flex items-center justify-center gap-2 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)] transition-all font-bold"
             >
                 <LogOut className="w-5 h-5" />
                 Log Out
             </button>
 
             {/* Footer */}
-            <p className="text-center text-[10px] text-[#B8B0A6]/50 pt-4">
+            <p className="text-center text-[10px] text-[#B8B0A6]/40 pt-4">
                 Open Court • v1.0.0
             </p>
         </div>

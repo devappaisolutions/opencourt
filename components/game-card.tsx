@@ -106,7 +106,7 @@ export function GameCard({
             <div className="relative h-full flex flex-col justify-between p-6 z-20 pointer-events-none">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 relative">
                     <div className="flex flex-wrap gap-2 items-center">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/5 border border-white/10 text-[#B8B0A6]">
+                        <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase badge-premium text-[#B8B0A6]">
                             {game.format}
                         </span>
 
@@ -170,7 +170,7 @@ export function GameCard({
 
                 <div className="space-y-5 mt-auto">
                     <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-[#F5EFEA] leading-tight tracking-tight group-hover:text-primary transition-colors">
+                        <h3 className="text-xl font-heading font-bold text-[#F5EFEA] leading-tight tracking-tight group-hover:text-primary transition-colors">
                             {game.title}
                         </h3>
                         <div className="flex items-center gap-2 text-[#B8B0A6] text-sm">
@@ -200,11 +200,11 @@ export function GameCard({
                                 </span>
                             </div>
                             {/* Fill Bar */}
-                            <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden mt-1">
+                            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden mt-1">
                                 <div
-                                    className={`h-full rounded-full transition-all duration-400 ${fillPercentage >= 100 ? 'bg-primary' :
-                                        fillPercentage >= 70 ? 'bg-[#FF9800]' :
-                                            'bg-[#F5EFEA]'
+                                    className={`h-full rounded-full transition-all duration-400 ${fillPercentage >= 100 ? 'bg-gradient-to-r from-primary to-[#E8A966]' :
+                                        fillPercentage >= 70 ? 'bg-gradient-to-r from-[#FF9800] to-primary' :
+                                            'bg-gradient-to-r from-[#F5EFEA]/60 to-[#F5EFEA]'
                                         }`}
                                     style={{ width: `${Math.min(fillPercentage, 100)}%` }}
                                 />

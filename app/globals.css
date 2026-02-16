@@ -38,6 +38,10 @@
 }
 
 @layer base {
+  .font-heading {
+    font-family: var(--font-heading), system-ui, sans-serif;
+  }
+
   :root {
     /* EFFECTIVE-Inspired Palette - Warm & Professional */
     --background: 0 3% 12%;
@@ -401,9 +405,27 @@
     animation: slide-up 0.4s ease-out forwards;
   }
 
-  /* Mesh Gradient - Disabled for clean look */
+  /* Aurora Background */
+  .aurora-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 40%, rgba(217, 98, 59, 0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 60%, rgba(245, 239, 234, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 90% 50% at 50% 80%, rgba(217, 123, 74, 0.08) 0%, transparent 50%);
+  }
+
+  /* Gradient Text (Static) */
+  .gradient-text {
+    background: linear-gradient(135deg, #F5EFEA 0%, #D9623B 50%, #E8A966 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Mesh Gradient */
   .mesh-gradient {
-    background: transparent;
+    background:
+      radial-gradient(ellipse 50% 50% at 25% 25%, rgba(217, 98, 59, 0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 75% 75%, rgba(245, 239, 234, 0.04) 0%, transparent 60%);
   }
 
   .particle {

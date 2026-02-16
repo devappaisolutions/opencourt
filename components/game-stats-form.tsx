@@ -81,7 +81,7 @@ export function GameStatsForm({ gameId, playerId, existingStats, onSuccess }: Ga
                 max={max}
                 value={stats[name]}
                 onChange={(e) => setStats({ ...stats, [name]: Math.min(max, Math.max(0, Number(e.target.value))) })}
-                className="w-full h-12 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-white text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all"
+                className="w-full h-12 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-white text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all input-premium"
             />
         </div>
     );
@@ -107,7 +107,7 @@ export function GameStatsForm({ gameId, playerId, existingStats, onSuccess }: Ga
             <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-primary text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shimmer-btn btn-glow"
             >
                 {loading ? "Saving..." : existingStats ? "Update Stats" : "Save Stats"}
             </button>

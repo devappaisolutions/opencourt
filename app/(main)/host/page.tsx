@@ -163,6 +163,9 @@ export default function HostGamePage() {
                 <div className="orb orb-secondary w-[300px] h-[300px] bottom-40 -left-40 opacity-15" style={{ animationDelay: '-8s' }} />
             </div>
 
+            {/* Floating Blob */}
+            <div className="absolute top-20 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-float pointer-events-none z-0" />
+
             {/* Header */}
             <div className="flex items-center gap-4 relative z-10">
                 <Link href="/dashboard" className="p-2.5 rounded-full bg-zinc-900 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all group">
@@ -173,7 +176,7 @@ export default function HostGamePage() {
                         <Star className="w-4 h-4 text-primary animate-spin-slow" />
                         <span className="text-[10px] font-black tracking-[0.3em] uppercase text-primary">Create Game</span>
                     </div>
-                    <h1 className="text-2xl font-bold text-white uppercase italic tracking-tight">Host a <span className="gradient-text-animated">Run</span></h1>
+                    <h1 className="text-2xl font-bold text-white uppercase italic tracking-tight font-heading gradient-text">Host a Run</h1>
                 </div>
             </div>
 
@@ -209,7 +212,7 @@ export default function HostGamePage() {
             {/* Progress Bar */}
             <div className="w-full h-1 bg-zinc-900 rounded-full overflow-hidden relative z-10">
                 <div
-                    className="h-full bg-gradient-to-r from-primary to-indigo-500 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]"
+                    className="h-full bg-gradient-to-r from-primary to-[#E8A966] transition-all duration-500 ease-out shadow-[0_0_10px_rgba(168,85,247,0.5)]"
                     style={{ width: `${(step / 5) * 100}%` }}
                 />
             </div>
@@ -222,7 +225,7 @@ export default function HostGamePage() {
                 {step === 1 && (
                     <div className="space-y-6 animate-in fade-in duration-500 relative z-10">
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <MapPin className="w-4 h-4 text-primary" /> Where are we playing?
                             </label>
                             <input
@@ -251,7 +254,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Calendar className="w-4 h-4 text-primary" /> When?
                             </label>
                             <div className="flex gap-2">
@@ -297,7 +300,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Clock className="w-4 h-4 text-primary" /> Start Time
                             </label>
                             <input
@@ -314,7 +317,7 @@ export default function HostGamePage() {
                 {step === 2 && (
                     <div className="space-y-6 animate-in fade-in duration-500 relative z-10">
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Users className="w-4 h-4 text-primary" /> Game Format
                             </label>
                             <div className="grid grid-cols-3 gap-3">
@@ -323,7 +326,7 @@ export default function HostGamePage() {
                                         key={f}
                                         onClick={() => setFormat(f)}
                                         className={`py-4 rounded-xl text-sm font-bold border transition-all duration-300 ${format === f
-                                            ? "bg-primary text-white border-primary shadow-[0_0_30px_rgba(168,85,247,0.4)] scale-105"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40 scale-105"
                                             : "bg-zinc-900/50 text-zinc-400 border-white/5 hover:border-white/20"
                                             }`}
                                     >
@@ -334,7 +337,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Users className="w-4 h-4 text-primary" /> Max Players: {maxPlayers}
                             </label>
                             <input
@@ -355,7 +358,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Trophy className="w-4 h-4 text-primary" /> Competition Level
                             </label>
                             <div className="space-y-2">
@@ -364,7 +367,7 @@ export default function HostGamePage() {
                                         key={l}
                                         onClick={() => setLevel(l)}
                                         className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-300 group ${level === l
-                                            ? "bg-white/5 border-primary shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40"
                                             : "bg-zinc-900/50 border-white/5 hover:border-white/10"
                                             }`}
                                     >
@@ -384,7 +387,7 @@ export default function HostGamePage() {
                 {step === 3 && (
                     <div className="space-y-6 animate-in fade-in duration-500 relative z-10">
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 📝 Game Description
                             </label>
                             <textarea
@@ -396,7 +399,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 📜 House Rules
                             </label>
                             <textarea
@@ -413,7 +416,7 @@ export default function HostGamePage() {
                 {step === 4 && (
                     <div className="space-y-6 animate-in fade-in duration-500 relative z-10">
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 🚻 Gender Constraint
                             </label>
                             <div className="grid grid-cols-3 gap-3">
@@ -422,7 +425,7 @@ export default function HostGamePage() {
                                         key={g}
                                         onClick={() => setGenderFilter(g)}
                                         className={`py-4 rounded-xl text-sm font-bold border transition-all ${genderFilter === g
-                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40"
                                             : "bg-zinc-900/50 text-zinc-400 border-white/5"
                                             }`}
                                     >
@@ -433,7 +436,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 🎂 Age Range
                             </label>
                             <div className="grid grid-cols-2 gap-3">
@@ -442,7 +445,7 @@ export default function HostGamePage() {
                                         key={a}
                                         onClick={() => setAgeRange(a)}
                                         className={`py-4 rounded-xl text-sm font-bold border transition-all ${ageRange === a
-                                            ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
+                                            ? "active-glow-ring bg-primary/20 text-primary border-primary/40"
                                             : "bg-zinc-900/50 text-zinc-400 border-white/5"
                                             }`}
                                     >
@@ -486,7 +489,7 @@ export default function HostGamePage() {
                         </div>
 
                         <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 💵 Cost per player
                             </label>
                             <input
@@ -512,7 +515,7 @@ export default function HostGamePage() {
                     )}
                     <button
                         onClick={step === 5 ? handlePublish : handleNext}
-                        className="flex-1 bg-primary text-white font-bold py-4 rounded-xl hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-primary/30 uppercase tracking-widest text-xs shimmer-btn btn-glow"
+                        className="flex-1 bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold py-4 rounded-xl hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-primary/30 uppercase tracking-widest text-xs shimmer-btn btn-glow"
                     >
                         {step === 5 ? (
                             <>
