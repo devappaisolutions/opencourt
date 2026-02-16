@@ -20,7 +20,7 @@ export default function LoginPage() {
     const handleLogin = async (provider: "google" | "facebook") => {
         setIsLoading(true);
         try {
-            const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || location.origin;
+            const redirectUrl = window.location.origin;
 
             await supabase.auth.signInWithOAuth({
                 provider: provider as any,
@@ -49,7 +49,7 @@ export default function LoginPage() {
                 router.refresh();
                 router.push("/dashboard");
             } else {
-                const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+                const redirectUrl = window.location.origin;
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
