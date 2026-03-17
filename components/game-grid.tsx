@@ -257,24 +257,22 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                             ))
                         )}
 
-                        {/* Host Game Card */}
-                        {desktopGames.length > 0 && (
-                            <NextLink
-                                href="/host"
-                                className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-white/10 bg-transparent p-10 flex flex-col items-center justify-center text-center gap-5 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[320px] h-full opacity-0 animate-card-entrance"
-                                style={{ animationDelay: `${Math.min(desktopGames.length, 8) * 0.08}s`, animationFillMode: 'forwards' }}
-                            >
-                                <div className="w-16 h-16 rounded-2xl bg-[#2A2827] border border-white/5 flex items-center justify-center group-hover:border-primary/30 transition-all">
-                                    <PlusCircle className="w-8 h-8 text-[#B8B0A6] group-hover:text-primary transition-colors" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="text-lg font-bold text-[#F5EFEA] uppercase tracking-tight group-hover:text-primary transition-colors">Host a Run</h3>
-                                    <p className="text-sm text-[#B8B0A6] font-medium">
-                                        Got a court? Need players?<br />Take the lead.
-                                    </p>
-                                </div>
-                            </NextLink>
-                        )}
+                        {/* Host Game Card - Always visible */}
+                        <NextLink
+                            href="/host"
+                            className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-white/10 bg-transparent p-10 flex flex-col items-center justify-center text-center gap-5 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[320px] h-full opacity-0 animate-card-entrance"
+                            style={{ animationDelay: `${Math.min(desktopGames.length, 8) * 0.08}s`, animationFillMode: 'forwards' }}
+                        >
+                            <div className="w-16 h-16 rounded-2xl bg-[#2A2827] border border-white/5 flex items-center justify-center group-hover:border-primary/30 transition-all">
+                                <PlusCircle className="w-8 h-8 text-[#B8B0A6] group-hover:text-primary transition-colors" />
+                            </div>
+                            <div className="space-y-1">
+                                <h3 className="text-lg font-bold text-[#F5EFEA] uppercase tracking-tight group-hover:text-primary transition-colors">Host a Run</h3>
+                                <p className="text-sm text-[#B8B0A6] font-medium">
+                                    Got a court? Need players?<br />Take the lead.
+                                </p>
+                            </div>
+                        </NextLink>
                     </div>
                 </div>
             )}
@@ -313,24 +311,22 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                         ))
                     )}
 
-                    {/* Host Game Card */}
-                    {mobileGames.length > 0 && (
-                        <NextLink
-                            href="/host"
-                            className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-white/10 bg-transparent p-10 flex flex-col items-center justify-center text-center gap-5 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[280px] h-full opacity-0 animate-card-entrance"
-                            style={{ animationDelay: `${Math.min(mobileGames.length, 4) * 0.08}s`, animationFillMode: 'forwards' }}
-                        >
-                            <div className="w-16 h-16 rounded-2xl bg-[#2A2827] border border-white/5 flex items-center justify-center group-hover:border-primary/30 transition-all">
-                                <PlusCircle className="w-8 h-8 text-[#B8B0A6] group-hover:text-primary transition-colors" />
-                            </div>
-                            <div className="space-y-1">
-                                <h3 className="text-lg font-bold text-[#F5EFEA] uppercase tracking-tight group-hover:text-primary transition-colors">Host a Run</h3>
-                                <p className="text-sm text-[#B8B0A6] font-medium">
-                                    Got a court? Need players?<br />Take the lead.
-                                </p>
-                            </div>
-                        </NextLink>
-                    )}
+                    {/* Host Game Card - Always visible */}
+                    <NextLink
+                        href="/host"
+                        className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-white/10 bg-transparent p-10 flex flex-col items-center justify-center text-center gap-5 hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[280px] h-full opacity-0 animate-card-entrance"
+                        style={{ animationDelay: `${Math.min(mobileGames.length, 4) * 0.08}s`, animationFillMode: 'forwards' }}
+                    >
+                        <div className="w-16 h-16 rounded-2xl bg-[#2A2827] border border-white/5 flex items-center justify-center group-hover:border-primary/30 transition-all">
+                            <PlusCircle className="w-8 h-8 text-[#B8B0A6] group-hover:text-primary transition-colors" />
+                        </div>
+                        <div className="space-y-1">
+                            <h3 className="text-lg font-bold text-[#F5EFEA] uppercase tracking-tight group-hover:text-primary transition-colors">Host a Run</h3>
+                            <p className="text-sm text-[#B8B0A6] font-medium">
+                                Got a court? Need players?<br />Take the lead.
+                            </p>
+                        </div>
+                    </NextLink>
                 </div>
             )}
 

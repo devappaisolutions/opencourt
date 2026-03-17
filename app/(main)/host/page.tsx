@@ -5,6 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Trophy, Users, Spar
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { GAME_FORMATS, MAX_PLAYERS_BY_FORMAT, SKILL_LEVELS } from "@/lib/constants";
 
 export default function HostGamePage() {
     const router = useRouter();
@@ -17,17 +18,18 @@ export default function HostGamePage() {
     const [user, setUser] = useState<any>(null);
 
     // Form State
+    const [title, setTitle] = useState("");
     const [location, setLocation] = useState("");
     const [date, setDate] = useState("Tomorrow");
     const [time, setTime] = useState("19:00");
-    const [format, setFormat] = useState("5v5");
-    const [level, setLevel] = useState("Competitive");
+    const [format, setFormat] = useState("Full Court (with Ref)");
+    const [level, setLevel] = useState("Open run");
     const [cost, setCost] = useState("Free");
     const [description, setDescription] = useState("");
     const [houseRules, setHouseRules] = useState("");
-    const [ageRange, setAgeRange] = useState("All Ages");
-    const [genderFilter, setGenderFilter] = useState("Mixed");
-    const [maxPlayers, setMaxPlayers] = useState(10);
+    const [ageRange, setAgeRange] = useState("All ages");
+    const [genderFilter, setGenderFilter] = useState("Mens");
+    const [maxPlayers, setMaxPlayers] = useState(20);
     const [usualCourts, setUsualCourts] = useState<any[]>([]);
 
     useEffect(() => {
@@ -48,12 +50,21 @@ export default function HostGamePage() {
                         .single();
 
                     if (!profile || error) {
-                        // Profile doesn't exist or error occurred - allow user to continue anyway
-                        console.warn('Profile not found or error:', error);
+                        // Profile doesn't exist - happens if DB was reset without clearing Auth users.
+                        console.warn('Profile not found, creating a new default profile explicitly...');
+                        const { error: insertError } = await supabase
+                            .from('profiles')
+                            .insert({
+                                id: user.id,
+                                username: user.email?.split('@')[0] || `user_${Math.floor(Math.random() * 10000)}`,
+                            });
+                        
+                        if (insertError) {
+                            console.error('Failed to auto-create profile:', insertError);
+                        }
                     }
                 } catch (profileError) {
-                    // Silently fail if profiles table doesn't exist yet
-                    console.warn('Could not fetch profile:', profileError);
+                    console.warn('Could not fetch/create profile:', profileError);
                 }
 
                 setLoading(false);
@@ -120,9 +131,11 @@ export default function HostGamePage() {
         ];
         const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
 
+        const insertTitle = title.trim() ? title : `${format} ${level} Run`;
+
         const { error } = await supabase.from('games').insert({
             host_id: user.id,
-            title: `${format} ${level} Run`,
+            title: insertTitle,
             location,
             date_time: gameDate.toISOString(),
             format,
@@ -226,6 +239,19 @@ export default function HostGamePage() {
                     <div className="space-y-6 animate-in fade-in duration-500 relative z-10">
                         <div className="space-y-3">
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
+                                🏀 Game Title <span className="text-zinc-500 text-xs font-normal">(Optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                placeholder={`e.g. ${format} ${level} Run`}
+                                className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all placeholder:text-zinc-600 input-premium"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-3">
+                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <MapPin className="w-4 h-4 text-primary" /> Where are we playing?
                             </label>
                             <input
@@ -320,8 +346,8 @@ export default function HostGamePage() {
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Users className="w-4 h-4 text-primary" /> Game Format
                             </label>
-                            <div className="grid grid-cols-3 gap-3">
-                                {["3v3", "4v4", "5v5"].map((f) => (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                {GAME_FORMATS.map((f) => (
                                     <button
                                         key={f}
                                         onClick={() => setFormat(f)}
@@ -342,7 +368,7 @@ export default function HostGamePage() {
                             </label>
                             <input
                                 type="range"
-                                min="10"
+                                min="15"
                                 max="25"
                                 step="5"
                                 value={maxPlayers}
@@ -350,7 +376,6 @@ export default function HostGamePage() {
                                 className="w-full h-2 bg-zinc-900 rounded-lg appearance-none cursor-pointer slider-thumb"
                             />
                             <div className="flex justify-between text-xs text-zinc-500 font-medium">
-                                <span>10</span>
                                 <span>15</span>
                                 <span>20</span>
                                 <span>25</span>
@@ -362,7 +387,7 @@ export default function HostGamePage() {
                                 <Trophy className="w-4 h-4 text-primary" /> Competition Level
                             </label>
                             <div className="space-y-2">
-                                {["Casual", "Competitive", "Elite"].map((l) => (
+                                {SKILL_LEVELS.map((l) => (
                                     <div
                                         key={l}
                                         onClick={() => setLevel(l)}
@@ -420,7 +445,7 @@ export default function HostGamePage() {
                                 🚻 Gender Constraint
                             </label>
                             <div className="grid grid-cols-3 gap-3">
-                                {["Mixed", "Mens", "Womens"].map((g) => (
+                                {["Mens", "Womens", "Mixed"].map((g) => (
                                     <button
                                         key={g}
                                         onClick={() => setGenderFilter(g)}
@@ -439,8 +464,8 @@ export default function HostGamePage() {
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 🎂 Age Range
                             </label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {["All Ages", "18+", "21+", "Under 18"].map((a) => (
+                            <div className="grid grid-cols-3 gap-3">
+                                {["All ages", "12U", "14U", "17U", "18+", "40+"].map((a) => (
                                     <button
                                         key={a}
                                         onClick={() => setAgeRange(a)}
@@ -465,7 +490,7 @@ export default function HostGamePage() {
                             <div className="absolute inset-0 holographic rounded-2xl opacity-30" />
                             <div className="flex justify-between items-start relative z-10">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">{format} {level} Run</h3>
+                                    <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">{title.trim() ? title : `${format} ${level} Run`}</h3>
                                     <p className="text-zinc-400 text-sm font-medium flex items-center gap-2">
                                         <MapPin className="w-3 h-3 text-primary" />
                                         {location || "No location set"}
@@ -479,7 +504,7 @@ export default function HostGamePage() {
                             <div className="grid grid-cols-2 gap-4 relative z-10">
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Total Slots</p>
-                                    <p className="text-white font-bold">{format === "3v3" ? 6 : format === "4v4" ? 10 : 15} Players</p>
+                                    <p className="text-white font-bold">{MAX_PLAYERS_BY_FORMAT[format as keyof typeof MAX_PLAYERS_BY_FORMAT] || 10} Players</p>
                                 </div>
                                 <div className="space-y-1 text-right">
                                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Filter</p>

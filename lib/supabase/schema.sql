@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS games (
   location TEXT NOT NULL,
   date_time TIMESTAMP WITH TIME ZONE NOT NULL,
   
-  format TEXT CHECK (format IN ('3v3', '4v4', '5v5', 'Drills')) NOT NULL,
-  skill_level TEXT CHECK (skill_level IN ('Casual', 'Intermediate', 'Competitive', 'Elite')) NOT NULL,
+  format TEXT CHECK (format IN ('Full Court (with Ref)', 'Full Court', '3v3', '4v4', '5v5', 'Full Court (Ref)', 'Drills')) NOT NULL,
+  skill_level TEXT CHECK (skill_level IN ('Open run', 'Papawis', 'Tito Gaming', 'Dayo', 'Malakasan', 'Elite', 'Casual', 'Intermediate', 'Competitive')) NOT NULL,
   
   cost TEXT DEFAULT 'Free',
   max_players INT DEFAULT 10,

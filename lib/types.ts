@@ -56,8 +56,8 @@ export interface UsualCourt {
     created_at?: string;
 }
 
-export type GameFormat = '3v3' | '4v4' | '5v5';
-export type SkillLevel = 'Casual' | 'Competitive' | 'Elite';
+export type GameFormat = 'Full Court (with Ref)' | 'Full Court';
+export type SkillLevel = 'Open run' | 'Papawis' | 'Tito Gaming' | 'Dayo' | 'Malakasan' | 'Elite';
 export type Position = 'Point Guard' | 'Shooting Guard' | 'Small Forward' | 'Power Forward' | 'Center';
 export type PositionAbbr = 'PG' | 'SG' | 'SF' | 'PF' | 'C';
 export type GameStatus = 'open' | 'cancelled' | 'completed';

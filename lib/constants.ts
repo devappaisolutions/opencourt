@@ -7,10 +7,10 @@ export const GAMES_PER_PAGE_MOBILE = 5;
 export const GAMES_PER_PAGE_DESKTOP = 8;
 
 // Game Formats
-export const GAME_FORMATS: GameFormat[] = ['3v3', '4v4', '5v5'];
+export const GAME_FORMATS: GameFormat[] = ['Full Court (with Ref)', 'Full Court'];
 
 // Skill Levels
-export const SKILL_LEVELS: SkillLevel[] = ['Casual', 'Competitive', 'Elite'];
+export const SKILL_LEVELS: SkillLevel[] = ['Open run', 'Papawis', 'Tito Gaming', 'Dayo', 'Malakasan', 'Elite'];
 
 // Positions
 export const POSITIONS: Position[] = [
@@ -42,9 +42,8 @@ export const REVERSE_POSITION_MAP: Record<Position, PositionAbbr> = {
 
 // Max Players by Format
 export const MAX_PLAYERS_BY_FORMAT: Record<GameFormat, number> = {
-    '3v3': 6,
-    '4v4': 10,
-    '5v5': 15
+    'Full Court (with Ref)': 20,
+    'Full Court': 20
 };
 
 // Color Gradients for Game Cards
@@ -78,13 +77,13 @@ export const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 // Age Ranges
-export const AGE_RANGES = ['All Ages', '18+', '21+', 'Under 18'];
+export const AGE_RANGES = ['All ages', '12U', '14U', '17U', '18+', '40+'];
 
 // Gender Filters
-export const GENDER_FILTERS = ['Mixed', 'Mens', 'Womens'];
+export const GENDER_FILTERS = ['Mens', 'Womens', 'Mixed'];
 
 // Default Values
-export const DEFAULT_SKILL_LEVEL: SkillLevel = 'Casual';
+export const DEFAULT_SKILL_LEVEL: SkillLevel = 'Open run';
 export const DEFAULT_POSITION: PositionAbbr = 'PG';
 export const DEFAULT_HEIGHT_FT = 5;
 export const DEFAULT_HEIGHT_IN = 9;

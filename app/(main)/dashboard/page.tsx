@@ -7,9 +7,15 @@ export default async function DashboardPage() {
     // Fetch Games from DB with error handling
     let games = [];
     try {
+        // Calculate the date 7 days ago
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const isoDate = sevenDaysAgo.toISOString();
+
         const { data, error } = await supabase
             .from('games')
             .select('*')
+            .gte('date_time', isoDate) // Filter Rule: Current date minus 7 days
             .order('date_time', { ascending: true });
 
         if (!error && data) {
