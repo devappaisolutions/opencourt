@@ -223,7 +223,6 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                 >
                     <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-primary text-white font-bold text-xs tracking-widest uppercase shadow-2xl shadow-primary/40 border border-primary/50">
                         <span className="text-base">🏀</span>
-                        <Wifi className="w-4 h-4 animate-pulse" />
                         New game just posted!
                     </div>
                 </div>
