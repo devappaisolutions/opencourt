@@ -249,6 +249,42 @@ CREATE TRIGGER on_auth_user_created
 
 
 -- ================================================
+-- ================================================
+-- AUTO-UPDATE current_players ON ROSTER CHANGES
+-- Fires after INSERT or DELETE on game_roster
+-- ================================================
+CREATE OR REPLACE FUNCTION sync_current_players()
+RETURNS TRIGGER AS $$
+DECLARE
+  target_game_id UUID;
+BEGIN
+  -- Determine which game was affected
+  IF TG_OP = 'DELETE' THEN
+    target_game_id := OLD.game_id;
+  ELSE
+    target_game_id := NEW.game_id;
+  END IF;
+
+  -- Recalculate and update
+  UPDATE games
+  SET current_players = (
+    SELECT COUNT(*)
+    FROM game_roster
+    WHERE game_id = target_game_id
+      AND status IN ('joined', 'checked_in')
+  )
+  WHERE id = target_game_id;
+
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_roster_change_sync_players ON game_roster;
+CREATE TRIGGER on_roster_change_sync_players
+  AFTER INSERT OR DELETE OR UPDATE OF status ON game_roster
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_current_players();
+
 -- RELIABILITY SCORE TRIGGER
 -- ================================================
 CREATE OR REPLACE FUNCTION update_reliability_score()
