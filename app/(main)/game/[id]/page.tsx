@@ -184,7 +184,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                                     <div>
                                         <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Schedule</p>
                                         <p className="font-bold text-lg">
-                                            {new Date(game.date_time).toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' })} at {new Date(game.date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(game.date_time).toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' })} at {new Date(game.date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' })}
                                         </p>
                                     </div>
                                 </div>

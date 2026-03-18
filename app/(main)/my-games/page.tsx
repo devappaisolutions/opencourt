@@ -75,8 +75,8 @@ export default async function MyGamesPage() {
         status: g.status || 'open',
         cancellation_reason: g.cancellation_reason || null,
         isHostPlaying: isHostPlaying || false,
-        time: new Date(g.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-        date: new Date(g.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
+        time: new Date(g.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' }),
+        date: new Date(g.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }),
     });
 
     const displayHosted = (hostedGames || []).map(g => processGame(g, hostJoinedGameIds.has(g.id)));

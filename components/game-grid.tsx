@@ -319,8 +319,8 @@ export function GameGrid({ initialGames, userId, joinedGameIds = [] }: GameGridP
                                             image: game.image_gradient || "bg-gradient-to-br from-[#2A2827] to-[#1F1D1D]",
                                             players: game.current_players || 0,
                                             max_players: game.max_players || 10,
-                                            time: new Date(game.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-                                            date: new Date(game.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }),
+                                            time: new Date(game.date_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' }),
+                                            date: new Date(game.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }),
                                             level: game.skill_level
                                         }}
                                         currentUserId={userId}
