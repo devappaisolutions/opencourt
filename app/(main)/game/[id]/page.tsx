@@ -40,7 +40,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             joined_at,
             player_id,
             profiles:player_id (
-                id, username, avatar_url, position, height_ft, height_in, skill_level
+                id, full_name, username, avatar_url, position, height_ft, height_in, skill_level
             )
         `)
         .eq('game_id', id);
@@ -221,7 +221,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <p className="font-bold text-xl text-white tracking-tight uppercase">@{game.profiles?.username || 'Unknown'}</p>
+                                <p className="font-bold text-xl text-white tracking-tight uppercase">{game.profiles?.username || 'Unknown'}</p>
                                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px] tracking-widest uppercase">
                                     <Zap className="w-3 h-3 fill-current" />
                                     {game.profiles?.reliability_score || 100}% Reliable

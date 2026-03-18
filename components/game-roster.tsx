@@ -47,7 +47,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                             status,
                             joined_at,
                             profiles:player_id (
-                                username, avatar_url, position, height_ft, height_in, skill_level
+                                full_name, username, avatar_url, position, height_ft, height_in, skill_level
                             )
                         `)
                         .eq('id', payload.new.id)
@@ -199,7 +199,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                 <div className="flex-1 min-w-0 z-10">
                     <div className="flex items-center justify-between">
                         <p className={`font-black text-xl tracking-tight truncate ${isAbsent ? "text-zinc-600 line-through" : "text-white"}`}>
-                            @{entry.profiles?.username || 'Baller'}
+                            {entry.profiles?.full_name || entry.profiles?.username || 'Baller'}
                         </p>
 
                         {/* Action Buttons for Host */}
