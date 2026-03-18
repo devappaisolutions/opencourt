@@ -224,6 +224,31 @@ CREATE POLICY "Players can update their own stats"
 
 
 -- ================================================
+-- AUTO-CREATE PROFILE ON NEW USER SIGNUP
+-- Fires on every INSERT into auth.users (email, OAuth, etc.)
+-- ================================================
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, username, updated_at)
+  VALUES (
+    NEW.id,
+    -- Derive a username from the email prefix, replace special chars with '_'
+    REGEXP_REPLACE(SPLIT_PART(NEW.email, '@', 1), '[^a-zA-Z0-9_]', '_', 'g'),
+    NOW()
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+
+-- ================================================
 -- RELIABILITY SCORE TRIGGER
 -- ================================================
 CREATE OR REPLACE FUNCTION update_reliability_score()
