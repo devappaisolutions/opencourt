@@ -497,7 +497,16 @@ export default function HostGamePage() {
                                     </p>
                                 </div>
                                 <span className="px-4 py-1.5 rounded-full bg-white/10 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-xl border border-white/10">
-                                    {date} @ {time}
+                                    {(() => {
+                                        const displayDate = date === 'Today' || date === 'Tomorrow'
+                                            ? date
+                                            : new Date(date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' });
+                                        const [h, m] = time.split(':').map(Number);
+                                        const ampm = h >= 12 ? 'PM' : 'AM';
+                                        const h12 = h % 12 || 12;
+                                        const displayTime = `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+                                        return `${displayDate} @ ${displayTime}`;
+                                    })()}
                                 </span>
                             </div>
                             <div className="h-px bg-white/5" />
