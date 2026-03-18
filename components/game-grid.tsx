@@ -9,13 +9,14 @@ import { createClient } from "@/lib/supabase/client";
 interface GameGridProps {
     initialGames: any[];
     userId?: string;
+    joinedGameIds?: string[];
 }
 
 // Number of games to show per page
 const GAMES_PER_PAGE_MOBILE = 5;
 const GAMES_PER_PAGE_DESKTOP = 8;
 
-export function GameGrid({ initialGames, userId }: GameGridProps) {
+export function GameGrid({ initialGames, userId, joinedGameIds = [] }: GameGridProps) {
     const supabase = createClient();
     const [games, setGames] = useState<any[]>(initialGames);
     const [newGameAlert, setNewGameAlert] = useState(false);
@@ -323,6 +324,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                                             level: game.skill_level
                                         }}
                                         currentUserId={userId}
+                                        isJoined={joinedGameIds.includes(game.id)}
                                     />
                                 </div>
                             ))
@@ -377,6 +379,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                                         level: game.skill_level
                                     }}
                                     currentUserId={userId}
+                                    isJoined={joinedGameIds.includes(game.id)}
                                 />
                             </div>
                         ))

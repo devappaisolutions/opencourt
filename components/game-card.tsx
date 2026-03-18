@@ -27,16 +27,18 @@ interface GameProps {
 export function GameCard({
     game,
     currentUserId,
-    role
+    role,
+    isJoined = false,
 }: {
     game: GameProps;
     currentUserId?: string;
-    role?: 'host' | 'joined'
+    role?: 'host' | 'joined';
+    isJoined?: boolean;
 }) {
     const supabase = createClient();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [joined, setJoined] = useState(game.isHostPlaying || false);
+    const [joined, setJoined] = useState(isJoined || game.isHostPlaying || false);
     const [mounted, setMounted] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
