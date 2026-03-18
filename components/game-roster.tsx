@@ -199,7 +199,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                 <div className="flex-1 min-w-0 z-10">
                     <div className="flex items-center justify-between">
                         <p className={`font-black text-xl tracking-tight truncate ${isAbsent ? "text-zinc-600 line-through" : "text-white"}`}>
-                            {entry.profiles?.full_name || entry.profiles?.username || 'Baller'}
+                            {entry.profiles?.username || entry.profiles?.full_name || 'Baller'}
                         </p>
 
                         {/* Action Buttons for Host */}
