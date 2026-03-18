@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { GameCard } from "./game-card";
-import { PlusCircle, MapPin, Flame, Sparkles, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { PlusCircle, MapPin, Flame, Sparkles, ChevronLeft, ChevronRight, Loader2, Wifi } from "lucide-react";
 import NextLink from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 interface GameGridProps {
     initialGames: any[];
@@ -15,12 +16,62 @@ const GAMES_PER_PAGE_MOBILE = 5;
 const GAMES_PER_PAGE_DESKTOP = 8;
 
 export function GameGrid({ initialGames, userId }: GameGridProps) {
+    const supabase = createClient();
+    const [games, setGames] = useState<any[]>(initialGames);
+    const [newGameAlert, setNewGameAlert] = useState(false);
     const [filter, setFilter] = useState("All");
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
-    const [visibleCount, setVisibleCount] = useState(GAMES_PER_PAGE_MOBILE); // For mobile infinite scroll
+    const [visibleCount, setVisibleCount] = useState(GAMES_PER_PAGE_MOBILE);
     const [isLoading, setIsLoading] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+
+    // Realtime subscription — listen for game changes
+    useEffect(() => {
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const channel = supabase
+            .channel('dashboard_games')
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'games',
+            }, (payload) => {
+                const newGame = payload.new as any;
+                // Only add if within the 7-day window
+                if (new Date(newGame.date_time) >= sevenDaysAgo) {
+                    setGames(prev => {
+                        if (prev.find(g => g.id === newGame.id)) return prev;
+                        // Sort by date_time ascending after inserting
+                        const updated = [...prev, newGame].sort(
+                            (a, b) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime()
+                        );
+                        return updated;
+                    });
+                    setNewGameAlert(true);
+                    setTimeout(() => setNewGameAlert(false), 3000);
+                }
+            })
+            .on('postgres_changes', {
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'games',
+            }, (payload) => {
+                const updated = payload.new as any;
+                setGames(prev => prev.map(g => g.id === updated.id ? { ...g, ...updated } : g));
+            })
+            .on('postgres_changes', {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'games',
+            }, (payload) => {
+                setGames(prev => prev.filter(g => g.id !== payload.old.id));
+            })
+            .subscribe();
+
+        return () => { supabase.removeChannel(channel); };
+    }, []);
 
     // Ref for infinite scroll sentinel (mobile only)
     const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -66,7 +117,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
         return Math.sqrt(Math.pow(lat2 - lat1, 2) + Math.pow(lon2 - lon1, 2));
     };
 
-    const filteredGames = [...initialGames].filter((game) => {
+    const filteredGames = [...games].filter((game) => {
         if (filter === "All") return true;
         if (filter === "Today") {
             const today = new Date();
@@ -160,10 +211,23 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                 <div className="orb orb-secondary w-[300px] h-[300px] bottom-40 -left-40" style={{ animationDelay: '-10s' }} />
             </div>
 
+            {/* New Game Toast */}
+            {newGameAlert && (
+                <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-primary text-white font-bold text-xs tracking-widest uppercase shadow-2xl shadow-primary/40 border border-primary/50">
+                        <Wifi className="w-4 h-4 animate-pulse" />
+                        New run just posted!
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/5 pb-6 relative z-10">
                 <div className="space-y-1">
-                    <span className="text-xs font-bold tracking-widest uppercase text-primary">Live Games</span>
+                    <span className="text-xs font-bold tracking-widest uppercase text-primary flex items-center gap-2">
+                        <Wifi className="w-3 h-3" />
+                        Live Games
+                    </span>
                     <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[#F5EFEA] uppercase italic leading-none font-heading gradient-text">
                         Find Your Run
                     </h1>
