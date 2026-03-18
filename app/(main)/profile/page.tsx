@@ -15,6 +15,8 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
 
     // Form State
+    const [fullName, setFullName] = useState("");
+    const [displayName, setDisplayName] = useState("");
     const [position, setPosition] = useState("PG");
     const [skillLevel, setSkillLevel] = useState("Casual");
     const [heightFt, setHeightFt] = useState(5);
@@ -76,6 +78,8 @@ export default function ProfilePage() {
                     'Power Forward': 'PF',
                     'Center': 'C'
                 };
+                setFullName(finalProfile.full_name || "");
+                setDisplayName(finalProfile.username || "");
                 setPosition(reversePositionMap[finalProfile.position] || finalProfile.position || "PG");
                 setSkillLevel(finalProfile.skill_level || "Casual");
                 setHeightFt(finalProfile.height_ft || 5);
@@ -105,6 +109,8 @@ export default function ProfilePage() {
 
             const updates = {
                 id: user.id,
+                full_name: fullName.trim(),
+                username: displayName.trim(),
                 position: positionMap[position] || position,
                 skill_level: skillLevel,
                 height_ft: heightFt,
@@ -235,6 +241,34 @@ export default function ProfilePage() {
 
                 {/* Stats Grid - Full Width with Padding */}
                 <div className="space-y-8 relative z-10 px-8 pt-6 pb-8">
+                    {/* Full Name & Display Name */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                                <UserIcon className="w-4 h-4 text-primary" /> Full Name
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="e.g. Juan dela Cruz"
+                                className="w-full bg-zinc-900/50 border border-white/5 hover:border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 input-premium transition-all placeholder:text-zinc-600"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-white flex items-center gap-2">
+                                <UserIcon className="w-4 h-4 text-primary" /> Display Name
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="@handle"
+                                className="w-full bg-zinc-900/50 border border-white/5 hover:border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary/40 input-premium transition-all placeholder:text-zinc-600"
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
                     {/* Position and Skill Level Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Position */}

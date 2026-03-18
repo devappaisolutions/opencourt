@@ -19,6 +19,20 @@ export async function GET(request: Request) {
         const supabase = await createClient();
         const { error } = await supabase.auth.exchangeCodeForSession(code);
         if (!error) {
+            // Check if the user has completed their profile (full_name required)
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("full_name, username")
+                    .eq("id", user.id)
+                    .single();
+
+                // If no full_name, send to onboarding
+                if (!profile?.full_name) {
+                    return NextResponse.redirect(`${redirectBase}/onboarding`);
+                }
+            }
             return NextResponse.redirect(`${redirectBase}${next}`);
         }
         console.error("Auth callback error:", error.message, error);
