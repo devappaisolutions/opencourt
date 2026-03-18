@@ -19,6 +19,7 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
     const supabase = createClient();
     const [games, setGames] = useState<any[]>(initialGames);
     const [newGameAlert, setNewGameAlert] = useState(false);
+    const [newGameFading, setNewGameFading] = useState(false);
     const [filter, setFilter] = useState("All");
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +51,10 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
                         return updated;
                     });
                     setNewGameAlert(true);
-                    setTimeout(() => setNewGameAlert(false), 3000);
+                    setNewGameFading(false);
+                    // Start fade at 4s, hide at 5s
+                    setTimeout(() => setNewGameFading(true), 4000);
+                    setTimeout(() => { setNewGameAlert(false); setNewGameFading(false); }, 5000);
                 }
             })
             .on('postgres_changes', {
@@ -213,10 +217,14 @@ export function GameGrid({ initialGames, userId }: GameGridProps) {
 
             {/* New Game Toast */}
             {newGameAlert && (
-                <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-4 duration-300">
+                <div
+                    className="fixed top-6 left-1/2 -translate-x-1/2 z-[200] animate-in slide-in-from-top-4 duration-300 transition-opacity duration-1000"
+                    style={{ opacity: newGameFading ? 0 : 1 }}
+                >
                     <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-primary text-white font-bold text-xs tracking-widest uppercase shadow-2xl shadow-primary/40 border border-primary/50">
+                        <span className="text-base">🏀</span>
                         <Wifi className="w-4 h-4 animate-pulse" />
-                        New run just posted!
+                        New game just posted!
                     </div>
                 </div>
             )}
