@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenCourt — User Manual</title>
+  <style>
+    :root {
+      --primary: #E8824A;
+      --bg: #141210;
+      --card: #1F1D1D;
+      --card2: #2A2827;
+      --text: #F5EFEA;
+      --muted: #B8B0A6;
+      --border: rgba(255,255,255,0.08);
+      --green: #22c55e;
+      --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 260px; height: 100vh;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      padding: 32px 20px;
+      overflow-y: auto;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 32px;
+    }
+    .sidebar-logo .ball { font-size: 28px; }
+    .sidebar-logo .brand {
+      font-size: 18px; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 2px;
+      font-style: italic;
+      background: linear-gradient(135deg, var(--primary), #E8A966);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .sidebar nav { list-style: none; }
+    .sidebar nav li { margin-bottom: 4px; }
+    .sidebar nav a {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      transition: all .2s;
+    }
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: rgba(232,130,74,.12);
+      color: var(--primary);
+    }
+    .sidebar nav .section-label {
+      font-size: 10px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: rgba(184,176,166,.4);
+      padding: 16px 12px 6px;
+    }
+
+    /* ── Main content ── */
+    .main {
+      margin-left: 260px;
+      padding: 48px 64px;
+      max-width: 1100px;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #2A2827 0%, #1F1D1D 100%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 56px 48px;
+      margin-bottom: 64px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '🏀';
+      position: absolute; right: 48px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 120px; opacity: .05;
+    }
+    .hero .pretitle {
+      font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 4px;
+      color: var(--primary); margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 48px; font-weight: 900;
+      text-transform: uppercase; font-style: italic;
+      letter-spacing: -1px; line-height: 1;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      color: var(--muted); font-size: 16px; max-width: 480px;
+    }
+    .hero .version-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 6px 16px;
+      background: rgba(232,130,74,.15);
+      border: 1px solid rgba(232,130,74,.3);
+      border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: var(--primary);
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 80px;
+      scroll-margin-top: 32px;
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--primary), #E8A966);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 16px; color: white;
+      flex-shrink: 0;
+    }
+    .section-header h2 {
+      font-size: 24px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    /* ── Screenshot area ── */
+    .screenshot-wrap {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      margin: 24px 0;
+      box-shadow: 0 24px 48px rgba(0,0,0,.5);
+    }
+    .screenshot-bar {
+      background: #111;
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .screenshot-bar .dot {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .screenshot-bar .dot.r { background: #ff5f57; }
+    .screenshot-bar .dot.y { background: #ffbd2e; }
+    .screenshot-bar .dot.g { background: #28c840; }
+    .screenshot-bar .url {
+      margin-left: 12px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      padding: 3px 12px;
+      font-size: 12px; color: #888;
+      font-family: monospace;
+    }
+    .screenshot-wrap img {
+      width: 100%; display: block;
+    }
+    .screenshot-placeholder {
+      background: var(--card2);
+      min-height: 360px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px; color: var(--muted);
+      border: 2px dashed rgba(255,255,255,.1);
+      border-radius: 0 0 16px 16px;
+    }
+    .screenshot-placeholder .ph-icon { font-size: 48px; opacity: .3; }
+    .screenshot-placeholder .ph-label {
+      font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px;
+      opacity: .5;
+    }
+    .screenshot-placeholder .ph-url {
+      font-size: 11px; color: var(--primary); opacity: .7;
+      font-family: monospace;
+    }
+
+    /* ── Callout ── */
+    .callout {
+      border-radius: 12px; padding: 16px 20px;
+      margin: 20px 0; font-size: 14px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .callout.tip  { background: rgba(232,130,74,.1); border: 1px solid rgba(232,130,74,.25); }
+    .callout.info { background: rgba(99,179,237,.1); border: 1px solid rgba(99,179,237,.25); }
+    .callout.warn { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25); }
+    .callout.success { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); }
+    .callout .ci { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .callout strong { display: block; margin-bottom: 4px; }
+
+    /* ── Table ── */
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; }
+    th {
+      background: var(--card2);
+      padding: 12px 16px;
+      text-align: left; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--muted); font-weight: 700;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.04);
+      color: var(--text);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    code {
+      background: var(--card2); padding: 2px 8px;
+      border-radius: 5px; font-size: 12px;
+      color: var(--primary); font-family: monospace;
+    }
+
+    /* ── Steps ── */
+    .steps { list-style: none; counter-reset: steps; }
+    .steps li {
+      counter-increment: steps;
+      display: flex; gap: 16px;
+      margin-bottom: 20px;
+    }
+    .steps li::before {
+      content: counter(steps);
+      width: 28px; height: 28px; flex-shrink: 0;
+      background: rgba(232,130,74,.15);
+      border: 1px solid rgba(232,130,74,.3);
+      border-radius: 999px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: var(--primary);
+    }
+    .steps li p { padding-top: 3px; font-size: 15px; color: var(--text); }
+    .steps li strong { color: var(--primary); }
+
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .badge.orange { background: rgba(232,130,74,.2); color: var(--primary); border: 1px solid rgba(232,130,74,.3); }
+    .badge.green  { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+    .badge.red    { background: rgba(239,68,68,.15); color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+    .badge.gray   { background: rgba(255,255,255,.07); color: var(--muted); border: 1px solid var(--border); }
+
+    /* ── Grid ── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .feature-card {
+      background: var(--card2); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px;
+    }
+    .feature-card .fc-icon { font-size: 28px; margin-bottom: 10px; }
+    .feature-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .feature-card p { font-size: 13px; color: var(--muted); }
+
+    /* ── Wizard steps ── */
+    .wizard-steps {
+      display: flex; gap: 0; margin: 24px 0; flex-wrap: wrap;
+    }
+    .wizard-step {
+      flex: 1; min-width: 120px;
+      background: var(--card2); border: 1px solid var(--border);
+      padding: 16px; text-align: center;
+    }
+    .wizard-step:first-child { border-radius: 12px 0 0 12px; }
+    .wizard-step:last-child  { border-radius: 0 12px 12px 0; }
+    .wizard-step .ws-num {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--primary), #E8A966);
+      border-radius: 50%; margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 14px; color: white;
+    }
+    .wizard-step h4 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+    .wizard-step p { font-size: 11px; color: var(--muted); }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; margin-bottom: 40px;
+    }
+    .toc h3 {
+      font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 3px;
+      color: var(--primary); margin-bottom: 16px;
+    }
+    .toc ul { list-style: none; columns: 2; gap: 32px; }
+    .toc ul li { margin-bottom: 8px; break-inside: avoid; }
+    .toc ul a {
+      color: var(--muted); text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      transition: color .2s;
+    }
+    .toc ul a:hover { color: var(--primary); }
+    .toc ul .toc-num {
+      display: inline-block; width: 20px; height: 20px;
+      background: rgba(232,130,74,.15); border-radius: 5px;
+      text-align: center; line-height: 20px;
+      font-size: 10px; font-weight: 800; color: var(--primary);
+      margin-right: 8px;
+    }
+    p { margin-bottom: 12px; }
+    h3 { font-size: 17px; font-weight: 800; margin: 28px 0 12px; color: var(--text); }
+    ul.bullets { padding-left: 20px; margin-bottom: 16px; }
+    ul.bullets li { margin-bottom: 6px; color: var(--muted); font-size: 14px; }
+    .divider { height: 1px; background: var(--border); margin: 32px 0; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <span class="ball">🏀</span>
+    <span class="brand">OpenCourt</span>
+  </div>
+  <nav>
+    <ul>
+      <li class="section-label">Getting Started</li>
+      <li><a href="#login">1. Login &amp; Sign Up</a></li>
+      <li><a href="#onboarding">2. Complete Your Profile</a></li>
+
+      <li class="section-label">Core Features</li>
+      <li><a href="#dashboard">3. Dashboard</a></li>
+      <li><a href="#joining">4. Joining a Run</a></li>
+      <li><a href="#game-detail">5. Game Details Page</a></li>
+
+      <li class="section-label">Hosting</li>
+      <li><a href="#hosting">6. Host a Run</a></li>
+      <li><a href="#host-controls">7. Host Controls</a></li>
+
+      <li class="section-label">Personal</li>
+      <li><a href="#my-games">8. My Schedule</a></li>
+      <li><a href="#profile">9. Profile Page</a></li>
+
+      <li class="section-label">Advanced</li>
+      <li><a href="#checkin">10. QR Check-In</a></li>
+      <li><a href="#reliability">11. Reliability Score</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="pretitle">User Manual · v2.0</div>
+    <h1>OpenCourt</h1>
+    <p>The complete guide to finding, joining, and hosting basketball runs in your area.</p>
+    <div class="version-badge">March 2026 · OpenCourt v1.0</div>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ul>
+      <li><a href="#login"><span class="toc-num">1</span>Login &amp; Sign Up</a></li>
+      <li><a href="#onboarding"><span class="toc-num">2</span>Complete Your Profile</a></li>
+      <li><a href="#dashboard"><span class="toc-num">3</span>Dashboard</a></li>
+      <li><a href="#joining"><span class="toc-num">4</span>Joining a Run</a></li>
+      <li><a href="#game-detail"><span class="toc-num">5</span>Game Details Page</a></li>
+      <li><a href="#hosting"><span class="toc-num">6</span>Host a Run</a></li>
+      <li><a href="#host-controls"><span class="toc-num">7</span>Host Controls</a></li>
+      <li><a href="#my-games"><span class="toc-num">8</span>My Schedule</a></li>
+      <li><a href="#profile"><span class="toc-num">9</span>Profile Page</a></li>
+      <li><a href="#checkin"><span class="toc-num">10</span>QR Check-In System</a></li>
+      <li><a href="#reliability"><span class="toc-num">11</span>Reliability Score</a></li>
+    </ul>
+  </div>
+
+  <!-- ═══ 1. LOGIN ═══ -->
+  <section class="section" id="login">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <h2>Login &amp; Sign Up</h2>
+    </div>
+
+    <p>Visit <strong><a href="https://opencourtph.vercel.app" style="color:var(--primary)">opencourtph.vercel.app</a></strong> to get started. You'll land on the login/signup page.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/login</div>
+      </div>
+      <img src="docs/screenshots/login.png" alt="OpenCourt Login Page" />
+    </div>
+
+    <h3>Sign-Up Options</h3>
+    <table>
+      <tr><th>Method</th><th>How to use</th></tr>
+      <tr><td>🔵 <strong>Google</strong></td><td>Click <strong>Continue with Google</strong> — one click with your Google account</td></tr>
+      <tr><td>🔵 <strong>Facebook</strong></td><td>Click <strong>Continue with Facebook</strong></td></tr>
+      <tr><td>✉️ <strong>Email</strong></td><td>Enter your email and a password, then click <strong>Sign Up</strong></td></tr>
+    </table>
+
+    <div class="callout tip">
+      <span class="ci">💡</span>
+      <div><strong>First time?</strong> After signing in for the first time, you'll be asked to complete your player profile before reaching the dashboard.</div>
+    </div>
+  </section>
+
+  <!-- ═══ 2. ONBOARDING ═══ -->
+  <section class="section" id="onboarding">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <h2>Complete Your Profile (Onboarding)</h2>
+    </div>
+
+    <p>First-time users are redirected to the <strong>Onboarding</strong> page at <code>/onboarding</code>. This step is required before you can access the app.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/onboarding</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">🏀</div>
+        <div class="ph-label">Onboarding Screen</div>
+        <div class="ph-url">/onboarding</div>
+      </div>
+    </div>
+
+    <h3>Required Fields</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th><th>Example</th></tr>
+      <tr><td><strong>Full Name</strong></td><td>Your real name (pre-filled from Google/Facebook)</td><td>Juan dela Cruz</td></tr>
+      <tr><td><strong>Display Name</strong></td><td>Your username on game rosters (min. 3 chars, no @ symbol)</td><td>juandc</td></tr>
+    </table>
+
+    <h3>Optional Fields</h3>
+    <table>
+      <tr><th>Field</th><th>Options</th></tr>
+      <tr><td>Position</td><td>Point Guard, Shooting Guard, Small Forward, Power Forward, Center</td></tr>
+      <tr><td>Height</td><td>Free text (e.g., 5'10")</td></tr>
+      <tr><td>Skill Level</td><td>Beginner / Casual / Competitive / Elite</td></tr>
+    </table>
+
+    <p>Click <strong>Complete Profile</strong> to save and go to the dashboard. All fields can be edited later on the Profile page.</p>
+  </section>
+
+  <!-- ═══ 3. DASHBOARD ═══ -->
+  <section class="section" id="dashboard">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>The Dashboard — Finding a Run</h2>
+    </div>
+
+    <p>The Dashboard (<code>/dashboard</code>) is the main hub. It shows all upcoming basketball games near you, updates in real-time as new games are posted.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/dashboard</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">🔍</div>
+        <div class="ph-label">Dashboard — Find Your Run</div>
+        <div class="ph-url">/dashboard</div>
+      </div>
+    </div>
+
+    <h3>Filter Bar</h3>
+    <table>
+      <tr><th>Filter</th><th>What it shows</th></tr>
+      <tr><td><span class="badge orange">ALL</span></td><td>Every upcoming game within 7 days</td></tr>
+      <tr><td><span class="badge orange">TODAY 🔥</span></td><td>Only games scheduled today</td></tr>
+      <tr><td><span class="badge gray">COMPETITIVE</span></td><td>Competitive skill level games</td></tr>
+      <tr><td><span class="badge gray">CASUAL</span></td><td>Casual / open run games</td></tr>
+      <tr><td><span class="badge gray">NEAR ME 📍</span></td><td>Sorted by distance (requires location permission)</td></tr>
+    </table>
+
+    <h3>Game Cards</h3>
+    <p>Each card on the grid shows:</p>
+    <ul class="bullets">
+      <li><strong>Game title</strong> and court location</li>
+      <li><strong>Format badge</strong> (Full Court / Half Court / 3-on-3) and <strong>skill level</strong></li>
+      <li><strong>Schedule</strong> — day, date, and time in 12-hr format (e.g., Thu, Mar 19 @ 7:00 PM)</li>
+      <li><strong>Roster bar</strong> — shows current players / max slots with a fill progress bar</li>
+      <li><strong>Entry fee</strong> — Free or a peso amount</li>
+      <li><strong>JOIN RUN</strong> button — changes to <span class="badge green">CONFIRMED</span> if you've already joined</li>
+    </ul>
+
+    <div class="callout success">
+      <span class="ci">🛜</span>
+      <div><strong>Live Updates!</strong> New games posted by other users appear automatically. A <strong>🏀 New game just posted!</strong> banner slides in and fades out after 5 seconds — no page refresh needed.</div>
+    </div>
+
+    <h3>Navigation Sidebar</h3>
+    <table>
+      <tr><th>Icon</th><th>Page</th></tr>
+      <tr><td>🏠</td><td>Dashboard (Find Your Run)</td></tr>
+      <tr><td>📅</td><td>My Schedule (joined and hosted games)</td></tr>
+      <tr><td>➕</td><td>Host a Run (create a new game)</td></tr>
+      <tr><td>👤</td><td>Profile (view and edit your info)</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══ 4. JOINING ═══ -->
+  <section class="section" id="joining">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <h2>Joining a Run</h2>
+    </div>
+
+    <h3>From the Dashboard</h3>
+    <ol class="steps">
+      <li><p>Find a game card on the dashboard.</p></li>
+      <li><p>Click <strong>JOIN RUN</strong> on the card.</p></li>
+      <li><p>If the game has <strong>House Rules</strong>, a modal appears — read it and click <strong>I AGREE &amp; JOIN THE RUN</strong>.</p></li>
+      <li><p>If the game is <strong>full</strong>, the button changes to <strong>JOIN THE WAITLIST</strong> — you'll move up automatically if a spot opens.</p></li>
+      <li><p>Once joined, the button changes to <span class="badge green">✓ CONFIRMED</span>.</p></li>
+    </ol>
+
+    <div class="callout info">
+      <span class="ci">ℹ️</span>
+      <div><strong>Already joined?</strong> The dashboard detects your join status on page load — you'll see CONFIRMED immediately without needing to click anything.</div>
+    </div>
+
+    <h3>From the Game Detail Page</h3>
+    <ol class="steps">
+      <li><p>Click anywhere on a game card to open the full detail page.</p></li>
+      <li><p>Review the full game info — format, rules, roster, location.</p></li>
+      <li><p>Click the large <strong>+ JOIN THE RUN</strong> button in the hero section.</p></li>
+    </ol>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/game/[id]</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">➕</div>
+        <div class="ph-label">Join Run — House Rules Modal</div>
+        <div class="ph-url">/game/[id] — Join Button</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 5. GAME DETAIL ═══ -->
+  <section class="section" id="game-detail">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <h2>Game Details Page</h2>
+    </div>
+
+    <p>Click any game card to open its full detail page at <code>/game/[id]</code>.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/game/[id]</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">🏟️</div>
+        <div class="ph-label">Game Detail Page</div>
+        <div class="ph-url">/game/[id]</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="feature-card">
+        <div class="fc-icon">📋</div>
+        <h4>Game Info</h4>
+        <p>Title, format, skill level, cost, location, full schedule, description, and house rules.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">🏠</div>
+        <h4>Hosted By</h4>
+        <p>Host's display name, avatar, and reliability score badge.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">👥</div>
+        <h4>Squad Roster</h4>
+        <p>All confirmed players with name, position, skill level, and check-in status.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">⏳</div>
+        <h4>Waitlist</h4>
+        <p>Players queued for a spot — shown when the main roster is full.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">⚡</div>
+        <h4>Team Generator</h4>
+        <p><em>(Host only)</em> Auto-splits the squad into 2 balanced teams by skill and position.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📊</div>
+        <h4>Game Stats</h4>
+        <p><em>(After game is completed)</em> Players log individual performance stats.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6. HOSTING ═══ -->
+  <section class="section" id="hosting">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <h2>Hosting a Run</h2>
+    </div>
+
+    <p>Click the <strong>➕</strong> icon in the sidebar or click <strong>HOST A RUN</strong> on the dashboard. The wizard walks you through <strong>5 steps</strong>.</p>
+
+    <div class="wizard-steps">
+      <div class="wizard-step">
+        <div class="ws-num">1</div>
+        <h4>Location</h4>
+        <p>Court, date &amp; time</p>
+      </div>
+      <div class="wizard-step">
+        <div class="ws-num">2</div>
+        <h4>Format</h4>
+        <p>Game type &amp; slots</p>
+      </div>
+      <div class="wizard-step">
+        <div class="ws-num">3</div>
+        <h4>Details</h4>
+        <p>Description &amp; rules</p>
+      </div>
+      <div class="wizard-step">
+        <div class="ws-num">4</div>
+        <h4>Filters</h4>
+        <p>Gender &amp; age</p>
+      </div>
+      <div class="wizard-step">
+        <div class="ws-num">5</div>
+        <h4>Confirm</h4>
+        <p>Review &amp; publish</p>
+      </div>
+    </div>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/host — Step 1</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">📍</div>
+        <div class="ph-label">Host Wizard — Step 1: Location &amp; Schedule</div>
+        <div class="ph-url">/host</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>Step 1 — Location &amp; Schedule</h3>
+    <table>
+      <tr><th>Field</th><th>Notes</th></tr>
+      <tr><td><strong>Game Title</strong></td><td>Optional — auto-generated as "[Format] [Level] Run" if left blank</td></tr>
+      <tr><td><strong>Location</strong></td><td>Court name or address. Previous courts appear as quick-select buttons.</td></tr>
+      <tr><td><strong>Date</strong></td><td>Quick select <strong>Today</strong> / <strong>Tomorrow</strong>, or pick any specific date from the calendar</td></tr>
+      <tr><td><strong>Start Time</strong></td><td>Time picker field (24hr input, displayed as 12hr e.g. 7:00 PM)</td></tr>
+    </table>
+
+    <h3>Step 2 — Format</h3>
+    <table>
+      <tr><th>Field</th><th>Options</th></tr>
+      <tr><td><strong>Game Format</strong></td><td>Full Court (with Ref), Full Court (no Ref), Half Court, 3-on-3</td></tr>
+      <tr><td><strong>Max Players</strong></td><td>Slider: 15 / 20 / 25 players</td></tr>
+      <tr><td><strong>Competition Level</strong></td><td>Beginner, Casual, Competitive, Elite, Open Run</td></tr>
+    </table>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/host — Step 2</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">🏀</div>
+        <div class="ph-label">Host Wizard — Step 2: Format</div>
+        <div class="ph-url">/host (Step 2)</div>
+      </div>
+    </div>
+
+    <h3>Step 3 — Details <span style="font-weight:400;color:var(--muted);font-size:14px">(optional)</span></h3>
+    <table>
+      <tr><th>Field</th><th>Example</th></tr>
+      <tr><td><strong>Description</strong></td><td>"Bring dark and light jerseys. Water provided."</td></tr>
+      <tr><td><strong>House Rules</strong></td><td>"No trash talk. Winner stays. 2s and 3s only."</td></tr>
+    </table>
+
+    <h3>Step 4 — Filters <span style="font-weight:400;color:var(--muted);font-size:14px">(optional)</span></h3>
+    <table>
+      <tr><th>Field</th><th>Options</th></tr>
+      <tr><td><strong>Gender</strong></td><td>Mens / Womens / Mixed</td></tr>
+      <tr><td><strong>Age Range</strong></td><td>All ages, 12U, 14U, 17U, 18+, 40+</td></tr>
+    </table>
+
+    <h3>Step 5 — Confirm &amp; Publish</h3>
+    <p>Review all details in the summary card. The date/time is shown in readable format (e.g., <strong>Mon, Mar 23 @ 7:00 PM</strong>). Enter an entry fee or leave as <strong>Free</strong>.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/host — Step 5: Confirm</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">⚡</div>
+        <div class="ph-label">Host Wizard — Step 5: Confirm &amp; Publish</div>
+        <div class="ph-url">/host (Step 5)</div>
+      </div>
+    </div>
+
+    <p>Click <strong>⚡ PUBLISH GAME</strong>. You'll be redirected to the dashboard and your game appears immediately — visible to all users in real-time.</p>
+  </section>
+
+  <!-- ═══ 7. HOST CONTROLS ═══ -->
+  <section class="section" id="host-controls">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <h2>Host Controls</h2>
+    </div>
+
+    <p>As the game creator, you have extra controls on the game detail page that regular players don't see.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/game/[id] — Host View</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">👑</div>
+        <div class="ph-label">Host Controls — Roster Management</div>
+        <div class="ph-url">/game/[id] (Host)</div>
+      </div>
+    </div>
+
+    <h3>Per-Player Roster Actions</h3>
+    <table>
+      <tr><th>Button</th><th>Action</th></tr>
+      <tr><td>✅ Green checkmark</td><td>Mark player as <span class="badge green">Checked In</span> (present on court)</td></tr>
+      <tr><td>❌ Red X</td><td>Mark player as <span class="badge red">Absent</span> (lowers their reliability score)</td></tr>
+      <tr><td>🗑️ Trash icon</td><td><strong>Kick</strong> player from the squad entirely</td></tr>
+      <tr><td>RESET</td><td>Revert a marked player back to <span class="badge gray">Joined</span></td></tr>
+    </table>
+
+    <h3>Waitlist Promotion</h3>
+    <p>If the main roster has space and players are waiting: click <strong>SQUAD UP</strong> next to a waitlisted player to move them into the main roster.</p>
+
+    <h3>Team Generator</h3>
+    <ol class="steps">
+      <li><p>Once your squad is confirmed, scroll to the <strong>Team Generator</strong> section.</p></li>
+      <li><p>Click <strong>Generate Teams</strong>.</p></li>
+      <li><p>The system splits players into 2 balanced teams by skill level and position.</p></li>
+      <li><p>Team assignments are saved and visible to all players on the roster.</p></li>
+    </ol>
+
+    <h3>Game Lifecycle</h3>
+    <table>
+      <tr><th>Action</th><th>When to use</th><th>Effect</th></tr>
+      <tr>
+        <td><span class="badge green">✅ COMPLETE RUN</span></td>
+        <td>After the game ends</td>
+        <td>Unlocks stat logging for all checked-in players. Game marked as completed.</td>
+      </tr>
+      <tr>
+        <td><span class="badge red">❌ CANCEL RUN</span></td>
+        <td>If the game won't happen</td>
+        <td>Requires a reason. All joined players will see the cancellation reason on the game card.</td>
+      </tr>
+    </table>
+
+    <div class="callout warn">
+      <span class="ci">⚠️</span>
+      <div><strong>Cancellation</strong> — once a game is cancelled, it cannot be uncancelled. Always use this option only when necessary.</div>
+    </div>
+  </section>
+
+  <!-- ═══ 8. MY GAMES ═══ -->
+  <section class="section" id="my-games">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <h2>My Schedule</h2>
+    </div>
+
+    <p>Navigate to <code>/my-games</code> via the calendar icon in the sidebar to see all your games at a glance.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/my-games</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">📅</div>
+        <div class="ph-label">My Schedule Page</div>
+        <div class="ph-url">/my-games</div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="feature-card">
+        <div class="fc-icon">🗓️</div>
+        <h4>Upcoming Runs</h4>
+        <p>Games you've joined that haven't happened yet. The next upcoming game is marked <strong>"Next Up →"</strong>.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">👑</div>
+        <h4>Hosted by You</h4>
+        <p>All games you created, with their status: <span class="badge orange">OPEN</span>, <span class="badge gray">COMPLETED</span>, or <span class="badge red">CANCELLED</span>.</p>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <span class="ci">ℹ️</span>
+      <div>A <strong>HOST A RUN</strong> shortcut button is available at the top of My Schedule for quick game creation.</div>
+    </div>
+  </section>
+
+  <!-- ═══ 9. PROFILE ═══ -->
+  <section class="section" id="profile">
+    <div class="section-header">
+      <div class="section-num">9</div>
+      <h2>Profile Page</h2>
+    </div>
+
+    <p>Access your profile at <code>/profile</code> via the person icon in the sidebar.</p>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/profile</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">👤</div>
+        <div class="ph-label">Profile Page</div>
+        <div class="ph-url">/profile</div>
+      </div>
+    </div>
+
+    <h3>Editable Fields</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><strong>Full Name</strong></td><td>Your real name, shown to other players</td></tr>
+      <tr><td><strong>Display Name</strong></td><td>Your username shown on game rosters</td></tr>
+      <tr><td><strong>Position</strong></td><td>Point Guard, Shooting Guard, Small Forward, Power Forward, Center</td></tr>
+      <tr><td><strong>Height</strong></td><td>Optional (e.g., 5'10")</td></tr>
+      <tr><td><strong>Skill Level</strong></td><td>Beginner / Casual / Competitive / Elite</td></tr>
+      <tr><td><strong>Avatar</strong></td><td>Profile picture URL</td></tr>
+    </table>
+
+    <p>Click <strong>Save Changes</strong> to update. Your stats summary (games played, reliability, win rate) is displayed below the form.</p>
+  </section>
+
+  <!-- ═══ 10. QR CHECK-IN ═══ -->
+  <section class="section" id="checkin">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>QR Check-In System</h2>
+    </div>
+
+    <p>OpenCourt uses QR codes to confirm player attendance on game day.</p>
+
+    <div class="grid2">
+      <div class="feature-card">
+        <div class="fc-icon">📱</div>
+        <h4>As a Player — Show Your Pass</h4>
+        <p>Open the game detail page → click <strong>📱 SHOW CHECK-IN QR</strong> → a "Player Pass" QR code appears. Show this to the host when you arrive.</p>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon">📷</div>
+        <h4>As a Host — Scan Mode</h4>
+        <p>Open the game detail page → click <strong>📷 SCAN MODE</strong> in the roster section → point camera at each player's QR code. They're marked <span class="badge green">Checked In ✅</span> instantly.</p>
+      </div>
+    </div>
+
+    <div class="screenshot-wrap">
+      <div class="screenshot-bar">
+        <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+        <div class="url">opencourtph.vercel.app/game/[id] — QR Code</div>
+      </div>
+      <div class="screenshot-placeholder">
+        <div class="ph-icon">📱</div>
+        <div class="ph-label">Player Pass QR Code</div>
+        <div class="ph-url">/game/[id] — Check-In QR</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="ci">⚠️</span>
+      <div><strong>Attendance affects your reliability score.</strong> Being marked Absent without notice will lower your score. Try to inform the host if you can't make it.</div>
+    </div>
+  </section>
+
+  <!-- ═══ 11. RELIABILITY ═══ -->
+  <section class="section" id="reliability">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>Reliability Score</h2>
+    </div>
+
+    <p>Your <strong>Reliability Score</strong> starts at <strong>100%</strong> and reflects how dependable you are as a player. It's visible to hosts when they view your profile.</p>
+
+    <table>
+      <tr><th>Event</th><th>Impact</th></tr>
+      <tr><td>✅ Checked In by host</td><td>Score maintained / improves over time</td></tr>
+      <tr><td>❌ Marked Absent by host</td><td>Score decreases</td></tr>
+      <tr><td>Consistent attendance streak</td><td>Score recovers and grows</td></tr>
+    </table>
+
+    <div class="callout tip">
+      <span class="ci">🎯</span>
+      <div><strong>Aim for above 80%.</strong> Hosts can see your reliability score and may prefer to invite players with high scores when games fill up.</div>
+    </div>
+
+    <div class="callout success">
+      <span class="ci">⭐</span>
+      <div><strong>100% Reliable</strong> badge appears on your hosted games' "Hosted By" card when your score is perfect — a great signal of trustworthiness to potential players.</div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div style="text-align:center; padding: 48px 0; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px;">
+    <div style="font-size:28px; margin-bottom:8px;">🏀</div>
+    <strong style="color: var(--text);">OpenCourt</strong> · User Manual v2.0<br/>
+    March 2026 · <a href="https://opencourtph.vercel.app" style="color:var(--primary);">opencourtph.vercel.app</a>
+  </div>
+
+</main>
+</body>
+</html>
