@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client";
 import { LogOut, Plus, ShieldCheck, X, ScrollText, CheckCircle2, QrCode, AlertTriangle, Trophy } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ReviewModal } from "./review-modal";
 
 interface GameActionsProps {
@@ -29,6 +29,19 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
     const [showReviewModal, setShowReviewModal] = useState(false);
 
     const isFull = currentPlayers >= maxPlayers;
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (showRulesModal || showQRModal) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [showRulesModal, showQRModal]);
 
     const handleJoin = async () => {
         if (!userId) return;
@@ -286,8 +299,8 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
 
             {/* House Rules Agreement Modal */}
             {showRulesModal && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="w-full max-w-lg glass-card rounded-[2.5rem] overflow-hidden border-t border-white/20 shadow-4xl animate-in zoom-in-95 duration-300">
+                <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300 overflow-y-auto">
+                    <div className="w-full max-w-lg glass-card rounded-[2.5rem] overflow-hidden border-t border-white/20 shadow-4xl animate-in zoom-in-95 duration-300 relative">
                         <div className="p-8 space-y-8">
                             <div className="flex justify-between items-start">
                                 <div className="space-y-1">

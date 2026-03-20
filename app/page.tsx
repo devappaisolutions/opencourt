@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { HeroLogin } from "@/components/hero-login";
+import { Logo4 } from "@/components/logos";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -34,15 +35,9 @@ export default async function Home() {
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 text-center space-y-8 max-w-4xl">
           <div className="space-y-6 animate-slide-up">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold tracking-widest uppercase">
-              <Zap className="w-3.5 h-3.5 fill-current" />
-              Now in Private Beta
-            </div>
-
             {/* Main Heading */}
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none uppercase italic">
-              <span className="text-[#F5EFEA]">
+              <span className="gradient-text">
                 OPEN
               </span>
               <br />
@@ -143,9 +138,9 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
-              { value: "500+", label: "Active Ballers" },
-              { value: "150+", label: "Weekly Runs" },
-              { value: "3", label: "Cities Live" },
+              { value: "200+", label: "Active Ballers" },
+              { value: "5+", label: "Weekly Runs" },
+              { value: "1", label: "Cities Live" },
               { value: "98%", label: "Show-up Rate" }
             ].map((stat, i) => (
               <div key={i} className="space-y-2 group">
@@ -169,11 +164,11 @@ export default async function Home() {
             <h2 className="text-4xl md:text-5xl font-black uppercase italic text-[#F5EFEA]">
               Join the <span className="text-primary">Squad</span>
             </h2>
-            <p className="text-[#B8B0A6] max-w-xl mx-auto">Available in NYC, LA, and Manila. Ready to run?</p>
+            <p className="text-[#B8B0A6] max-w-xl mx-auto">Available in San Pablo City, Laguna. Ready to run?</p>
           </div>
 
           <div className="flex flex-wrap justify-center gap-10 opacity-50 hover:opacity-100 transition-all duration-500">
-            {["RUCKER PARK", "DYCKMAN", "VENICE BEACH", "TENEMENT"].map((court, i) => (
+            {["YMCA SAN PABLO", "RACE COURT", "EFARCA", "POOK KASIYAHAN"].map((court, i) => (
               <div
                 key={i}
                 className="font-black text-xl md:text-2xl tracking-tight italic text-[#F5EFEA] hover:text-primary hover:scale-105 transition-all cursor-pointer"
@@ -200,17 +195,16 @@ export default async function Home() {
       <footer className="py-16 border-t border-white/5 container mx-auto px-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-full bg-primary" />
+            <Logo4 className="w-7 h-7" />
             <span className="text-xl font-black italic tracking-tight text-[#F5EFEA]">OPEN COURT</span>
           </div>
           <div className="flex gap-8 text-sm text-[#B8B0A6] font-medium">
-            <Link href="#" className="hover:text-[#F5EFEA] transition-colors">Terms</Link>
-            <Link href="#" className="hover:text-[#F5EFEA] transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-[#F5EFEA] transition-colors">Support</Link>
-            <Link href="#" className="hover:text-[#F5EFEA] transition-colors">Instagram</Link>
+            <Link href="/terms" className="hover:text-[#F5EFEA] transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-[#F5EFEA] transition-colors">Privacy</Link>
+            <Link href="/support" className="hover:text-[#F5EFEA] transition-colors">Support</Link>
           </div>
           <div className="text-sm text-[#B8B0A6]/60">
-            © 2026 OpenCourt Labs
+            © 2025 DEVAPP Solutions
           </div>
         </div>
       </footer>

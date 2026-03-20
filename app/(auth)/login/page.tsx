@@ -98,11 +98,11 @@ export default function LoginPage() {
                         {/* Badge */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full badge-premium text-primary text-xs font-bold tracking-widest uppercase">
                             <Zap className="w-3.5 h-3.5 fill-current" />
-                            Elite Pickup Basketball
+                            Papawis Pickup Basketball
                         </div>
 
                         {/* Main Heading */}
-                        <h1 className="font-heading text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase italic">
+                        <h1 className="font-heading text-5xl md:text-7xl font-black tracking-tighter leading-none uppercase italic px-4">
                             <span className="gradient-text">OPEN</span>
                             <br />
                             <span className="text-primary">COURT</span>
@@ -247,9 +247,9 @@ export default function LoginPage() {
                     <div className="mt-8 animate-slide-up" style={{ animationDelay: '0.4s' }}>
                         <p className="text-[#B8B0A6]/60 text-xs">
                             By continuing, you agree to our{" "}
-                            <Link href="#" className="text-[#B8B0A6] hover:text-[#F5EFEA] transition-colors">Terms</Link>
+                            <Link href="/terms" className="text-[#B8B0A6] hover:text-[#F5EFEA] transition-colors">Terms</Link>
                             {" "}&{" "}
-                            <Link href="#" className="text-[#B8B0A6] hover:text-[#F5EFEA] transition-colors">Privacy</Link>
+                            <Link href="/privacy" className="text-[#B8B0A6] hover:text-[#F5EFEA] transition-colors">Privacy</Link>
                         </p>
                     </div>
                 </div>
