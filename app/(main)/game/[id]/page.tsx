@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 // Force dynamic since we use params and DB
 export const dynamic = 'force-dynamic';
 
-export default async function GameDetailsPage({ params }: { params: { id: string } }) {
+export default async function GameDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const supabase = await createClient();
     const { id } = await params;
 
@@ -249,7 +249,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             </div>
 
             {/* Game Info & Rules */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 relative">
                 <div className="lg:col-span-2 space-y-8">
                     {game.description && (
                         <div className="glass-card-premium p-8 rounded-[2rem] border-t border-white/10 space-y-4 hover-lift transition-all duration-500">
@@ -281,12 +281,12 @@ export default async function GameDetailsPage({ params }: { params: { id: string
                     {/* Game Metadata Card */}
                     <div className="glass-card-premium p-8 rounded-[2.5rem] border-t border-white/10 space-y-6 relative overflow-hidden group hover-lift transition-all duration-500">
                         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 relative z-10 font-heading gradient-text">
+                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 relative font-heading gradient-text">
                             <Zap className="w-3 h-3 text-primary" />
                             Run Intel
                         </h2>
 
-                        <div className="space-y-4 relative z-10">
+                        <div className="space-y-4 relative">
                             <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
                                 <span className="text-zinc-500 font-medium">Format</span>
                                 <span className="text-white font-bold">{game.format}</span>
@@ -314,7 +314,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             </div>
 
             {/* Interactive Roster Section */}
-            <div className="px-4 relative z-10">
+            <div className="px-4 relative">
                 <GameRoster
                     roster={roster || []}
                     gameId={id}
@@ -324,7 +324,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
             </div>
 
             {/* Team Generator Section */}
-            <div className="px-4 relative z-10">
+            <div className="px-4 relative">
                 <TeamGenerator
                     gameId={id}
                     isHost={isHost}
@@ -336,7 +336,7 @@ export default async function GameDetailsPage({ params }: { params: { id: string
 
             {/* Game Stats Section (Only for Completed Games) */}
             {game.status === 'completed' && (
-                <div className="px-4 relative z-10 space-y-8">
+                <div className="px-4 relative space-y-8">
                     {/* Stats Input Form (Only if user can add stats) */}
                     {canAddStats && user && (
                         <GameStatsForm
