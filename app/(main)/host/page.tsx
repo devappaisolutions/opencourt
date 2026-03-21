@@ -31,6 +31,8 @@ export default function HostGamePage() {
     const [genderFilter, setGenderFilter] = useState("Mens");
     const [maxPlayers, setMaxPlayers] = useState(20);
     const [usualCourts, setUsualCourts] = useState<any[]>([]);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [timeError, setTimeError] = useState("");
 
     useEffect(() => {
         const checkUserAndProfile = async () => {
@@ -100,9 +102,6 @@ export default function HostGamePage() {
     );
 
 
-
-    const [errors, setErrors] = useState<string[]>([]);
-    const [timeError, setTimeError] = useState("");
 
     const getMinDate = () => new Date().toISOString().split('T')[0];
 
