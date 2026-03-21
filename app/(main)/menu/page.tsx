@@ -78,8 +78,8 @@ export default function MenuPage() {
 
     const settingsItems = [
         { icon: Settings, label: "Settings", href: "#" },
-        { icon: Shield, label: "Privacy", href: "#" },
-        { icon: HelpCircle, label: "Help & Support", href: "#" },
+        { icon: Shield, label: "Privacy", href: "/privacy" },
+        { icon: HelpCircle, label: "Help & Support", href: "/support" },
     ];
 
     if (loading) {

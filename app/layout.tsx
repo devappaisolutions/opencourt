@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { CookieConsent } from "@/components/cookie-consent";
 
 const dmSans = DM_Sans({
   variable: "--font-sans",
@@ -19,12 +20,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "OpenCourt | Elite Pickup Basketball",
+  title: "OpenCourt | Papawis Pickup Basketball",
   description: "The elite platform for pickup basketball runs. Host games, join waitlists, and build your reliability score.",
   keywords: ["basketball", "pickup basketball", "sports", "games", "court finder", "basketball community"],
   authors: [{ name: "OpenCourt" }],
   openGraph: {
-    title: "OpenCourt | Elite Pickup Basketball",
+    title: "OpenCourt | Papawis Pickup Basketball",
     description: "Find and join pickup basketball games near you. Build your reliability score and connect with the basketball community.",
     type: "website",
     siteName: "OpenCourt",
@@ -51,6 +52,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <CookieConsent />
       </body>
     </html>
   );

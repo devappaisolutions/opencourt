@@ -1,5 +1,6 @@
 import { Mail } from "lucide-react";
 import Link from "next/link";
+import { Logo4 } from "@/components/logos";
 
 export default function DataDeletionPage() {
     return (
@@ -8,7 +9,7 @@ export default function DataDeletionPage() {
                 {/* Header */}
                 <div className="mb-12">
                     <Link href="/" className="inline-flex items-center gap-3 mb-8 group">
-                        <div className="w-8 h-8 rounded-full bg-primary" />
+                        <Logo4 className="w-8 h-8" />
                         <span className="text-2xl font-black italic tracking-tight text-[#F5EFEA] group-hover:text-primary transition-colors">
                             OPEN COURT
                         </span>
@@ -172,10 +173,10 @@ export default function DataDeletionPage() {
                         <Link href="/" className="text-[#B8B0A6] text-sm hover:text-[#F5EFEA] transition-colors">
                             Home
                         </Link>
-                        <Link href="#" className="text-[#B8B0A6] text-sm hover:text-[#F5EFEA] transition-colors">
+                        <Link href="/privacy" className="text-[#B8B0A6] text-sm hover:text-[#F5EFEA] transition-colors">
                             Privacy Policy
                         </Link>
-                        <Link href="#" className="text-[#B8B0A6] text-sm hover:text-[#F5EFEA] transition-colors">
+                        <Link href="/terms" className="text-[#B8B0A6] text-sm hover:text-[#F5EFEA] transition-colors">
                             Terms of Service
                         </Link>
                     </div>
