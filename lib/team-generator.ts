@@ -40,7 +40,7 @@ export async function generateTeams(gameId: string, hostId: string) {
         return { error: "Only the host can generate teams" };
     }
 
-    // 2. Get all checked-in players
+    // 2. Get all confirmed players (joined or checked-in)
     const { data: roster, error: rosterError } = await supabase
         .from("game_roster")
         .select(`
@@ -56,10 +56,10 @@ export async function generateTeams(gameId: string, hostId: string) {
       )
     `)
         .eq("game_id", gameId)
-        .eq("status", "checked_in");
+        .in("status", ["joined", "checked_in"]);
 
     if (rosterError || !roster || roster.length === 0) {
-        return { error: "No checked-in players found" };
+        return { error: "No confirmed players found" };
     }
 
     // Extract player data
@@ -67,8 +67,8 @@ export async function generateTeams(gameId: string, hostId: string) {
         .map((r: any) => r.profiles)
         .filter((p: any) => p !== null);
 
-    if (players.length < 2) {
-        return { error: "Need at least 2 players to generate teams" };
+    if (players.length < 14) {
+        return { error: "Need at least 14 confirmed players to generate teams" };
     }
 
     // 3. Balance teams

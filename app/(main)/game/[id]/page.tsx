@@ -331,6 +331,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     gameStatus={game.status}
                     teamsGenerated={game.teams_generated || false}
                     existingTeams={existingTeams || undefined}
+                    confirmedCount={roster?.filter((r: any) => ['joined', 'checked_in'].includes(r.status)).length || 0}
                 />
             </div>
 

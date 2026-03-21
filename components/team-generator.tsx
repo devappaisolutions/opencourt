@@ -10,6 +10,7 @@ interface TeamGeneratorProps {
     gameStatus: string;
     teamsGenerated: boolean;
     existingTeams?: any[];
+    confirmedCount: number;
 }
 
 export function TeamGenerator({
@@ -17,7 +18,8 @@ export function TeamGenerator({
     isHost,
     gameStatus,
     teamsGenerated,
-    existingTeams
+    existingTeams,
+    confirmedCount
 }: TeamGeneratorProps) {
     const [teams, setTeams] = useState(existingTeams || null);
     const [loading, setLoading] = useState(false);
@@ -74,7 +76,7 @@ export function TeamGenerator({
 
                 <button
                     onClick={handleRegenerateClick}
-                    disabled={loading}
+                    disabled={loading || confirmedCount < 14}
                     className="px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-primary/50"
                 >
                     {loading ? (
@@ -95,6 +97,15 @@ export function TeamGenerator({
                     )}
                 </button>
             </div>
+
+            {/* Minimum Players Warning */}
+            {confirmedCount < 14 && !teams && (
+                <div className="glass-card-premium p-4 rounded-xl border border-white/10 bg-white/5">
+                    <p className="text-sm text-zinc-400">
+                        Need at least 14 confirmed players to generate teams ({confirmedCount}/14 confirmed)
+                    </p>
+                </div>
+            )}
 
             {/* Confirmation Dialog */}
             {showConfirm && (
