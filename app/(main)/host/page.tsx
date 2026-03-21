@@ -24,7 +24,8 @@ export default function HostGamePage() {
     const [time, setTime] = useState("19:00");
     const [format, setFormat] = useState("Full Court (with Ref)");
     const [level, setLevel] = useState("Open run");
-    const [cost, setCost] = useState("Free");
+    const [cost, setCost] = useState("");
+    const [isFree, setIsFree] = useState(false);
     const [description, setDescription] = useState("");
     const [houseRules, setHouseRules] = useState("");
     const [ageRange, setAgeRange] = useState("All ages");
@@ -143,6 +144,14 @@ export default function HostGamePage() {
     const handlePublish = async () => {
         if (!user) return alert("You must be logged in to host.");
 
+        // Validate cost if not free
+        if (!isFree) {
+            if (!cost.trim() || parseInt(cost) <= 0) {
+                setErrors(["cost"]);
+                return;
+            }
+        }
+
         // Construct DateTime (Rough approximation for MVP)
         const gameDate = new Date();
         if (date === "Tomorrow") {
@@ -176,7 +185,7 @@ export default function HostGamePage() {
             date_time: gameDate.toISOString(),
             format,
             skill_level: level,
-            cost: cost === "0" || cost === "" ? "Free" : cost,
+            cost: isFree ? "Free" : `₱${parseInt(cost).toLocaleString()}`,
             image_gradient: randomGradient,
             max_players: maxPlayers,
             description: description || null,
@@ -568,17 +577,53 @@ export default function HostGamePage() {
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
-                                💵 Cost per player
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="Free"
-                                className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-zinc-600 input-premium"
-                                value={cost}
-                                onChange={(e) => setCost(e.target.value)}
-                            />
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
+                                    💵 Cost per player
+                                </label>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-xs text-zinc-400 font-medium">Free</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setIsFree(!isFree); if (!isFree) { setCost(""); setErrors(errors.filter(e => e !== "cost")); } }}
+                                        className={`relative w-12 h-6 rounded-full transition-all duration-300 ${isFree ? 'bg-emerald-500' : 'bg-zinc-700'}`}
+                                    >
+                                        <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-md transition-transform duration-300 ${isFree ? 'translate-x-6' : 'translate-x-0'}`} />
+                                    </button>
+                                </div>
+                            </div>
+                            {!isFree && (
+                                <div className="space-y-2">
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">₱</span>
+                                        <input
+                                            type="text"
+                                            inputMode="numeric"
+                                            placeholder="Enter amount"
+                                            className={`w-full bg-zinc-900/50 border rounded-xl pl-8 pr-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-zinc-600 input-premium ${errors.includes("cost") ? "border-red-500" : "border-white/10"}`}
+                                            value={cost}
+                                            onChange={(e) => {
+                                                const val = e.target.value.replace(/[^0-9]/g, '');
+                                                const num = parseInt(val || '0');
+                                                if (num <= 10000) {
+                                                    setCost(val);
+                                                    setErrors(errors.filter(err => err !== "cost"));
+                                                }
+                                            }}
+                                        />
+                                    </div>
+                                    {errors.includes("cost") && (
+                                        <p className="text-red-500 text-xs">Please enter an amount (max ₱10,000)</p>
+                                    )}
+                                    <p className="text-zinc-600 text-xs">Maximum: ₱10,000</p>
+                                </div>
+                            )}
+                            {isFree && (
+                                <div className="py-3 px-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium text-center">
+                                    This game is free to join
+                                </div>
+                            )}
                         </div>
                     </div>
                 )}
