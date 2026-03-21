@@ -101,7 +101,44 @@ export default function HostGamePage() {
 
 
 
-    const handleNext = () => setStep(step + 1);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [timeError, setTimeError] = useState("");
+
+    const getMinDate = () => new Date().toISOString().split('T')[0];
+
+    const handleNext = () => {
+        if (step === 1) {
+            const newErrors: string[] = [];
+            if (!location.trim()) newErrors.push("location");
+            if (!date) newErrors.push("date");
+            if (!time) newErrors.push("time");
+
+            // Validate time is at least 30 mins from now when Today is selected
+            if (date === "Today" && time) {
+                const now = new Date();
+                const [h, m] = time.split(':').map(Number);
+                const selectedTime = new Date();
+                selectedTime.setHours(h, m, 0, 0);
+                const minTime = new Date(now.getTime() + 30 * 60 * 1000);
+                if (selectedTime < minTime) {
+                    newErrors.push("time");
+                    const minH = minTime.getHours();
+                    const minM = minTime.getMinutes();
+                    const ampm = minH >= 12 ? 'PM' : 'AM';
+                    const h12 = minH % 12 || 12;
+                    setTimeError(`Start time must be at least 30 minutes from now (after ${h12}:${String(minM).padStart(2, '0')} ${ampm})`);
+                }
+            }
+
+            if (newErrors.length > 0) {
+                setErrors(newErrors);
+                return;
+            }
+            setErrors([]);
+            setTimeError("");
+        }
+        setStep(step + 1);
+    };
     const handleBack = () => setStep(step - 1);
 
     const handlePublish = async () => {
@@ -252,15 +289,18 @@ export default function HostGamePage() {
 
                         <div className="space-y-3">
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
-                                <MapPin className="w-4 h-4 text-primary" /> Where are we playing?
+                                <MapPin className="w-4 h-4 text-primary" /> Where are we playing? <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 placeholder="Enter court name or address"
-                                className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all placeholder:text-zinc-600 input-premium"
+                                className={`w-full bg-zinc-900/50 border rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all placeholder:text-zinc-600 input-premium ${errors.includes("location") ? "border-red-500" : "border-white/10"}`}
                                 value={location}
-                                onChange={(e) => setLocation(e.target.value)}
+                                onChange={(e) => { setLocation(e.target.value); setErrors(errors.filter(e => e !== "location")); }}
                             />
+                            {errors.includes("location") && (
+                                <p className="text-red-500 text-xs">Please enter a location</p>
+                            )}
                             {usualCourts.length > 0 && (
                                 <div className="space-y-2 pt-2">
                                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">My Usual Courts</p>
@@ -281,7 +321,7 @@ export default function HostGamePage() {
 
                         <div className="space-y-3">
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
-                                <Calendar className="w-4 h-4 text-primary" /> When?
+                                <Calendar className="w-4 h-4 text-primary" /> When? <span className="text-red-500">*</span>
                             </label>
                             <div className="flex gap-2">
                                 {["Today", "Tomorrow"].map((d) => (
@@ -300,7 +340,11 @@ export default function HostGamePage() {
                                     <input
                                         ref={dateInputRef}
                                         type="date"
-                                        onChange={(e) => setDate(e.target.value)}
+                                        min={getMinDate()}
+                                        onChange={(e) => {
+                                            if (e.target.value < getMinDate()) return;
+                                            setDate(e.target.value);
+                                        }}
                                         className="sr-only"
                                     />
                                     <button
@@ -327,14 +371,17 @@ export default function HostGamePage() {
 
                         <div className="space-y-3">
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
-                                <Clock className="w-4 h-4 text-primary" /> Start Time
+                                <Clock className="w-4 h-4 text-primary" /> Start Time <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="time"
-                                className="w-full bg-zinc-900/50 border border-white/10 rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all scheme-dark input-premium"
+                                className={`w-full bg-zinc-900/50 border rounded-xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all scheme-dark input-premium ${errors.includes("time") ? "border-red-500" : "border-white/10"}`}
                                 value={time}
-                                onChange={(e) => setTime(e.target.value)}
+                                onChange={(e) => { setTime(e.target.value); setErrors(errors.filter(err => err !== "time")); setTimeError(""); }}
                             />
+                            {timeError && (
+                                <p className="text-red-500 text-xs">{timeError}</p>
+                            )}
                         </div>
                     </div>
                 )}
