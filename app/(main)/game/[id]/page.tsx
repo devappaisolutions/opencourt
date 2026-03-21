@@ -298,7 +298,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                             <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
                                 <span className="text-zinc-500 font-medium">Cost</span>
                                 <span className={`font-bold ${game.cost === 'Free' ? 'text-emerald-400' : 'text-white'}`}>
-                                    {game.cost === 'Free' ? 'FREE' : `$${game.cost}`}
+                                    {game.cost === 'Free' ? 'FREE' : game.cost?.startsWith('₱') ? game.cost : `₱${game.cost}`}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
