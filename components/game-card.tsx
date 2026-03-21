@@ -217,7 +217,7 @@ export function GameCard({
                     <div className="flex items-center justify-between gap-4">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-bold text-[#B8B0A6]/60 uppercase tracking-widest mb-0.5">Entry</span>
-                            <span className={`text-lg font-bold tracking-tight ${game.cost === 'Free' ? 'text-[#F5EFEA]' : 'text-[#F5EFEA]'}`}>
+                            <span className={`text-lg font-normal tracking-tight ${game.cost === 'Free' ? 'text-[#F5EFEA]' : 'text-[#F5EFEA]'}`}>
                                 {game.cost === 'Free' ? 'FREE' : game.cost?.startsWith('₱') ? game.cost : `₱${game.cost}`}
                             </span>
                         </div>
