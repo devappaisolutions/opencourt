@@ -50,7 +50,7 @@ export default async function MyGamesPage() {
                 game:games (*)
             `)
             .eq('player_id', user.id)
-            .eq('status', 'joined');
+            .in('status', ['joined', 'checked_in']);
         joinedData = data || [];
     } catch (error) {
         console.warn('Could not fetch joined games:', error);
