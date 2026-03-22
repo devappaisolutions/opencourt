@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { GameCard } from "@/components/game-card";
-import { Calendar, Crown, PlusCircle, Sparkles, Zap } from "lucide-react";
+import { MyGamesTabs } from "@/components/my-games-tabs";
+import { Calendar, PlusCircle } from "lucide-react";
 import { redirect } from "next/navigation";
 import NextLink from "next/link";
 
@@ -41,7 +41,7 @@ export default async function MyGamesPage() {
 
     const hostJoinedGameIds = new Set(hostRosterEntries.map(e => e.game_id));
 
-    // Fetch Joined Games (all games user has joined as player, including own hosted games)
+    // Fetch Joined Games (all games user has joined as player)
     let joinedData: any[] = [];
     try {
         const { data } = await supabase
@@ -56,13 +56,13 @@ export default async function MyGamesPage() {
         console.warn('Could not fetch joined games:', error);
     }
 
-    // Flatten joined data - include all games user has joined as player
+    // Flatten joined data
     interface JoinedGameData {
         game: any;
     }
     const joinedGames = joinedData?.map((item: JoinedGameData) => item.game) || [];
 
-    // Sort joined games by date (client-side sort since we fetched via relation)
+    // Sort joined games by date
     joinedGames.sort((a: any, b: any) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime());
 
     // Helper to process game for display
@@ -79,8 +79,12 @@ export default async function MyGamesPage() {
         date: new Date(g.date_time).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' }),
     });
 
-    const displayHosted = (hostedGames || []).map(g => processGame(g, hostJoinedGameIds.has(g.id)));
-    const displayJoined = joinedGames.map((g: any) => processGame(g));
+    const allHosted = (hostedGames || []).map(g => processGame(g, hostJoinedGameIds.has(g.id)));
+    const allJoined = joinedGames.map((g: any) => processGame(g));
+
+    // Split into upcoming vs completed
+    const upcomingGames = allJoined.filter((g: any) => g.status !== 'completed');
+    const completedGames = allJoined.filter((g: any) => g.status === 'completed');
 
     return (
         <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-20 relative">
@@ -90,7 +94,7 @@ export default async function MyGamesPage() {
                 <div className="orb orb-secondary w-[400px] h-[400px] bottom-20 -left-40 opacity-15" style={{ animationDelay: '-8s' }} />
             </div>
 
-            {/* Split Header consistent with Profile */}
+            {/* Header */}
             <div className="flex items-center justify-between relative z-10">
                 <div>
                     <div className="flex items-center gap-2 mb-2">
@@ -109,121 +113,13 @@ export default async function MyGamesPage() {
                 </NextLink>
             </div>
 
-            {/* Upcoming (Joined) - Wrapped in Glass Card like Profile Sections */}
-            <div className="glass-card-premium p-6 md:p-8 rounded-[2.5rem] border-t border-white/10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full pointer-events-none" />
-
-                <div className="flex items-center justify-between mb-8 relative z-10">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-primary/10 border border-primary/20 relative">
-                            <Calendar className="w-5 h-5 text-primary" />
-                            {/* Pulse Effect */}
-                            <div className="absolute inset-0 rounded-xl bg-primary/20 animate-pulse-slow" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold font-heading gradient-text text-white uppercase tracking-tight">Upcoming Runs</h2>
-                            <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Games you're joining</p>
-                        </div>
-                    </div>
-                    <span className="badge-premium px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                        <Zap className="w-3 h-3 text-primary" />
-                        {displayJoined.length} Joined
-                    </span>
-                </div>
-
-                {displayJoined.length === 0 ? (
-                    <div className="p-12 border border-dashed border-white/5 rounded-3xl text-center bg-zinc-950/30 relative overflow-hidden">
-                        <div className="absolute inset-0 mesh-gradient opacity-20" />
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mx-auto mb-4">
-                                <Calendar className="w-8 h-8 text-zinc-600" />
-                            </div>
-                            <p className="text-zinc-500 font-medium mb-4">You haven't joined any games yet.</p>
-                            <NextLink href="/dashboard" className="text-primary font-bold text-xs uppercase tracking-widest hover:text-glow transition-all inline-flex items-center gap-2">
-                                <Sparkles className="w-3 h-3" />
-                                Browse the Dashboard
-                            </NextLink>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="relative z-10 space-y-12 pl-6">
-                        {/* Timeline Path */}
-                        <div className="absolute left-0 top-4 bottom-4 w-px bg-gradient-to-b from-primary via-primary/30 to-transparent" />
-
-                        {displayJoined.map((game: any, idx: number) => (
-                            <div
-                                key={game.id}
-                                className="relative group opacity-0 animate-card-entrance hover-lift card-shine"
-                                style={{ animationDelay: `${idx * 0.15}s`, animationFillMode: 'forwards' }}
-                            >
-                                {/* Timeline Node */}
-                                <div className="absolute -left-8 top-12 w-4 h-4 rounded-full border-2 border-primary bg-black z-20 transition-all duration-300 group-hover:scale-150 group-hover:bg-primary shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
-
-                                {/* Next Up Badge */}
-                                {idx === 0 && (
-                                    <div className="absolute -top-6 left-0 flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
-                                        <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Next Up</span>
-                                    </div>
-                                )}
-
-                                <GameCard game={game} currentUserId={user.id} role="joined" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Hosted - Consistent with Profile Sections */}
-            <div className="glass-card-premium p-6 md:p-8 rounded-[2.5rem] border-t border-white/10 relative overflow-hidden">
-                <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/5 blur-[100px] rounded-full pointer-events-none" />
-
-                <div className="flex items-center justify-between mb-8 relative z-10">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 relative">
-                            <Crown className="w-5 h-5 text-amber-500" />
-                            {/* Shine Effect */}
-                            <div className="absolute inset-0 rounded-xl bg-amber-500/10 animate-pulse-slow" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold font-heading gradient-text text-white uppercase tracking-tight">Hosted by You</h2>
-                            <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Games you're running</p>
-                        </div>
-                    </div>
-                    <span className="badge-premium px-4 py-1.5 rounded-full bg-zinc-900 border border-white/5 text-zinc-500 text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-                        <Crown className="w-3 h-3 text-amber-500" />
-                        {displayHosted.length} Created
-                    </span>
-                </div>
-
-                {displayHosted.length === 0 ? (
-                    <div className="p-12 border border-dashed border-white/5 rounded-3xl text-center bg-zinc-950/30 relative overflow-hidden">
-                        <div className="absolute inset-0 mesh-gradient opacity-20" />
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 rounded-full bg-zinc-900 border border-white/10 flex items-center justify-center mx-auto mb-4">
-                                <Crown className="w-8 h-8 text-zinc-600" />
-                            </div>
-                            <p className="text-zinc-500 font-medium mb-4">You aren't hosting any games.</p>
-                            <NextLink href="/host" className="text-amber-500 font-bold text-xs uppercase tracking-widest hover:text-glow transition-all inline-flex items-center gap-2">
-                                <Sparkles className="w-3 h-3" />
-                                Create your first run
-                            </NextLink>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-8 relative z-10">
-                        {displayHosted.map((game: any, idx: number) => (
-                            <div
-                                key={game.id}
-                                className="opacity-0 animate-card-entrance hover-lift card-shine"
-                                style={{ animationDelay: `${idx * 0.15}s`, animationFillMode: 'forwards' }}
-                            >
-                                <GameCard game={game} currentUserId={user.id} role="host" />
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
+            {/* Tabbed Content */}
+            <MyGamesTabs
+                upcomingGames={upcomingGames}
+                hostedGames={allHosted}
+                completedGames={completedGames}
+                userId={user.id}
+            />
         </div>
     );
 }
