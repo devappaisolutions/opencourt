@@ -53,6 +53,8 @@ export function GameCard({
         setMounted(true);
     }, []);
 
+    const isFull = game.players >= game.max_players;
+
     const handleJoin = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
@@ -65,7 +67,7 @@ export function GameCard({
         const { error } = await supabase.from("game_roster").insert({
             game_id: game.id,
             player_id: currentUserId,
-            status: "joined",
+            status: isFull ? "waitlist" : "joined",
         });
 
         if (error) {
@@ -235,10 +237,13 @@ export function GameCard({
                             ) : (
                                 <button
                                     onClick={handleJoin}
-                                    disabled={loading || game.players >= game.max_players}
-                                    className="px-6 py-2.5 rounded-xl font-bold text-xs tracking-widest uppercase transition-all pointer-events-auto bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 active:scale-95 shimmer-btn"
+                                    disabled={loading}
+                                    className={`px-6 py-2.5 rounded-xl font-bold text-xs tracking-widest uppercase transition-all pointer-events-auto active:scale-95 ${isFull
+                                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30'
+                                        : 'bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/20 shimmer-btn'
+                                    }`}
                                 >
-                                    {loading ? "..." : role === 'host' ? "JOIN AS PLAYER" : "JOIN RUN"}
+                                    {loading ? "..." : isFull ? "JOIN WAITLIST" : role === 'host' ? "JOIN AS PLAYER" : "JOIN RUN"}
                                 </button>
                             )
                         )}
