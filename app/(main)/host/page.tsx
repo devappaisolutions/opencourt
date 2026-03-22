@@ -5,7 +5,7 @@ import { Calendar, ChevronLeft, ChevronRight, Clock, MapPin, Trophy, Users, Spar
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { GAME_FORMATS, MAX_PLAYERS_BY_FORMAT, SKILL_LEVELS } from "@/lib/constants";
+import { GAME_FORMATS, SKILL_LEVELS } from "@/lib/constants";
 
 export default function HostGamePage() {
     const router = useRouter();
@@ -576,7 +576,7 @@ export default function HostGamePage() {
                             <div className="grid grid-cols-2 gap-4 relative z-10">
                                 <div className="space-y-1">
                                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Total Slots</p>
-                                    <p className="text-white font-bold">{MAX_PLAYERS_BY_FORMAT[format as keyof typeof MAX_PLAYERS_BY_FORMAT] || 10} Players</p>
+                                    <p className="text-white font-bold">{maxPlayers} Players</p>
                                 </div>
                                 <div className="space-y-1 text-right">
                                     <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">Filter</p>
