@@ -344,7 +344,6 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                             gameId={id}
                             playerId={user.id}
                             existingStats={userStats}
-                            onSuccess={() => window.location.reload()}
                         />
                     )}
 

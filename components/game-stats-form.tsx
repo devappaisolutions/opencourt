@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TrendingUp } from "lucide-react";
 
 interface GameStatsFormProps {
@@ -15,11 +16,11 @@ interface GameStatsFormProps {
         blocks: number;
         turnovers: number;
     } | null;
-    onSuccess?: () => void;
 }
 
-export function GameStatsForm({ gameId, playerId, existingStats, onSuccess }: GameStatsFormProps) {
+export function GameStatsForm({ gameId, playerId, existingStats }: GameStatsFormProps) {
     const supabase = createClient();
+    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [stats, setStats] = useState({
         points: existingStats?.points || 0,
@@ -61,7 +62,7 @@ export function GameStatsForm({ gameId, playerId, existingStats, onSuccess }: Ga
             }
 
             alert("Stats saved successfully!");
-            onSuccess?.();
+            router.refresh();
         } catch (error: any) {
             console.error("Error saving stats:", error);
             alert(error.message || "Failed to save stats");
