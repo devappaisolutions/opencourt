@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { Camera, ChevronRight, Ruler, Save, Shield, Trophy, User as UserIcon, Sparkles, Zap, Star } from "lucide-react";
+import { Camera, ChevronRight, Ruler, Save, Shield, Trophy, User as UserIcon, Sparkles, Zap, Star, TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -21,6 +21,14 @@ export default function ProfilePage() {
     const [skillLevel, setSkillLevel] = useState("Casual");
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(9);
+    const [avgStats, setAvgStats] = useState({
+        avg_points: 0,
+        avg_rebounds: 0,
+        avg_assists: 0,
+        avg_steals: 0,
+        avg_blocks: 0,
+        avg_turnovers: 0,
+    });
 
     useEffect(() => {
         getProfile();
@@ -84,6 +92,14 @@ export default function ProfilePage() {
                 setSkillLevel(finalProfile.skill_level || "Casual");
                 setHeightFt(finalProfile.height_ft || 5);
                 setHeightIn(finalProfile.height_in || 9);
+                setAvgStats({
+                    avg_points: finalProfile.avg_points || 0,
+                    avg_rebounds: finalProfile.avg_rebounds || 0,
+                    avg_assists: finalProfile.avg_assists || 0,
+                    avg_steals: finalProfile.avg_steals || 0,
+                    avg_blocks: finalProfile.avg_blocks || 0,
+                    avg_turnovers: finalProfile.avg_turnovers || 0,
+                });
             }
         } catch (error) {
             console.error(error);
@@ -115,6 +131,7 @@ export default function ProfilePage() {
                 skill_level: skillLevel,
                 height_ft: heightFt,
                 height_in: heightIn,
+                ...avgStats,
                 updated_at: new Date().toISOString(),
             };
 
@@ -345,6 +362,36 @@ export default function ProfilePage() {
                                     {Array.from({ length: 12 }).map((_, i) => <option key={i} value={i} className="bg-zinc-900">{i}"</option>)}
                                 </select>
                             </div>
+                        </div>
+                    </div>
+
+                    {/* Honest Average Stats */}
+                    <div className="space-y-3">
+                        <label className="text-sm font-medium text-white flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-primary" /> Honest Averages
+                        </label>
+                        <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">Be real — this helps balance teams</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            {([
+                                { label: "Avg Points", key: "avg_points", max: 100 },
+                                { label: "Avg Rebounds", key: "avg_rebounds", max: 50 },
+                                { label: "Avg Assists", key: "avg_assists", max: 50 },
+                                { label: "Avg Steals", key: "avg_steals", max: 20 },
+                                { label: "Avg Blocks", key: "avg_blocks", max: 20 },
+                                { label: "Avg Turnovers", key: "avg_turnovers", max: 20 },
+                            ] as const).map((stat) => (
+                                <div key={stat.key} className="space-y-2">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{stat.label}</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max={stat.max}
+                                        value={avgStats[stat.key]}
+                                        onChange={(e) => setAvgStats({ ...avgStats, [stat.key]: Math.min(stat.max, Math.max(0, Number(e.target.value))) })}
+                                        className="w-full h-12 bg-zinc-900/50 border border-white/5 hover:border-white/10 rounded-xl px-4 text-white text-center text-lg font-bold focus:outline-none focus:border-primary/40 input-premium transition-all"
+                                    />
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>

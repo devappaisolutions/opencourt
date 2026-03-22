@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { ChevronRight, Ruler, Trophy, User as UserIcon, BadgeCheck } from "lucide-react";
+import { ChevronRight, Ruler, Trophy, User as UserIcon, BadgeCheck, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,6 +21,16 @@ export default function OnboardingPage() {
     const [heightFt, setHeightFt] = useState(5);
     const [heightIn, setHeightIn] = useState(10);
     const [skillLevel, setSkillLevel] = useState<string | null>(null);
+
+    // Honest average stats
+    const [avgStats, setAvgStats] = useState({
+        avg_points: 0,
+        avg_rebounds: 0,
+        avg_assists: 0,
+        avg_steals: 0,
+        avg_blocks: 0,
+        avg_turnovers: 0,
+    });
 
     useEffect(() => {
         const getUser = async () => {
@@ -60,6 +70,7 @@ export default function OnboardingPage() {
         if (skillLevel) updates.skill_level = skillLevel;
         updates.height_ft = heightFt;
         updates.height_in = heightIn;
+        Object.assign(updates, avgStats);
 
         const { error } = await supabase.from("profiles").upsert(updates);
 
@@ -193,6 +204,37 @@ export default function OnboardingPage() {
                                 >
                                     {skill}
                                 </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Honest Average Stats */}
+                    <div className="h-px bg-white/5" />
+                    <div className="space-y-3">
+                        <label className="text-sm font-medium text-white/80 flex items-center gap-2">
+                            <TrendingUp className="w-4 h-4 text-primary" /> Honest Averages
+                        </label>
+                        <p className="text-[10px] text-zinc-500 font-medium uppercase tracking-widest">Be real — this helps balance teams</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            {([
+                                { label: "Avg Points", key: "avg_points", max: 100 },
+                                { label: "Avg Rebounds", key: "avg_rebounds", max: 50 },
+                                { label: "Avg Assists", key: "avg_assists", max: 50 },
+                                { label: "Avg Steals", key: "avg_steals", max: 20 },
+                                { label: "Avg Blocks", key: "avg_blocks", max: 20 },
+                                { label: "Avg Turnovers", key: "avg_turnovers", max: 20 },
+                            ] as const).map((stat) => (
+                                <div key={stat.key} className="space-y-1.5">
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400">{stat.label}</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max={stat.max}
+                                        value={avgStats[stat.key]}
+                                        onChange={(e) => setAvgStats({ ...avgStats, [stat.key]: Math.min(stat.max, Math.max(0, Number(e.target.value))) })}
+                                        className="w-full bg-[#1F1D1D]/60 border border-white/10 rounded-xl px-4 py-2.5 text-white text-center text-sm font-bold focus:outline-none focus:border-primary/50 input-premium transition-all"
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>

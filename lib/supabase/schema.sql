@@ -26,6 +26,14 @@ CREATE TABLE IF NOT EXISTS profiles (
   )),
   reliability_score INT DEFAULT 100,
 
+  -- Honest self-reported average stats
+  avg_points INT DEFAULT 0 CHECK (avg_points >= 0 AND avg_points <= 100),
+  avg_rebounds INT DEFAULT 0 CHECK (avg_rebounds >= 0 AND avg_rebounds <= 50),
+  avg_assists INT DEFAULT 0 CHECK (avg_assists >= 0 AND avg_assists <= 50),
+  avg_steals INT DEFAULT 0 CHECK (avg_steals >= 0 AND avg_steals <= 20),
+  avg_blocks INT DEFAULT 0 CHECK (avg_blocks >= 0 AND avg_blocks <= 20),
+  avg_turnovers INT DEFAULT 0 CHECK (avg_turnovers >= 0 AND avg_turnovers <= 20),
+
   CONSTRAINT username_length CHECK (char_length(username) >= 3)
 );
 
