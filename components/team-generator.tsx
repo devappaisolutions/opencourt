@@ -76,7 +76,7 @@ export function TeamGenerator({
 
                 <button
                     onClick={handleRegenerateClick}
-                    disabled={loading || confirmedCount < 14}
+                    disabled={loading || confirmedCount < 4}
                     className="px-6 py-3 rounded-xl bg-primary hover:bg-primary/90 text-black font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-primary/50"
                 >
                     {loading ? (
@@ -99,10 +99,10 @@ export function TeamGenerator({
             </div>
 
             {/* Minimum Players Warning */}
-            {confirmedCount < 14 && !teams && (
+            {confirmedCount < 4 && !teams && (
                 <div className="glass-card-premium p-4 rounded-xl border border-white/10 bg-white/5">
                     <p className="text-sm text-zinc-400">
-                        Need at least 14 confirmed players to generate teams ({confirmedCount}/14 confirmed)
+                        Need at least 4 confirmed players to generate teams ({confirmedCount}/4 confirmed)
                     </p>
                 </div>
             )}

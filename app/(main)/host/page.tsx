@@ -421,20 +421,28 @@ export default function HostGamePage() {
                             <label className="text-sm font-medium text-white flex items-center gap-2 font-heading">
                                 <Users className="w-4 h-4 text-primary" /> Max Players: {maxPlayers}
                             </label>
-                            <input
-                                type="range"
-                                min="15"
-                                max="25"
-                                step="5"
-                                value={maxPlayers}
-                                onChange={(e) => setMaxPlayers(Number(e.target.value))}
-                                className="w-full h-2 bg-zinc-900 rounded-lg appearance-none cursor-pointer slider-thumb"
-                            />
-                            <div className="flex justify-between text-xs text-zinc-500 font-medium">
-                                <span>15</span>
-                                <span>20</span>
-                                <span>25</span>
-                            </div>
+                            {(() => {
+                                const playerOptions = [4, 15, 20, 25];
+                                const sliderIndex = playerOptions.indexOf(maxPlayers) + 1 || 3;
+                                return (
+                                    <>
+                                        <input
+                                            type="range"
+                                            min="1"
+                                            max="4"
+                                            step="1"
+                                            value={sliderIndex}
+                                            onChange={(e) => setMaxPlayers(playerOptions[Number(e.target.value) - 1])}
+                                            className="w-full h-2 bg-zinc-900 rounded-lg appearance-none cursor-pointer slider-thumb"
+                                        />
+                                        <div className="flex justify-between text-xs text-zinc-500 font-medium">
+                                            {playerOptions.map((val) => (
+                                                <span key={val}>{val}</span>
+                                            ))}
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
 
                         <div className="space-y-3">
