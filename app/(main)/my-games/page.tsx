@@ -12,6 +12,11 @@ export default async function MyGamesPage() {
         redirect("/login");
     }
 
+    // Only show games from the last 7 days
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const sevenDaysAgoISO = sevenDaysAgo.toISOString();
+
     // Fetch Hosted Games with error handling
     let hostedGames: any[] = [];
     try {
@@ -19,6 +24,7 @@ export default async function MyGamesPage() {
             .from('games')
             .select('*')
             .eq('host_id', user.id)
+            .gte('date_time', sevenDaysAgoISO)
             .order('date_time', { ascending: true });
         hostedGames = data || [];
     } catch (error) {
@@ -60,7 +66,8 @@ export default async function MyGamesPage() {
     interface JoinedGameData {
         game: any;
     }
-    const joinedGames = joinedData?.map((item: JoinedGameData) => item.game) || [];
+    const joinedGames = (joinedData?.map((item: JoinedGameData) => item.game) || [])
+        .filter((g: any) => new Date(g.date_time).getTime() >= sevenDaysAgo.getTime());
 
     // Sort joined games by date
     joinedGames.sort((a: any, b: any) => new Date(a.date_time).getTime() - new Date(b.date_time).getTime());
