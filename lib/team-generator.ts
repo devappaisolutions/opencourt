@@ -8,18 +8,66 @@ export interface Player {
     height_in: number | null;
     skill_level: string | null;
     reliability_score: number;
+    avg_points: number;
+    avg_rebounds: number;
+    avg_assists: number;
+    avg_steals: number;
+    avg_blocks: number;
+    avg_turnovers: number;
 }
 
 export interface TeamAssignment {
     team_number: number;
-    players: Player[];
-    avg_skill: number;
+    players: (Player & { ovr: number })[];
+    avg_ovr: number;
+}
+
+/**
+ * Calculate OVR (Overall Rating) for a player based on stats and skill level.
+ * Returns a value from 0-100.
+ */
+export function calculateOVR(player: Player): number {
+    const hasStats = (player.avg_points || 0) > 0 ||
+        (player.avg_rebounds || 0) > 0 ||
+        (player.avg_assists || 0) > 0 ||
+        (player.avg_steals || 0) > 0 ||
+        (player.avg_blocks || 0) > 0;
+
+    // Skill level modifier
+    const skillModifier: Record<string, number> = {
+        Elite: 20,
+        Competitive: 15,
+        Casual: 10,
+        Beginner: 5,
+    };
+    const skillBonus = skillModifier[player.skill_level || ''] ?? 5;
+
+    // If player has no stats, fall back to skill-level-only rating
+    if (!hasStats) {
+        const skillOnlyRating: Record<string, number> = {
+            Elite: 80,
+            Competitive: 60,
+            Casual: 40,
+            Beginner: 20,
+        };
+        return skillOnlyRating[player.skill_level || ''] ?? 30;
+    }
+
+    // Stat score: each stat normalized to its max, then weighted
+    const statScore =
+        ((player.avg_points || 0) / 100) * 35 +
+        ((player.avg_rebounds || 0) / 50) * 15 +
+        ((player.avg_assists || 0) / 50) * 20 +
+        ((player.avg_steals || 0) / 20) * 10 +
+        ((player.avg_blocks || 0) / 20) * 10 -
+        ((player.avg_turnovers || 0) / 20) * 10;
+
+    const ovr = statScore + skillBonus;
+    return Math.max(0, Math.min(100, Math.round(ovr)));
 }
 
 /**
  * Generate balanced teams for a game
- * @param gameId - The game ID to generate teams for
- * @returns Team assignments or error
  */
 export async function generateTeams(gameId: string, hostId: string) {
     const supabase = await createClient();
@@ -44,17 +92,23 @@ export async function generateTeams(gameId: string, hostId: string) {
     const { data: roster, error: rosterError } = await supabase
         .from("game_roster")
         .select(`
-      player_id,
-      profiles (
-        id,
-        full_name,
-        position,
-        height_ft,
-        height_in,
-        skill_level,
-        reliability_score
-      )
-    `)
+            player_id,
+            profiles (
+                id,
+                full_name,
+                position,
+                height_ft,
+                height_in,
+                skill_level,
+                reliability_score,
+                avg_points,
+                avg_rebounds,
+                avg_assists,
+                avg_steals,
+                avg_blocks,
+                avg_turnovers
+            )
+        `)
         .eq("game_id", gameId)
         .in("status", ["joined", "checked_in"]);
 
@@ -111,113 +165,80 @@ export async function generateTeams(gameId: string, hostId: string) {
 }
 
 /**
- * Balance players into two teams using enhanced algorithm
- * Considers: position, height, skill level, and reliability
- * @param players - Array of players to balance
- * @returns Two balanced teams
+ * Balance players into two teams using OVR-based algorithm.
+ * 1. Calculate OVR for each player
+ * 2. Sort by OVR descending
+ * 3. Snake draft (1-2-2-1-1-2...) for initial assignment
+ * 4. Swap optimization pass to minimize OVR gap between teams
  */
 function balanceTeams(players: Player[]): TeamAssignment[] {
-    // Helper: Calculate height in inches
-    const getHeightInInches = (player: Player): number => {
-        const ft = player.height_ft || 0;
-        const inches = player.height_in || 0;
-        return ft * 12 + inches;
-    };
+    // Calculate OVR for each player
+    const playersWithOVR = players.map(player => ({
+        ...player,
+        ovr: calculateOVR(player),
+    }));
 
-    // Helper: Get numeric skill value
-    const getSkillValue = (skillLevel: string | null): number => {
-        const skillOrder = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
-        return skillOrder[skillLevel as keyof typeof skillOrder] || 0;
-    };
+    // Sort by OVR descending
+    playersWithOVR.sort((a, b) => b.ovr - a.ovr);
 
-    // Helper: Normalize position
-    const normalizePosition = (position: string | null): string => {
-        if (!position) return 'Unknown';
-        const pos = position.toLowerCase();
-        if (pos.includes('guard') || pos.includes('pg') || pos.includes('sg')) return 'Guard';
-        if (pos.includes('forward') || pos.includes('sf') || pos.includes('pf')) return 'Forward';
-        if (pos.includes('center') || pos.includes('c')) return 'Center';
-        return 'Unknown';
-    };
+    // Snake draft: 1-2-2-1-1-2-2-1...
+    const team1: (Player & { ovr: number })[] = [];
+    const team2: (Player & { ovr: number })[] = [];
 
-    // Calculate composite score for each player
-    const playersWithScores = players.map(player => {
-        const skillValue = getSkillValue(player.skill_level);
-        const reliabilityScore = player.reliability_score || 100;
-        const heightInches = getHeightInInches(player);
+    playersWithOVR.forEach((player, index) => {
+        // Snake pattern: round = floor(index / 2), even rounds -> team based on index parity
+        const round = Math.floor(index / 2);
+        const isEvenRound = round % 2 === 0;
 
-        // Composite score: skill (60%) + reliability (30%) + height factor (10%)
-        // Height factor: normalized to 0-4 range (assuming 60-84 inches)
-        const heightFactor = Math.min(4, Math.max(0, (heightInches - 60) / 6));
-        const compositeScore = (skillValue * 0.6) + (reliabilityScore / 100 * 4 * 0.3) + (heightFactor * 0.1);
-
-        return {
-            ...player,
-            position: normalizePosition(player.position),
-            compositeScore,
-            skillValue,
-            heightInches
-        };
+        if (index % 2 === 0) {
+            (isEvenRound ? team1 : team2).push(player);
+        } else {
+            (isEvenRound ? team2 : team1).push(player);
+        }
     });
 
-    // Group players by position
-    const guards = playersWithScores.filter(p => p.position === 'Guard');
-    const forwards = playersWithScores.filter(p => p.position === 'Forward');
-    const centers = playersWithScores.filter(p => p.position === 'Center');
-    const unknown = playersWithScores.filter(p => p.position === 'Unknown');
+    // Swap optimization: try swapping players between teams to reduce OVR gap
+    const getTeamOVR = (team: { ovr: number }[]) =>
+        team.reduce((sum, p) => sum + p.ovr, 0);
 
-    // Sort each position group by composite score (descending)
-    const sortByScore = (a: any, b: any) => b.compositeScore - a.compositeScore;
-    guards.sort(sortByScore);
-    forwards.sort(sortByScore);
-    centers.sort(sortByScore);
-    unknown.sort(sortByScore);
+    let improved = true;
+    while (improved) {
+        improved = false;
+        const diff = Math.abs(getTeamOVR(team1) - getTeamOVR(team2));
 
-    const team1: Player[] = [];
-    const team2: Player[] = [];
+        for (let i = 0; i < team1.length; i++) {
+            for (let j = 0; j < team2.length; j++) {
+                // Try swapping team1[i] with team2[j]
+                const newTeam1OVR = getTeamOVR(team1) - team1[i].ovr + team2[j].ovr;
+                const newTeam2OVR = getTeamOVR(team2) - team2[j].ovr + team1[i].ovr;
+                const newDiff = Math.abs(newTeam1OVR - newTeam2OVR);
 
-    // Snake draft within each position group
-    const snakeDraft = (positionGroup: any[]) => {
-        let pickForTeam1 = true;
-
-        positionGroup.forEach((player, index) => {
-            if (pickForTeam1) {
-                team1.push(player);
-            } else {
-                team2.push(player);
+                if (newDiff < diff) {
+                    // Swap
+                    const temp = team1[i];
+                    team1[i] = team2[j];
+                    team2[j] = temp;
+                    improved = true;
+                    break;
+                }
             }
+            if (improved) break;
+        }
+    }
 
-            // Alternate picks (1-2-2-1 pattern for snake draft)
-            if (index === 0 || (index > 0 && positionGroup.length > 2)) {
-                pickForTeam1 = !pickForTeam1;
-            }
-        });
-    };
-
-    // Draft players by position to ensure balanced position distribution
-    snakeDraft(guards);
-    snakeDraft(forwards);
-    snakeDraft(centers);
-    snakeDraft(unknown);
-
-    // Calculate average skill levels
-    const calculateAvgSkill = (team: Player[]) => {
-        if (team.length === 0) return 0;
-        const total = team.reduce((sum, p) => sum + getSkillValue(p.skill_level), 0);
-        return total / team.length;
-    };
+    const avgOVR = (team: { ovr: number }[]) =>
+        team.length === 0 ? 0 : Math.round(team.reduce((sum, p) => sum + p.ovr, 0) / team.length);
 
     return [
         {
             team_number: 1,
             players: team1,
-            avg_skill: calculateAvgSkill(team1),
+            avg_ovr: avgOVR(team1),
         },
         {
             team_number: 2,
             players: team2,
-            avg_skill: calculateAvgSkill(team2),
+            avg_ovr: avgOVR(team2),
         },
     ];
 }
-

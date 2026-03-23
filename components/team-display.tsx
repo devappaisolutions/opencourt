@@ -12,16 +12,24 @@ interface Player {
     skill_level: string | null;
     reliability_score: number;
     avatar_url?: string | null;
+    ovr?: number;
 }
 
 interface Team {
     team_number: number;
     players: Player[];
-    avg_skill: number;
+    avg_ovr: number;
 }
 
 interface TeamDisplayProps {
     teams: Team[];
+}
+
+function getOVRColor(ovr: number): string {
+    if (ovr >= 80) return "text-amber-400 bg-amber-400/15 border-amber-400/30";
+    if (ovr >= 60) return "text-primary bg-primary/15 border-primary/30";
+    if (ovr >= 40) return "text-blue-400 bg-blue-400/15 border-blue-400/30";
+    return "text-zinc-400 bg-zinc-400/15 border-zinc-400/30";
 }
 
 export function TeamDisplay({ teams }: TeamDisplayProps) {
@@ -29,19 +37,6 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
     const team2 = teams.find((t) => t.team_number === 2);
 
     if (!team1 || !team2) return null;
-
-    const getSkillColor = (skill: string | null) => {
-        switch (skill) {
-            case "Elite":
-                return "text-amber-400";
-            case "Competitive":
-                return "text-primary";
-            case "Casual":
-                return "text-blue-400";
-            default:
-                return "text-zinc-400";
-        }
-    };
 
     const TeamCard = ({ team, color }: { team: Team; color: string }) => (
         <div className="flex-1 space-y-4">
@@ -53,8 +48,8 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                             Team {team.team_number}
                         </h3>
                     </div>
-                    <div className="text-xs text-zinc-400">
-                        Avg Skill: {team.avg_skill.toFixed(1)}
+                    <div className="text-xs text-zinc-400 font-bold">
+                        AVG OVR: <span className="text-white">{team.avg_ovr}</span>
                     </div>
                 </div>
 
@@ -90,20 +85,22 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                                         <>
                                             <span className="text-zinc-700">•</span>
                                             <span className="text-zinc-500">
-                                                {player.height_ft || 0}'{player.height_in || 0}"
+                                                {player.height_ft || 0}&apos;{player.height_in || 0}&quot;
                                             </span>
                                         </>
                                     )}
                                     <span className="text-zinc-700">•</span>
-                                    <span className={getSkillColor(player.skill_level)}>
+                                    <span className="text-zinc-500">
                                         {player.skill_level || "No Level"}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="text-xs font-bold text-zinc-500">
-                                {player.reliability_score}
-                            </div>
+                            {player.ovr != null && (
+                                <div className={`px-2.5 py-1 rounded-lg text-xs font-black border ${getOVRColor(player.ovr)}`}>
+                                    {player.ovr}
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

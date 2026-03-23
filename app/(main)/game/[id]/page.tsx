@@ -4,6 +4,7 @@ import { GameStatsForm } from "@/components/game-stats-form";
 import { GameStatsDisplay } from "@/components/game-stats-display";
 import { TeamGenerator } from "@/components/team-generator";
 import { createClient } from "@/lib/supabase/server";
+import { calculateOVR } from "@/lib/team-generator";
 import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -87,43 +88,43 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     height_in,
                     skill_level,
                     reliability_score,
-                    avatar_url
+                    avatar_url,
+                    avg_points,
+                    avg_rebounds,
+                    avg_assists,
+                    avg_steals,
+                    avg_blocks,
+                    avg_turnovers
                 )
             `)
             .eq('game_id', id)
             .order('team_number');
 
         if (assignments && assignments.length > 0) {
-            // Group by team number
-            const team1Players = assignments
-                .filter((a: any) => a.team_number === 1)
-                .map((a: any) => a.profiles);
-            const team2Players = assignments
-                .filter((a: any) => a.team_number === 2)
-                .map((a: any) => a.profiles);
+            // Group by team number and attach OVR
+            const withOVR = (players: any[]) =>
+                players.map((p: any) => ({ ...p, ovr: calculateOVR(p) }));
 
-            // Calculate average skill
-            const getSkillValue = (skill: string | null) => {
-                const skillOrder = { Elite: 4, Competitive: 3, Casual: 2, Beginner: 1 };
-                return skillOrder[skill as keyof typeof skillOrder] || 0;
-            };
+            const team1Players = withOVR(
+                assignments.filter((a: any) => a.team_number === 1).map((a: any) => a.profiles)
+            );
+            const team2Players = withOVR(
+                assignments.filter((a: any) => a.team_number === 2).map((a: any) => a.profiles)
+            );
 
-            const calculateAvgSkill = (players: any[]) => {
-                if (players.length === 0) return 0;
-                const total = players.reduce((sum, p) => sum + getSkillValue(p.skill_level), 0);
-                return total / players.length;
-            };
+            const avgOVR = (players: any[]) =>
+                players.length === 0 ? 0 : Math.round(players.reduce((sum: number, p: any) => sum + p.ovr, 0) / players.length);
 
             existingTeams = [
                 {
                     team_number: 1,
                     players: team1Players,
-                    avg_skill: calculateAvgSkill(team1Players),
+                    avg_ovr: avgOVR(team1Players),
                 },
                 {
                     team_number: 2,
                     players: team2Players,
-                    avg_skill: calculateAvgSkill(team2Players),
+                    avg_ovr: avgOVR(team2Players),
                 },
             ];
         }
