@@ -25,11 +25,11 @@ interface GameChatProps {
 export function GameChat({ gameId, userId }: GameChatProps) {
     const supabase = createClient();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [newMessage, setNewMessage] = useState('');
     const [sending, setSending] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const isExpandedRef = useRef(isExpanded);
 
     // Keep ref in sync
@@ -115,7 +115,8 @@ export function GameChat({ gameId, userId }: GameChatProps) {
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !userId || sending) return;
+        const value = inputRef.current?.value?.trim();
+        if (!value || !userId || sending) return;
 
         setSending(true);
         try {
@@ -124,10 +125,10 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 .insert({
                     game_id: gameId,
                     user_id: userId,
-                    message: newMessage.trim(),
+                    message: value,
                 });
             if (error) throw error;
-            setNewMessage('');
+            if (inputRef.current) inputRef.current.value = '';
         } catch (error) {
             console.error('Error sending message:', error);
         } finally {
@@ -239,16 +240,15 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                             className="flex items-center gap-2 p-3 border-t border-white/5"
                         >
                             <input
+                                ref={inputRef}
                                 type="text"
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
                                 placeholder="Type a message..."
                                 maxLength={500}
                                 className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all"
                             />
                             <button
                                 type="submit"
-                                disabled={sending || !newMessage.trim()}
+                                disabled={sending}
                                 className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
                             >
                                 <Send className="w-4 h-4" />
