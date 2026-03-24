@@ -5,7 +5,7 @@ import { GameStatsDisplay } from "@/components/game-stats-display";
 import { TeamGenerator } from "@/components/team-generator";
 import { createClient } from "@/lib/supabase/server";
 import { calculateOVR } from "@/lib/team-generator";
-import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap } from "lucide-react";
+import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap, DollarSign, Users } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -137,182 +137,132 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
 
     return (
         <div className="space-y-6 animate-in fade-in duration-1000 pb-16 relative">
-            {/* Premium Hero Section */}
-            <div className={`relative rounded-[2.5rem] overflow-hidden p-6 md:p-10 ${bgGradient} border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.6)] group`}>
+            {/* Hero Section */}
+            <div className={`relative rounded-2xl overflow-hidden ${bgGradient} border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.4)]`}>
                 {/* Background Overlay */}
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-md transition-all duration-700 group-hover:bg-black/30" />
-
-                {/* Glare Effect */}
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-md" />
                 <div className="glare-effect" />
 
-                <div className="relative z-10 flex flex-col lg:flex-row gap-6 justify-between items-end">
-                    <div className="space-y-4 flex-1">
-                        {/* Badges */}
-                        <div className="flex flex-wrap gap-3">
-                            <span className="badge-premium px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl">
+                <div className="relative z-10 p-5 md:p-8 space-y-4">
+                    {/* Top Row: Badges + Host */}
+                    <div className="flex items-center justify-between gap-4">
+                        <div className="flex flex-wrap gap-2">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-white/10 border border-white/20 text-white">
                                 {game.format}
                             </span>
-                            <span className={`badge-premium px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase backdrop-blur-xl border shadow-2xl flex items-center gap-1.5 ${game.skill_level === 'Elite'
-                                ? 'bg-primary/20 text-primary border-primary/30'
-                                : 'bg-primary/20 text-primary border-primary/30'
-                                }`}>
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase bg-primary/20 border border-primary/30 text-primary flex items-center gap-1">
                                 {game.skill_level === 'Elite' && <Sparkles className="w-3 h-3" />}
                                 {game.skill_level}
                             </span>
+                            <span className={`px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase flex items-center gap-1 ${game.status === 'completed' ? 'bg-emerald-500/15 border border-emerald-500/25 text-emerald-400' : game.status === 'cancelled' ? 'bg-rose-500/15 border border-rose-500/25 text-rose-400' : 'bg-primary/10 border border-primary/20 text-primary'}`}>
+                                <div className={`w-1.5 h-1.5 rounded-full ${game.status === 'completed' ? 'bg-emerald-400' : game.status === 'cancelled' ? 'bg-rose-400' : 'bg-primary animate-pulse'}`} />
+                                {game.status}
+                            </span>
                         </div>
 
-                        {/* Title & Info */}
-                        <div className="space-y-4">
-                            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight tracking-tight uppercase italic font-heading">
-                                {game.title}
-                            </h1>
-                            <div className="flex flex-col md:flex-row gap-4 md:gap-8 pt-4">
-                                {/* Location */}
-                                <div className="flex items-center gap-3 text-zinc-300 group/item">
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/item:bg-primary/20 group-hover/item:border-primary/30 transition-all">
-                                        <MapPin className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Location</p>
-                                        <p className="font-bold text-lg">{game.location}</p>
-                                    </div>
-                                </div>
-                                {/* Schedule */}
-                                <div className="flex items-center gap-3 text-zinc-300 group/item">
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10 group-hover/item:bg-primary/20 group-hover/item:border-primary/30 transition-all">
-                                        <Clock className="w-5 h-5 text-primary" />
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Schedule</p>
-                                        <p className="font-bold text-lg">
-                                            {new Date(game.date_time).toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' })} at {new Date(game.date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' })}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Host Card */}
-                    <div className="glass-card-premium p-4 md:p-5 rounded-[2.5rem] min-w-[280px] border-t border-white/20 shadow-2xl relative overflow-hidden group/host transition-all duration-500 hover:border-primary/50 hover-lift">
-                        {/* Card Glow */}
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/15 blur-[60px] rounded-full transition-opacity group-hover/host:opacity-100 opacity-30" />
-
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 relative z-10 font-heading">Hosted By</p>
-                        <div className="flex items-center gap-4 relative z-10">
-                            {/* Avatar */}
+                        {/* Host - inline */}
+                        <div className="flex items-center gap-2.5 shrink-0">
                             <div className="relative">
-                                <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner transform group-hover/host:scale-105 transition-transform">
+                                <div className="w-9 h-9 rounded-xl bg-zinc-900 flex items-center justify-center border border-white/10 overflow-hidden">
                                     {game.profiles?.avatar_url ? (
                                         <Image
                                             src={game.profiles.avatar_url}
                                             alt={`${game.profiles.username || 'Host'} avatar`}
-                                            width={48}
-                                            height={48}
+                                            width={36}
+                                            height={36}
                                             className="object-cover"
-                                            sizes="48px"
+                                            sizes="36px"
                                         />
                                     ) : (
-                                        <UserIcon className="w-8 h-8 text-zinc-600" />
+                                        <UserIcon className="w-5 h-5 text-zinc-600" />
                                     )}
                                 </div>
-                                {/* Verification Badge */}
-                                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-zinc-950 shadow-lg">
-                                    <Shield className="w-3 h-3 text-white" />
+                                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center border-2 border-zinc-950">
+                                    <Shield className="w-2 h-2 text-white" />
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <p className="font-bold text-xl text-white tracking-tight uppercase">{game.profiles?.username || 'Unknown'}</p>
-                                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-[10px] tracking-widest uppercase">
-                                    <Zap className="w-3 h-3 fill-current" />
-                                    {game.profiles?.reliability_score || 100}% Reliable
-                                </div>
+                            <div className="hidden sm:block">
+                                <p className="text-sm font-bold text-white leading-tight">{game.profiles?.username || 'Unknown'}</p>
+                                <p className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest">
+                                    <Zap className="w-2.5 h-2.5 inline fill-current" /> {game.profiles?.reliability_score || 100}%
+                                </p>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="relative z-10 pt-6 flex justify-center lg:justify-start">
-                    <GameActions
-                        gameId={id}
-                        userId={user?.id || ''}
-                        isHost={isHost}
-                        isJoined={roster?.some((p: any) => p.player_id === user?.id) || false}
-                        currentPlayers={game.current_players}
-                        maxPlayers={game.max_players}
-                        disabled={!user}
-                        houseRules={game.house_rules}
-                        rosterId={roster?.find((p: any) => p.player_id === user?.id)?.id}
-                        status={game.status}
-                    />
+                    {/* Title */}
+                    <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight tracking-tight uppercase italic font-heading">
+                        {game.title}
+                    </h1>
+
+                    {/* Info Bar */}
+                    <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-zinc-300">
+                        <div className="flex items-center gap-2">
+                            <MapPin className="w-4 h-4 text-primary" />
+                            <span className="font-semibold">{game.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="font-semibold">
+                                {new Date(game.date_time).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'Asia/Manila' })} at {new Date(game.date_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' })}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-primary" />
+                            <span className={`font-semibold ${game.cost === 'Free' ? 'text-emerald-400' : ''}`}>
+                                {game.cost === 'Free' ? 'FREE' : game.cost?.startsWith('₱') ? game.cost : `₱${game.cost}`}
+                            </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-primary" />
+                            <span className="font-semibold">{game.current_players}/{game.max_players} Players</span>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="pt-1 flex flex-wrap gap-3">
+                        <GameActions
+                            gameId={id}
+                            userId={user?.id || ''}
+                            isHost={isHost}
+                            isJoined={roster?.some((p: any) => p.player_id === user?.id) || false}
+                            currentPlayers={game.current_players}
+                            maxPlayers={game.max_players}
+                            disabled={!user}
+                            houseRules={game.house_rules}
+                            rosterId={roster?.find((p: any) => p.player_id === user?.id)?.id}
+                            status={game.status}
+                        />
+                    </div>
                 </div>
             </div>
 
-            {/* Game Info & Rules */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 px-4 relative">
-                <div className="lg:col-span-2 space-y-4">
+            {/* Description & House Rules */}
+            {(game.description || game.house_rules) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-4">
                     {game.description && (
-                        <div className="glass-card-premium p-5 rounded-[2rem] border-t border-white/10 space-y-3 hover-lift transition-all duration-500">
+                        <div className="glass-card-premium p-5 rounded-2xl border-t border-white/10 space-y-2">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 <Sparkles className="w-3 h-3 text-primary" />
                                 The Run
                             </h2>
-                            <p className="text-zinc-300 leading-relaxed text-lg">
+                            <p className="text-zinc-300 leading-relaxed">
                                 {game.description}
                             </p>
                         </div>
                     )}
-
                     {game.house_rules && (
-                        <div className="glass-card-premium p-5 rounded-[2rem] border-t border-white/10 space-y-3 hover-lift transition-all duration-500">
+                        <div className="glass-card-premium p-5 rounded-2xl border-t border-white/10 space-y-2">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 📜 House Rules
                             </h2>
-                            <div className="prose prose-invert max-w-none">
-                                <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                                    {game.house_rules}
-                                </p>
-                            </div>
+                            <p className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                                {game.house_rules}
+                            </p>
                         </div>
                     )}
                 </div>
-
-                <div className="space-y-4">
-                    {/* Game Metadata Card */}
-                    <div className="glass-card-premium p-5 rounded-[2.5rem] border-t border-white/10 space-y-3 relative overflow-hidden group hover-lift transition-all duration-500">
-                        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 relative font-heading gradient-text">
-                            <Zap className="w-3 h-3 text-primary" />
-                            Run Intel
-                        </h2>
-
-                        <div className="space-y-4 relative">
-                            <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
-                                <span className="text-zinc-500 font-medium">Format</span>
-                                <span className="text-white font-bold">{game.format}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
-                                <span className="text-zinc-500 font-medium">Level</span>
-                                <span className="text-white font-bold">{game.skill_level}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
-                                <span className="text-zinc-500 font-medium">Cost</span>
-                                <span className={`font-normal ${game.cost === 'Free' ? 'text-emerald-400' : 'text-white'}`}>
-                                    {game.cost === 'Free' ? 'FREE' : game.cost?.startsWith('₱') ? game.cost : `₱${game.cost}`}
-                                </span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 border border-white/5">
-                                <span className="text-zinc-500 font-medium">Status</span>
-                                <span className="text-primary font-bold uppercase tracking-widest text-[10px] flex items-center gap-1">
-                                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                                    {game.status}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            )}
 
             {/* Interactive Roster Section */}
             <div className="px-4 relative">
