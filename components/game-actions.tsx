@@ -158,7 +158,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
 
     if (status === "cancelled") {
         return (
-            <div className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold text-xs tracking-[0.2em] uppercase italic">
+            <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold text-xs tracking-[0.2em] uppercase italic">
                 <AlertTriangle className="w-5 h-5" />
                 RUN CANCELLED
             </div>
@@ -168,14 +168,14 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
     if (status === "completed") {
         return (
             <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs tracking-[0.2em] uppercase italic">
+                <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-bold text-xs tracking-[0.2em] uppercase italic">
                     <CheckCircle2 className="w-5 h-5" />
                     RUN COMPLETED
                 </div>
                 {isJoined && (
                     <button
                         onClick={() => setShowReviewModal(true)}
-                        className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 shimmer-btn btn-glow"
+                        className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 shimmer-btn btn-glow"
                     >
                         <Trophy className="w-4 h-4" /> REVIEW SQUAD
                     </button>
@@ -187,21 +187,21 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
     if (isHost) {
         return (
             <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-zinc-900 border border-white/10 text-zinc-500 font-bold text-xs tracking-[0.2em] uppercase italic">
+                <div className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-zinc-900 border border-white/10 text-zinc-500 font-bold text-xs tracking-[0.2em] uppercase italic">
                     <ShieldCheck className="w-5 h-5 text-emerald-500" />
                     HOST MODE ACTIVE
                 </div>
                 <button
                     onClick={handleComplete}
                     disabled={loading}
-                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95 disabled:opacity-50"
                 >
                     <CheckCircle2 className="w-4 h-4" /> COMPLETE RUN
                 </button>
                 <button
                     onClick={handleCancel}
                     disabled={loading}
-                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
                 >
                     {loading ? "CANCELING..." : (
                         <>
@@ -218,14 +218,14 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
             <div className="flex flex-col sm:flex-row gap-4">
                 <button
                     onClick={() => setShowQRModal(true)}
-                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-all active:scale-95"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-primary/20 border border-primary/30 text-primary hover:bg-primary/30 transition-all active:scale-95"
                 >
                     <QrCode className="w-4 h-4" /> SHOW CHECK-IN QR
                 </button>
                 <button
                     onClick={handleLeave}
                     disabled={loading}
-                    className="flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
                 >
                     {loading ? "LEAVING..." : (
                         <>
@@ -284,7 +284,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
             <button
                 onClick={handleJoin}
                 disabled={loading || disabled || (!userId && !loading)}
-                className={`flex items-center gap-2 px-10 py-5 rounded-[2rem] font-bold text-xs tracking-[0.2em] uppercase transition-all duration-500 active:scale-95 disabled:opacity-50 italic ${isFull
+                className={`flex items-center gap-2 px-8 py-4 rounded-[2rem] font-bold text-xs tracking-[0.2em] uppercase transition-all duration-500 active:scale-95 disabled:opacity-50 italic ${isFull
                     ? "bg-zinc-900 text-amber-500 border border-amber-500/20"
                     : "bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 shimmer-btn btn-glow"
                     }`}

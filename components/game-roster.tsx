@@ -160,7 +160,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
 
         return (
             <div
-                className={`relative glass-card p-5 rounded-[1.5rem] flex items-center gap-5 border transition-all duration-500 overflow-hidden group hover-lift ${isCheckedIn ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.1)]" :
+                className={`relative glass-card p-3 rounded-[1.25rem] flex items-center gap-3 border transition-all duration-500 overflow-hidden group hover-lift ${isCheckedIn ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_30px_rgba(16,185,129,0.1)]" :
                     isAbsent ? "border-rose-500/30 bg-rose-500/5 blur-[0.5px] grayscale opacity-60 hover:filter-none hover:opacity-100" :
                         isWaitlist ? "border-white/5 bg-white/2 opacity-50 grayscale" :
                             "border-white/5 hover:border-white/10 hover:shadow-2xl"
@@ -169,15 +169,15 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
             >
                 <div className="glare-effect" />
 
-                <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 relative overflow-hidden shadow-inner">
+                <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 relative overflow-hidden shadow-inner">
                     {entry.profiles?.avatar_url ? (
                         <Image
                             src={entry.profiles.avatar_url}
                             alt={`${entry.profiles?.username || 'Player'} avatar`}
-                            width={64}
-                            height={64}
+                            width={48}
+                            height={48}
                             className="object-cover transition-transform duration-500 group-hover:scale-110"
-                            sizes="64px"
+                            sizes="48px"
                         />
                     ) : (
                         <UserIcon className="w-7 h-7 text-zinc-600" />
@@ -198,7 +198,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
 
                 <div className="flex-1 min-w-0 z-10">
                     <div className="flex items-center justify-between">
-                        <p className={`font-black text-xl tracking-tight truncate ${isAbsent ? "text-zinc-600 line-through" : "text-white"}`}>
+                        <p className={`font-black text-base tracking-tight truncate ${isAbsent ? "text-zinc-600 line-through" : "text-white"}`}>
                             {entry.profiles?.username || entry.profiles?.full_name || 'Baller'}
                         </p>
 
@@ -291,12 +291,12 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
     };
 
     return (
-        <div className="space-y-10">
+        <div className="space-y-6">
             {/* Squad Roster */}
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                        <h2 className="text-2xl font-bold text-white">Squad Roster</h2>
+                        <h2 className="text-lg font-bold text-white">Squad Roster</h2>
                         <p className="text-zinc-500 text-sm">Players confirmed for this run</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -339,16 +339,16 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                     </div>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {joinedPlayers.map((entry: any) => (
                         <PlayerCard key={entry.id} entry={entry} />
                     ))}
 
                     {/* Empty Slots */}
                     {Array.from({ length: Math.max(0, maxPlayers - joinedPlayers.length) }).map((_, i) => (
-                        <div key={`empty-${i}`} className="p-4 rounded-xl border border-dashed border-white/5 flex items-center gap-4 opacity-50">
-                            <div className="w-14 h-14 rounded-full bg-zinc-900/50 flex items-center justify-center border border-dashed border-white/10">
-                                <UserIcon className="w-6 h-6 text-zinc-700" />
+                        <div key={`empty-${i}`} className="p-3 rounded-xl border border-dashed border-white/5 flex items-center gap-3 opacity-50">
+                            <div className="w-10 h-10 rounded-full bg-zinc-900/50 flex items-center justify-center border border-dashed border-white/10">
+                                <UserIcon className="w-5 h-5 text-zinc-700" />
                             </div>
                             <p className="text-zinc-600 font-medium">Open Slot</p>
                         </div>
@@ -364,7 +364,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                         <p className="text-zinc-600 text-sm">Next in line if someone leaves</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                         {waitlistedPlayers.map((entry: any) => (
                             <PlayerCard key={entry.id} entry={entry} />
                         ))}

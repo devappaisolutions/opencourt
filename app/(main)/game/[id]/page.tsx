@@ -136,17 +136,17 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
         : (game.image_gradient || "bg-gradient-to-br from-[#2A2827] to-[#1F1D1D]");
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-1000 pb-32 relative">
+        <div className="space-y-6 animate-in fade-in duration-1000 pb-16 relative">
             {/* Premium Hero Section */}
-            <div className={`relative rounded-[2.5rem] overflow-hidden p-8 md:p-16 ${bgGradient} border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.6)] group`}>
+            <div className={`relative rounded-[2.5rem] overflow-hidden p-6 md:p-10 ${bgGradient} border border-white/10 shadow-[0_0_100px_rgba(0,0,0,0.6)] group`}>
                 {/* Background Overlay */}
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-md transition-all duration-700 group-hover:bg-black/30" />
 
                 {/* Glare Effect */}
                 <div className="glare-effect" />
 
-                <div className="relative z-10 flex flex-col lg:flex-row gap-12 justify-between items-end">
-                    <div className="space-y-8 flex-1">
+                <div className="relative z-10 flex flex-col lg:flex-row gap-6 justify-between items-end">
+                    <div className="space-y-4 flex-1">
                         {/* Badges */}
                         <div className="flex flex-wrap gap-3">
                             <span className="badge-premium px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest uppercase bg-white/10 backdrop-blur-xl border border-white/20 text-white shadow-2xl">
@@ -194,23 +194,23 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     </div>
 
                     {/* Host Card */}
-                    <div className="glass-card-premium p-6 md:p-8 rounded-[2.5rem] min-w-[300px] border-t border-white/20 shadow-2xl relative overflow-hidden group/host transition-all duration-500 hover:border-primary/50 hover-lift">
+                    <div className="glass-card-premium p-4 md:p-5 rounded-[2.5rem] min-w-[280px] border-t border-white/20 shadow-2xl relative overflow-hidden group/host transition-all duration-500 hover:border-primary/50 hover-lift">
                         {/* Card Glow */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/15 blur-[60px] rounded-full transition-opacity group-hover/host:opacity-100 opacity-30" />
 
-                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-6 relative z-10 font-heading">Hosted By</p>
+                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3 relative z-10 font-heading">Hosted By</p>
                         <div className="flex items-center gap-4 relative z-10">
                             {/* Avatar */}
                             <div className="relative">
-                                <div className="w-16 h-16 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner transform group-hover/host:scale-105 transition-transform">
+                                <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center border border-white/10 overflow-hidden shadow-inner transform group-hover/host:scale-105 transition-transform">
                                     {game.profiles?.avatar_url ? (
                                         <Image
                                             src={game.profiles.avatar_url}
                                             alt={`${game.profiles.username || 'Host'} avatar`}
-                                            width={64}
-                                            height={64}
+                                            width={48}
+                                            height={48}
                                             className="object-cover"
-                                            sizes="64px"
+                                            sizes="48px"
                                         />
                                     ) : (
                                         <UserIcon className="w-8 h-8 text-zinc-600" />
@@ -233,7 +233,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 </div>
 
                 {/* Action Buttons */}
-                <div className="relative z-10 pt-12 flex justify-center lg:justify-start">
+                <div className="relative z-10 pt-6 flex justify-center lg:justify-start">
                     <GameActions
                         gameId={id}
                         userId={user?.id || ''}
@@ -250,10 +250,10 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
             </div>
 
             {/* Game Info & Rules */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 px-4 relative">
-                <div className="lg:col-span-2 space-y-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 px-4 relative">
+                <div className="lg:col-span-2 space-y-4">
                     {game.description && (
-                        <div className="glass-card-premium p-8 rounded-[2rem] border-t border-white/10 space-y-4 hover-lift transition-all duration-500">
+                        <div className="glass-card-premium p-5 rounded-[2rem] border-t border-white/10 space-y-3 hover-lift transition-all duration-500">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 <Sparkles className="w-3 h-3 text-primary" />
                                 The Run
@@ -265,7 +265,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     )}
 
                     {game.house_rules && (
-                        <div className="glass-card-premium p-8 rounded-[2rem] border-t border-white/10 space-y-4 hover-lift transition-all duration-500">
+                        <div className="glass-card-premium p-5 rounded-[2rem] border-t border-white/10 space-y-3 hover-lift transition-all duration-500">
                             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 font-heading gradient-text">
                                 📜 House Rules
                             </h2>
@@ -278,9 +278,9 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     )}
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-4">
                     {/* Game Metadata Card */}
-                    <div className="glass-card-premium p-8 rounded-[2.5rem] border-t border-white/10 space-y-6 relative overflow-hidden group hover-lift transition-all duration-500">
+                    <div className="glass-card-premium p-5 rounded-[2.5rem] border-t border-white/10 space-y-3 relative overflow-hidden group hover-lift transition-all duration-500">
                         <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                         <h2 className="text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-2 relative font-heading gradient-text">
                             <Zap className="w-3 h-3 text-primary" />
@@ -338,7 +338,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
 
             {/* Game Stats Section (Only for Completed Games) */}
             {game.status === 'completed' && (
-                <div className="px-4 relative space-y-8">
+                <div className="px-4 relative space-y-4">
                     {/* Stats Input Form (Only if user can add stats) */}
                     {canAddStats && user && (
                         <GameStatsForm

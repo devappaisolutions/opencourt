@@ -41,7 +41,7 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
     const TeamCard = ({ team, color }: { team: Team; color: string }) => (
         <div className="flex-1 space-y-4">
             <div className={`glass-card-premium p-4 rounded-2xl border-2 ${color}`}>
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${color.replace('border', 'bg')}`} />
                         <h3 className="font-bold text-white uppercase tracking-wider font-heading">
@@ -57,16 +57,16 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                     {team.players.map((player) => (
                         <div
                             key={player.id}
-                            className="flex items-center gap-3 p-3 rounded-xl bg-zinc-900/50 border border-white/5 hover-lift"
+                            className="flex items-center gap-2.5 p-2.5 rounded-xl bg-zinc-900/50 border border-white/5 hover-lift"
                         >
-                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-zinc-800">
+                            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-zinc-800">
                                 {player.avatar_url ? (
                                     <Image
                                         src={player.avatar_url}
                                         alt={player.full_name || "Player"}
                                         fill
                                         className="object-cover"
-                                        sizes="40px"
+                                        sizes="32px"
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center">
