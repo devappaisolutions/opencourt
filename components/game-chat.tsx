@@ -226,7 +226,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             {isExpanded && (
                 <div className="border-t border-white/5">
                     {/* Messages Area */}
-                    <div className="h-64 overflow-y-auto p-4 space-y-3">
+                    <div className="h-64 overflow-y-auto p-4 space-y-3" style={{ contain: 'content' }}>
                         {messages.length === 0 ? (
                             <p className="text-center text-zinc-600 text-sm py-8">
                                 No messages yet. Start the conversation!
@@ -248,13 +248,14 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                         <form
                             onSubmit={handleSend}
                             className="flex items-center gap-2 p-3 border-t border-white/5"
+                            style={{ willChange: 'transform' }}
                         >
                             <input
                                 ref={inputRef}
                                 type="text"
                                 placeholder="Type a message..."
                                 maxLength={500}
-                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none"
                             />
                             <button
                                 type="submit"
