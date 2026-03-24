@@ -3,6 +3,7 @@ import { GameRoster } from "@/components/game-roster";
 import { GameStatsForm } from "@/components/game-stats-form";
 import { GameStatsDisplay } from "@/components/game-stats-display";
 import { TeamGenerator } from "@/components/team-generator";
+import { GameChat } from "@/components/game-chat";
 import { createClient } from "@/lib/supabase/server";
 import { calculateOVR } from "@/lib/team-generator";
 import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap, DollarSign, Users } from "lucide-react";
@@ -271,6 +272,14 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     gameId={id}
                     maxPlayers={game.max_players}
                     isHost={isHost}
+                />
+            </div>
+
+            {/* Game Chat */}
+            <div className="px-4 relative">
+                <GameChat
+                    gameId={id}
+                    userId={user?.id || ''}
                 />
             </div>
 

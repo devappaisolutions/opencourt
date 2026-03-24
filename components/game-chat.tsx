@@ -1,0 +1,268 @@
+"use client";
+
+import { createClient } from "@/lib/supabase/client";
+import { useState, useEffect, useRef } from "react";
+import { MessageCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
+import Image from "next/image";
+
+interface ChatMessage {
+    id: string;
+    game_id: string;
+    user_id: string;
+    message: string;
+    created_at: string;
+    profiles: {
+        username: string;
+        avatar_url: string | null;
+    };
+}
+
+interface GameChatProps {
+    gameId: string;
+    userId: string;
+}
+
+export function GameChat({ gameId, userId }: GameChatProps) {
+    const supabase = createClient();
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [newMessage, setNewMessage] = useState('');
+    const [sending, setSending] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const isExpandedRef = useRef(isExpanded);
+
+    // Keep ref in sync
+    useEffect(() => {
+        isExpandedRef.current = isExpanded;
+    }, [isExpanded]);
+
+    // Fetch last 50 messages on mount
+    useEffect(() => {
+        const fetchMessages = async () => {
+            const { data } = await supabase
+                .from('game_chat')
+                .select(`
+                    id, game_id, user_id, message, created_at,
+                    profiles:user_id (username, avatar_url)
+                `)
+                .eq('game_id', gameId)
+                .order('created_at', { ascending: true })
+                .limit(50);
+
+            if (data) setMessages(data as unknown as ChatMessage[]);
+        };
+        fetchMessages();
+    }, [gameId, supabase]);
+
+    // Real-time subscription
+    useEffect(() => {
+        const channel = supabase
+            .channel(`game_chat_${gameId}`)
+            .on('postgres_changes', {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'game_chat',
+                filter: `game_id=eq.${gameId}`
+            }, async (payload: any) => {
+                const { data: newMsg } = await supabase
+                    .from('game_chat')
+                    .select(`
+                        id, game_id, user_id, message, created_at,
+                        profiles:user_id (username, avatar_url)
+                    `)
+                    .eq('id', payload.new.id)
+                    .single();
+
+                if (newMsg) {
+                    setMessages(prev => {
+                        if (prev.find(m => m.id === newMsg.id)) return prev;
+                        return [...prev, newMsg as unknown as ChatMessage];
+                    });
+                    if (!isExpandedRef.current) {
+                        setUnreadCount(prev => prev + 1);
+                    }
+                }
+            })
+            .on('postgres_changes', {
+                event: 'DELETE',
+                schema: 'public',
+                table: 'game_chat',
+                filter: `game_id=eq.${gameId}`
+            }, (payload: any) => {
+                setMessages(prev => prev.filter(m => m.id !== payload.old.id));
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [gameId, supabase]);
+
+    // Auto-scroll when new messages arrive and chat is expanded
+    useEffect(() => {
+        if (isExpanded) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messages, isExpanded]);
+
+    const handleToggle = () => {
+        setIsExpanded(prev => !prev);
+        if (!isExpanded) {
+            setUnreadCount(0);
+        }
+    };
+
+    const handleSend = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newMessage.trim() || !userId || sending) return;
+
+        setSending(true);
+        try {
+            const { error } = await supabase
+                .from('game_chat')
+                .insert({
+                    game_id: gameId,
+                    user_id: userId,
+                    message: newMessage.trim(),
+                });
+            if (error) throw error;
+            setNewMessage('');
+        } catch (error) {
+            console.error('Error sending message:', error);
+        } finally {
+            setSending(false);
+        }
+    };
+
+    const formatTime = (dateStr: string) => {
+        return new Date(dateStr).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'Asia/Manila'
+        });
+    };
+
+    return (
+        <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
+            {/* Collapsible Header */}
+            <button
+                onClick={handleToggle}
+                className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
+            >
+                <div className="flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-primary" />
+                    <h2 className="text-lg font-bold text-white uppercase tracking-wider">
+                        Game Chat
+                    </h2>
+                    {messages.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-400 text-xs font-bold">
+                            {messages.length}
+                        </span>
+                    )}
+                    {unreadCount > 0 && !isExpanded && (
+                        <span className="px-2 py-0.5 rounded-full bg-primary text-white text-xs font-bold animate-pulse">
+                            {unreadCount} new
+                        </span>
+                    )}
+                </div>
+                {isExpanded
+                    ? <ChevronUp className="w-5 h-5 text-zinc-500" />
+                    : <ChevronDown className="w-5 h-5 text-zinc-500" />
+                }
+            </button>
+
+            {/* Chat Body */}
+            {isExpanded && (
+                <div className="border-t border-white/5">
+                    {/* Messages Area */}
+                    <div className="h-64 overflow-y-auto p-4 space-y-3">
+                        {messages.length === 0 ? (
+                            <p className="text-center text-zinc-600 text-sm py-8">
+                                No messages yet. Start the conversation!
+                            </p>
+                        ) : (
+                            messages.map((msg) => {
+                                const isOwn = msg.user_id === userId;
+                                return (
+                                    <div
+                                        key={msg.id}
+                                        className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}
+                                    >
+                                        {/* Avatar */}
+                                        <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
+                                            {msg.profiles?.avatar_url ? (
+                                                <Image
+                                                    src={msg.profiles.avatar_url}
+                                                    alt={msg.profiles.username || 'User'}
+                                                    width={28}
+                                                    height={28}
+                                                    className="object-cover"
+                                                    sizes="28px"
+                                                />
+                                            ) : (
+                                                <span className="text-[10px] text-zinc-600 font-bold">
+                                                    {(msg.profiles?.username || '?')[0].toUpperCase()}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Message Bubble */}
+                                        <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
+                                            <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
+                                                <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
+                                                    {msg.profiles?.username || 'Unknown'}
+                                                </span>
+                                                <span className="text-[9px] text-zinc-700">
+                                                    {formatTime(msg.created_at)}
+                                                </span>
+                                            </div>
+                                            <div className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
+                                                isOwn
+                                                    ? 'bg-primary/20 text-white rounded-tr-sm'
+                                                    : 'bg-white/5 text-zinc-300 rounded-tl-sm'
+                                            }`}>
+                                                {msg.message}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Input Area */}
+                    {userId ? (
+                        <form
+                            onSubmit={handleSend}
+                            className="flex items-center gap-2 p-3 border-t border-white/5"
+                        >
+                            <input
+                                type="text"
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder="Type a message..."
+                                maxLength={500}
+                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all"
+                            />
+                            <button
+                                type="submit"
+                                disabled={sending || !newMessage.trim()}
+                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
+                            >
+                                <Send className="w-4 h-4" />
+                            </button>
+                        </form>
+                    ) : (
+                        <div className="p-3 border-t border-white/5 text-center">
+                            <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">
+                                Sign in to chat
+                            </p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}

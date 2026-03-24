@@ -323,6 +323,34 @@ CREATE TRIGGER on_roster_status_change
 
 
 -- ================================================
+-- GAME CHAT TABLE
+-- ================================================
+CREATE TABLE IF NOT EXISTS game_chat (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  game_id UUID REFERENCES games(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES profiles(id) NOT NULL,
+  message TEXT NOT NULL CHECK (char_length(message) >= 1 AND char_length(message) <= 500),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE game_chat ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Chat messages are viewable by everyone" ON game_chat;
+CREATE POLICY "Chat messages are viewable by everyone"
+  ON game_chat FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Authenticated users can send chat messages" ON game_chat;
+CREATE POLICY "Authenticated users can send chat messages"
+  ON game_chat FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete their own messages" ON game_chat;
+CREATE POLICY "Users can delete their own messages"
+  ON game_chat FOR DELETE
+  USING (auth.uid() = user_id);
+
+
+-- ================================================
 -- INDEXES
 -- ================================================
 CREATE INDEX IF NOT EXISTS idx_games_date_time ON games(date_time);
@@ -334,6 +362,8 @@ CREATE INDEX IF NOT EXISTS idx_team_assignments_game_id ON team_assignments(game
 CREATE INDEX IF NOT EXISTS idx_team_assignments_player_id ON team_assignments(player_id);
 CREATE INDEX IF NOT EXISTS idx_game_stats_game_id ON game_stats(game_id);
 CREATE INDEX IF NOT EXISTS idx_game_stats_player_id ON game_stats(player_id);
+CREATE INDEX IF NOT EXISTS idx_game_chat_game_id ON game_chat(game_id);
+CREATE INDEX IF NOT EXISTS idx_game_chat_created_at ON game_chat(game_id, created_at);
 
 
 -- ================================================
@@ -344,6 +374,7 @@ COMMENT ON TABLE games IS 'Basketball games/runs hosted by users';
 COMMENT ON TABLE game_roster IS 'Players who have joined games';
 COMMENT ON TABLE team_assignments IS 'Team assignments for balanced matchups';
 COMMENT ON TABLE game_stats IS 'Player statistics for completed games';
+COMMENT ON TABLE game_chat IS 'Live chat messages for game detail pages';
 COMMENT ON COLUMN profiles.reliability_score IS 'Player reliability score (0-100), affected by attendance';
 COMMENT ON COLUMN games.latitude IS 'Latitude coordinate for game location (-90 to 90)';
 COMMENT ON COLUMN games.longitude IS 'Longitude coordinate for game location (-180 to 180)';
