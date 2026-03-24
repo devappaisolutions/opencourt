@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 import { MessageCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 
@@ -22,8 +22,64 @@ interface GameChatProps {
     userId: string;
 }
 
+const formatTime = (dateStr: string) => {
+    return new Date(dateStr).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZone: 'Asia/Manila'
+    });
+};
+
+const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
+    return (
+        <div className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
+            {/* Avatar */}
+            <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
+                {msg.profiles?.avatar_url ? (
+                    <Image
+                        src={msg.profiles.avatar_url}
+                        alt={msg.profiles.username || 'User'}
+                        width={28}
+                        height={28}
+                        className="object-cover"
+                        sizes="28px"
+                    />
+                ) : (
+                    <span className="text-[10px] text-zinc-600 font-bold">
+                        {(msg.profiles?.username || '?')[0].toUpperCase()}
+                    </span>
+                )}
+            </div>
+
+            {/* Message Bubble */}
+            <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
+                <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
+                        {msg.profiles?.username || 'Unknown'}
+                    </span>
+                    <span className="text-[9px] text-zinc-700">
+                        {formatTime(msg.created_at)}
+                    </span>
+                </div>
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
+                    isOwn
+                        ? 'bg-primary/20 text-white rounded-tr-sm'
+                        : 'bg-white/5 text-zinc-300 rounded-tl-sm'
+                }`}>
+                    {msg.message}
+                </div>
+            </div>
+        </div>
+    );
+});
+
+const MESSAGE_SELECT = `
+    id, game_id, user_id, message, created_at,
+    profiles:user_id (username, avatar_url)
+`;
+
 export function GameChat({ gameId, userId }: GameChatProps) {
-    const supabase = createClient();
+    const supabaseRef = useRef(createClient());
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [sending, setSending] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -39,13 +95,11 @@ export function GameChat({ gameId, userId }: GameChatProps) {
 
     // Fetch last 50 messages on mount
     useEffect(() => {
+        const supabase = supabaseRef.current;
         const fetchMessages = async () => {
             const { data } = await supabase
                 .from('game_chat')
-                .select(`
-                    id, game_id, user_id, message, created_at,
-                    profiles:user_id (username, avatar_url)
-                `)
+                .select(MESSAGE_SELECT)
                 .eq('game_id', gameId)
                 .order('created_at', { ascending: true })
                 .limit(50);
@@ -53,10 +107,11 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             if (data) setMessages(data as unknown as ChatMessage[]);
         };
         fetchMessages();
-    }, [gameId, supabase]);
+    }, [gameId]);
 
     // Real-time subscription
     useEffect(() => {
+        const supabase = supabaseRef.current;
         const channel = supabase
             .channel(`game_chat_${gameId}`)
             .on('postgres_changes', {
@@ -67,10 +122,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             }, async (payload: any) => {
                 const { data: newMsg } = await supabase
                     .from('game_chat')
-                    .select(`
-                        id, game_id, user_id, message, created_at,
-                        profiles:user_id (username, avatar_url)
-                    `)
+                    .select(MESSAGE_SELECT)
                     .eq('id', payload.new.id)
                     .single();
 
@@ -97,7 +149,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [gameId, supabase]);
+    }, [gameId]);
 
     // Auto-scroll when new messages arrive and chat is expanded
     useEffect(() => {
@@ -106,21 +158,23 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         }
     }, [messages, isExpanded]);
 
-    const handleToggle = () => {
+    const handleToggle = useCallback(() => {
         setIsExpanded(prev => !prev);
-        if (!isExpanded) {
-            setUnreadCount(0);
-        }
-    };
+        setUnreadCount(prev => {
+            // Reset only when expanding
+            if (!isExpandedRef.current) return 0;
+            return prev;
+        });
+    }, []);
 
-    const handleSend = async (e: React.FormEvent) => {
+    const handleSend = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         const value = inputRef.current?.value?.trim();
         if (!value || !userId || sending) return;
 
         setSending(true);
         try {
-            const { error } = await supabase
+            const { error } = await supabaseRef.current
                 .from('game_chat')
                 .insert({
                     game_id: gameId,
@@ -134,15 +188,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         } finally {
             setSending(false);
         }
-    };
-
-    const formatTime = (dateStr: string) => {
-        return new Date(dateStr).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-            timeZone: 'Asia/Manila'
-        });
-    };
+    }, [gameId, userId, sending]);
 
     return (
         <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
@@ -183,52 +229,13 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                                 No messages yet. Start the conversation!
                             </p>
                         ) : (
-                            messages.map((msg) => {
-                                const isOwn = msg.user_id === userId;
-                                return (
-                                    <div
-                                        key={msg.id}
-                                        className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}
-                                    >
-                                        {/* Avatar */}
-                                        <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
-                                            {msg.profiles?.avatar_url ? (
-                                                <Image
-                                                    src={msg.profiles.avatar_url}
-                                                    alt={msg.profiles.username || 'User'}
-                                                    width={28}
-                                                    height={28}
-                                                    className="object-cover"
-                                                    sizes="28px"
-                                                />
-                                            ) : (
-                                                <span className="text-[10px] text-zinc-600 font-bold">
-                                                    {(msg.profiles?.username || '?')[0].toUpperCase()}
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Message Bubble */}
-                                        <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
-                                            <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
-                                                <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
-                                                    {msg.profiles?.username || 'Unknown'}
-                                                </span>
-                                                <span className="text-[9px] text-zinc-700">
-                                                    {formatTime(msg.created_at)}
-                                                </span>
-                                            </div>
-                                            <div className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
-                                                isOwn
-                                                    ? 'bg-primary/20 text-white rounded-tr-sm'
-                                                    : 'bg-white/5 text-zinc-300 rounded-tl-sm'
-                                            }`}>
-                                                {msg.message}
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })
+                            messages.map((msg) => (
+                                <ChatBubble
+                                    key={msg.id}
+                                    msg={msg}
+                                    isOwn={msg.user_id === userId}
+                                />
+                            ))
                         )}
                         <div ref={messagesEndRef} />
                     </div>
@@ -244,12 +251,12 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                                 type="text"
                                 placeholder="Type a message..."
                                 maxLength={500}
-                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30 transition-all"
+                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
                             />
                             <button
                                 type="submit"
                                 disabled={sending}
-                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
+                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
                             >
                                 <Send className="w-4 h-4" />
                             </button>
