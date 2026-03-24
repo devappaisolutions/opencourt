@@ -61,7 +61,7 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                         {formatTime(msg.created_at)}
                     </span>
                 </div>
-                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm break-words overflow-hidden ${
                     isOwn
                         ? 'bg-primary/20 text-white rounded-tr-sm'
                         : 'bg-white/5 text-zinc-300 rounded-tl-sm'
