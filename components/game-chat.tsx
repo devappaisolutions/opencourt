@@ -191,7 +191,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
     }, [gameId, userId, sending]);
 
     return (
-        <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-[#2A2827] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
             {/* Collapsible Header */}
             <button
                 onClick={handleToggle}
