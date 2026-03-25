@@ -1,9 +1,8 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect, useRef, memo, useCallback } from "react";
+import { useState, useEffect, useRef, memo, useCallback, startTransition } from "react";
 import { MessageCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
-import Image from "next/image";
 
 interface ChatMessage {
     id: string;
@@ -22,6 +21,8 @@ interface GameChatProps {
     userId: string;
 }
 
+// --- Static helpers (never recreated) ---
+
 const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString([], {
         hour: '2-digit',
@@ -30,19 +31,25 @@ const formatTime = (dateStr: string) => {
     });
 };
 
+const MESSAGE_SELECT = `
+    id, game_id, user_id, message, created_at,
+    profiles:user_id (username, avatar_url)
+`;
+
+// --- Memoized message bubble (plain <img>, no next/image overhead) ---
+
 const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
     return (
         <div className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
-            {/* Avatar */}
             <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
                 {msg.profiles?.avatar_url ? (
-                    <Image
+                    <img
                         src={msg.profiles.avatar_url}
                         alt={msg.profiles.username || 'User'}
                         width={28}
                         height={28}
-                        className="object-cover"
-                        sizes="28px"
+                        loading="lazy"
+                        className="w-7 h-7 object-cover"
                     />
                 ) : (
                     <span className="text-[10px] text-zinc-600 font-bold">
@@ -50,8 +57,6 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                     </span>
                 )}
             </div>
-
-            {/* Message Bubble */}
             <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
                 <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
                     <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
@@ -61,7 +66,7 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                         {formatTime(msg.created_at)}
                     </span>
                 </div>
-                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm break-all ${
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm overflow-wrap-anywhere ${
                     isOwn
                         ? 'bg-primary/20 text-white rounded-tr-sm'
                         : 'bg-white/5 text-zinc-300 rounded-tl-sm'
@@ -73,22 +78,69 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
     );
 });
 
-const MESSAGE_SELECT = `
-    id, game_id, user_id, message, created_at,
-    profiles:user_id (username, avatar_url)
-`;
+// --- Isolated input (own state boundary, never re-renders from messages) ---
+
+const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; userId: string }) {
+    const supabase = useRef(createClient()).current;
+    const inputRef = useRef<HTMLInputElement>(null);
+    const sendingRef = useRef(false);
+
+    const handleSend = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const value = inputRef.current?.value?.trim();
+        if (!value || !userId || sendingRef.current) return;
+
+        sendingRef.current = true;
+        try {
+            const { error } = await supabase
+                .from('game_chat')
+                .insert({
+                    game_id: gameId,
+                    user_id: userId,
+                    message: value,
+                });
+            if (error) throw error;
+            if (inputRef.current) inputRef.current.value = '';
+        } catch (error) {
+            console.error('Error sending message:', error);
+        } finally {
+            sendingRef.current = false;
+        }
+    };
+
+    return (
+        <form
+            onSubmit={handleSend}
+            className="flex items-center gap-2 p-3 border-t border-white/5"
+        >
+            <input
+                ref={inputRef}
+                type="text"
+                placeholder="Type a message..."
+                maxLength={500}
+                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+            />
+            <button
+                type="submit"
+                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
+            >
+                <Send className="w-4 h-4" />
+            </button>
+        </form>
+    );
+});
+
+// --- Main chat component (manages messages + subscription only) ---
 
 export function GameChat({ gameId, userId }: GameChatProps) {
     const supabaseRef = useRef(createClient());
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [sending, setSending] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
     const isExpandedRef = useRef(isExpanded);
+    const scrollRaf = useRef<number>(0);
 
-    // Keep ref in sync
     useEffect(() => {
         isExpandedRef.current = isExpanded;
     }, [isExpanded]);
@@ -127,9 +179,12 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                     .single();
 
                 if (newMsg) {
-                    setMessages(prev => {
-                        if (prev.find(m => m.id === newMsg.id)) return prev;
-                        return [...prev, newMsg as unknown as ChatMessage];
+                    // Low-priority update — won't block input events
+                    startTransition(() => {
+                        setMessages(prev => {
+                            if (prev.find(m => m.id === newMsg.id)) return prev;
+                            return [...prev, newMsg as unknown as ChatMessage];
+                        });
                     });
                     if (!isExpandedRef.current) {
                         setUnreadCount(prev => prev + 1);
@@ -142,7 +197,9 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 table: 'game_chat',
                 filter: `game_id=eq.${gameId}`
             }, (payload: any) => {
-                setMessages(prev => prev.filter(m => m.id !== payload.old.id));
+                startTransition(() => {
+                    setMessages(prev => prev.filter(m => m.id !== payload.old.id));
+                });
             })
             .subscribe();
 
@@ -151,10 +208,13 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         };
     }, [gameId]);
 
-    // Auto-scroll when new messages arrive and chat is expanded
+    // Debounced auto-scroll — collapses rapid arrivals, uses instant scroll
     useEffect(() => {
-        if (isExpanded) {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (isExpanded && messages.length > 0) {
+            cancelAnimationFrame(scrollRaf.current);
+            scrollRaf.current = requestAnimationFrame(() => {
+                messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+            });
         }
     }, [messages, isExpanded]);
 
@@ -166,31 +226,8 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         });
     }, []);
 
-    const handleSend = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-        const value = inputRef.current?.value?.trim();
-        if (!value || !userId || sending) return;
-
-        setSending(true);
-        try {
-            const { error } = await supabaseRef.current
-                .from('game_chat')
-                .insert({
-                    game_id: gameId,
-                    user_id: userId,
-                    message: value,
-                });
-            if (error) throw error;
-            if (inputRef.current) inputRef.current.value = '';
-        } catch (error) {
-            console.error('Error sending message:', error);
-        } finally {
-            setSending(false);
-        }
-    }, [gameId, userId, sending]);
-
     return (
-        <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
+        <div className="bg-[#2A2827] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
             {/* Collapsible Header */}
             <button
                 onClick={handleToggle}
@@ -221,8 +258,8 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             {/* Chat Body */}
             {isExpanded && (
                 <div className="border-t border-white/5">
-                    {/* Messages Area */}
-                    <div className="h-64 overflow-y-auto p-4 space-y-3">
+                    {/* Messages — contained so repaints don't affect input */}
+                    <div className="h-64 overflow-y-auto p-4 space-y-3" style={{ contain: 'content' }}>
                         {messages.length === 0 ? (
                             <p className="text-center text-zinc-600 text-sm py-8">
                                 No messages yet. Start the conversation!
@@ -239,27 +276,9 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input Area */}
+                    {/* Input — completely isolated component */}
                     {userId ? (
-                        <form
-                            onSubmit={handleSend}
-                            className="flex items-center gap-2 p-3 border-t border-white/5"
-                        >
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                placeholder="Type a message..."
-                                maxLength={500}
-                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
-                            />
-                            <button
-                                type="submit"
-                                disabled={sending}
-                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
-                            >
-                                <Send className="w-4 h-4" />
-                            </button>
-                        </form>
+                        <ChatInput gameId={gameId} userId={userId} />
                     ) : (
                         <div className="p-3 border-t border-white/5 text-center">
                             <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">
