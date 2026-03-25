@@ -52,7 +52,7 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
             </div>
 
             {/* Message Bubble */}
-            <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
+            <div className={`max-w-[75%] break-words ${isOwn ? 'text-right' : ''}`}>
                 <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
                     <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
                         {msg.profiles?.username || 'Unknown'}
