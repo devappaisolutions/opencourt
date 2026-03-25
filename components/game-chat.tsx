@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useState, useEffect, useRef, memo } from "react";
+import { useState, useEffect, useRef, memo, useCallback } from "react";
 import { MessageCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
 import Image from "next/image";
 
@@ -33,6 +33,7 @@ const formatTime = (dateStr: string) => {
 const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
     return (
         <div className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
+            {/* Avatar */}
             <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
                 {msg.profiles?.avatar_url ? (
                     <Image
@@ -49,6 +50,8 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                     </span>
                 )}
             </div>
+
+            {/* Message Bubble */}
             <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
                 <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
                     <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
@@ -58,70 +61,15 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                         {formatTime(msg.created_at)}
                     </span>
                 </div>
-                <div
-                    className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
-                        isOwn
-                            ? 'bg-primary/20 text-white rounded-tr-sm'
-                            : 'bg-white/5 text-zinc-300 rounded-tl-sm'
-                    }`}
-                    style={{ wordBreak: 'break-word' }}
-                >
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm ${
+                    isOwn
+                        ? 'bg-primary/20 text-white rounded-tr-sm'
+                        : 'bg-white/5 text-zinc-300 rounded-tl-sm'
+                }`}>
                     {msg.message}
                 </div>
             </div>
         </div>
-    );
-});
-
-// Completely isolated input — has its own state, never re-renders from parent
-const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; userId: string }) {
-    const supabase = useRef(createClient()).current;
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [sending, setSending] = useState(false);
-
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const value = inputRef.current?.value?.trim();
-        if (!value || !userId || sending) return;
-
-        setSending(true);
-        try {
-            const { error } = await supabase
-                .from('game_chat')
-                .insert({
-                    game_id: gameId,
-                    user_id: userId,
-                    message: value,
-                });
-            if (error) throw error;
-            if (inputRef.current) inputRef.current.value = '';
-        } catch (error) {
-            console.error('Error sending message:', error);
-        } finally {
-            setSending(false);
-        }
-    };
-
-    return (
-        <form
-            onSubmit={handleSend}
-            className="flex items-center gap-2 p-3 border-t border-white/5"
-        >
-            <input
-                ref={inputRef}
-                type="text"
-                placeholder="Type a message..."
-                maxLength={500}
-                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none"
-            />
-            <button
-                type="submit"
-                disabled={sending}
-                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
-            >
-                <Send className="w-4 h-4" />
-            </button>
-        </form>
     );
 });
 
@@ -133,15 +81,19 @@ const MESSAGE_SELECT = `
 export function GameChat({ gameId, userId }: GameChatProps) {
     const supabaseRef = useRef(createClient());
     const [messages, setMessages] = useState<ChatMessage[]>([]);
+    const [sending, setSending] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
     const isExpandedRef = useRef(isExpanded);
 
+    // Keep ref in sync
     useEffect(() => {
         isExpandedRef.current = isExpanded;
     }, [isExpanded]);
 
+    // Fetch last 50 messages on mount
     useEffect(() => {
         const supabase = supabaseRef.current;
         const fetchMessages = async () => {
@@ -157,6 +109,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         fetchMessages();
     }, [gameId]);
 
+    // Real-time subscription
     useEffect(() => {
         const supabase = supabaseRef.current;
         const channel = supabase
@@ -198,19 +151,47 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         };
     }, [gameId]);
 
+    // Auto-scroll when new messages arrive and chat is expanded
     useEffect(() => {
         if (isExpanded) {
             messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages, isExpanded]);
 
-    const handleToggle = () => {
+    const handleToggle = useCallback(() => {
         setIsExpanded(prev => !prev);
-        if (!isExpanded) setUnreadCount(0);
-    };
+        setUnreadCount(prev => {
+            if (!isExpandedRef.current) return 0;
+            return prev;
+        });
+    }, []);
+
+    const handleSend = useCallback(async (e: React.FormEvent) => {
+        e.preventDefault();
+        const value = inputRef.current?.value?.trim();
+        if (!value || !userId || sending) return;
+
+        setSending(true);
+        try {
+            const { error } = await supabaseRef.current
+                .from('game_chat')
+                .insert({
+                    game_id: gameId,
+                    user_id: userId,
+                    message: value,
+                });
+            if (error) throw error;
+            if (inputRef.current) inputRef.current.value = '';
+        } catch (error) {
+            console.error('Error sending message:', error);
+        } finally {
+            setSending(false);
+        }
+    }, [gameId, userId, sending]);
 
     return (
-        <div className="bg-[#2A2827] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
+        <div className="glass-card-premium rounded-2xl border border-white/10 overflow-hidden">
+            {/* Collapsible Header */}
             <button
                 onClick={handleToggle}
                 className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
@@ -237,8 +218,10 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 }
             </button>
 
+            {/* Chat Body */}
             {isExpanded && (
                 <div className="border-t border-white/5">
+                    {/* Messages Area */}
                     <div className="h-64 overflow-y-auto p-4 space-y-3">
                         {messages.length === 0 ? (
                             <p className="text-center text-zinc-600 text-sm py-8">
@@ -256,8 +239,27 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                         <div ref={messagesEndRef} />
                     </div>
 
+                    {/* Input Area */}
                     {userId ? (
-                        <ChatInput gameId={gameId} userId={userId} />
+                        <form
+                            onSubmit={handleSend}
+                            className="flex items-center gap-2 p-3 border-t border-white/5"
+                        >
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                placeholder="Type a message..."
+                                maxLength={500}
+                                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+                            />
+                            <button
+                                type="submit"
+                                disabled={sending}
+                                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
+                            >
+                                <Send className="w-4 h-4" />
+                            </button>
+                        </form>
                     ) : (
                         <div className="p-3 border-t border-white/5 text-center">
                             <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">
