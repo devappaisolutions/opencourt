@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { CookieConsent } from "@/components/cookie-consent";
+import NextTopLoader from "nextjs-toploader";
 
 const dmSans = DM_Sans({
   variable: "--font-sans",
@@ -51,6 +52,7 @@ export default function RootLayout({
         className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans antialiased bg-[#1F1D1D] text-[#F5EFEA] selection:bg-primary/30 min-h-screen`}
         suppressHydrationWarning
       >
+        <NextTopLoader color="#E8692A" height={3} showSpinner={false} />
         {children}
         <CookieConsent />
       </body>
