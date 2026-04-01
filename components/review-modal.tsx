@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { CheckCircle2, Star, Trophy, X, User as UserIcon } from "lucide-react";
+import { CheckCircle2, Loader2, Star, Trophy, X, User as UserIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -185,7 +185,7 @@ export function ReviewModal({ gameId, userId, isOpen, onClose }: ReviewModalProp
                                 disabled={loading}
                                 className="w-full py-5 rounded-[2rem] bg-primary text-white font-black text-xs tracking-[0.2em] uppercase italic shadow-xl shadow-primary/20 hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
                             >
-                                {loading ? "SUBMITTING..." : "SUBMIT REVIEW"}
+                                {loading ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />SUBMITTING...</> : "SUBMIT REVIEW"}
                             </button>
                         </div>
                     )}

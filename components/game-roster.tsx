@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { CheckCircle2, Shield, User as UserIcon, XCircle, Trash2, RefreshCw, Scan, X } from "lucide-react";
+import { CheckCircle2, Shield, User as UserIcon, XCircle, Trash2, RefreshCw, Scan, X, Loader2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import Image from "next/image";
@@ -213,7 +213,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             className="p-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-500 border border-emerald-500/20 transition-all hover:scale-110 active:scale-90"
                                             title="Mark Present (+Score)"
                                         >
-                                            <CheckCircle2 className="w-4 h-4" />
+                                            {updating === entry.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                                         </button>
                                         <button
                                             onClick={() => handleStatusUpdate(entry.id, 'absent')}
@@ -221,7 +221,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 border border-rose-500/20 transition-all hover:scale-110 active:scale-90"
                                             title="Mark Absent (-Score)"
                                         >
-                                            <XCircle className="w-4 h-4" />
+                                            {updating === entry.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                                         </button>
                                         <button
                                             onClick={() => handleKick(entry.id, entry.profiles?.username)}
@@ -229,7 +229,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-rose-500 hover:text-white text-zinc-600 border border-white/5 transition-all hover:scale-110 active:scale-90"
                                             title="Kick from Squad"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            {updating === entry.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                                         </button>
                                     </>
                                 )}
@@ -239,9 +239,9 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             <button
                                                 onClick={() => handleStatusUpdate(entry.id, 'joined')}
                                                 disabled={!!updating}
-                                                className="px-3 py-1 rounded-lg bg-emerald-500 text-black hover:bg-emerald-400 transition-all text-[10px] font-black tracking-widest uppercase"
+                                                className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500 text-black hover:bg-emerald-400 transition-all text-[10px] font-black tracking-widest uppercase"
                                             >
-                                                SQUAD UP
+                                                {updating === entry.id ? <Loader2 className="w-3 h-3 animate-spin" /> : null} SQUAD UP
                                             </button>
                                         )}
                                         <button
@@ -250,7 +250,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-rose-500 hover:text-white text-zinc-600 border border-white/5 transition-all hover:scale-110 active:scale-90"
                                             title="Remove from Waitlist"
                                         >
-                                            <Trash2 className="w-4 h-4" />
+                                            {updating === entry.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                                         </button>
                                     </div>
                                 )}
@@ -258,9 +258,9 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                     <button
                                         onClick={() => handleStatusUpdate(entry.id, 'joined')}
                                         disabled={!!updating}
-                                        className="text-[10px] text-zinc-600 hover:text-white uppercase font-black tracking-widest transition-colors"
+                                        className="flex items-center gap-1 text-[10px] text-zinc-600 hover:text-white uppercase font-black tracking-widest transition-colors"
                                     >
-                                        RESET
+                                        {updating === entry.id && <Loader2 className="w-3 h-3 animate-spin" />} RESET
                                     </button>
                                 )}
                             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, Plus, ShieldCheck, X, ScrollText, CheckCircle2, QrCode, AlertTriangle, Trophy } from "lucide-react";
+import { LogOut, Plus, ShieldCheck, X, ScrollText, CheckCircle2, QrCode, AlertTriangle, Trophy, Loader2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -196,18 +196,14 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                     disabled={loading}
                     className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-black text-[10px] tracking-widest uppercase bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95 disabled:opacity-50"
                 >
-                    <CheckCircle2 className="w-4 h-4" /> COMPLETE RUN
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} COMPLETE RUN
                 </button>
                 <button
                     onClick={handleCancel}
                     disabled={loading}
                     className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
                 >
-                    {loading ? "CANCELING..." : (
-                        <>
-                            <X className="w-4 h-4" /> CANCEL RUN
-                        </>
-                    )}
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />} CANCEL RUN
                 </button>
             </div>
         );
@@ -227,11 +223,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                     disabled={loading}
                     className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
                 >
-                    {loading ? "LEAVING..." : (
-                        <>
-                            <LogOut className="w-5 h-5" /> LEAVE SQUAD
-                        </>
-                    )}
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-5 h-5" />} LEAVE SQUAD
                 </button>
 
                 {/* QR Code Modal */}
@@ -289,12 +281,8 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                     : "bg-gradient-to-r from-primary to-[#E8A966] text-white shadow-xl shadow-primary/20 hover:bg-primary/90 shimmer-btn btn-glow"
                     }`}
             >
-                {loading ? "PROCESSING..." : (
-                    <>
-                        <Plus className="w-5 h-5" />
-                        {isFull ? "JOIN THE WAITLIST" : "JOIN THE RUN"}
-                    </>
-                )}
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                {isFull ? "JOIN THE WAITLIST" : "JOIN THE RUN"}
             </button>
 
             {/* House Rules Agreement Modal */}
@@ -330,11 +318,7 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                                     disabled={loading}
                                     className="w-full bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold py-5 rounded-[2rem] hover:bg-primary/90 transition-all active:scale-95 flex items-center justify-center gap-3 shadow-xl shadow-primary/20 uppercase tracking-[0.2em] text-xs italic shimmer-btn btn-glow"
                                 >
-                                    {loading ? "PROCESSING..." : (
-                                        <>
-                                            <CheckCircle2 className="w-5 h-5" /> I AGREE & JOIN THE RUN
-                                        </>
-                                    )}
+                                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />} I AGREE & JOIN THE RUN
                                 </button>
                                 <p className="text-center text-[10px] text-zinc-500 font-medium uppercase tracking-widest">
                                     By joining, you agree to respect the host and follow the court rules.

@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, Loader2 } from "lucide-react";
 
 interface GameStatsFormProps {
     gameId: string;
@@ -110,7 +110,7 @@ export function GameStatsForm({ gameId, playerId, existingStats }: GameStatsForm
                 disabled={loading}
                 className="w-full h-10 bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-sm uppercase tracking-wider rounded-xl hover:bg-primary/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shimmer-btn btn-glow"
             >
-                {loading ? "Saving..." : existingStats ? "Update Stats" : "Save Stats"}
+                {loading ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />Saving...</> : existingStats ? "Update Stats" : "Save Stats"}
             </button>
         </form>
     );
