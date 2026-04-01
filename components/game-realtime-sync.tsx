@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface GameRealtimeSyncProps {
     gameId: string;
@@ -15,12 +15,18 @@ interface GameRealtimeSyncProps {
  * Covers tables not already handled by other components:
  *   - games            (status, teams_published, current_players, etc.)
  *   - team_assignments (team lineup changes)
+ *
+ * Requires both tables to be added to the supabase_realtime publication:
+ *   ALTER PUBLICATION supabase_realtime ADD TABLE games;
+ *   ALTER PUBLICATION supabase_realtime ADD TABLE team_assignments;
  */
 export function GameRealtimeSync({ gameId }: GameRealtimeSyncProps) {
-    const supabase = createClient();
+    const supabaseRef = useRef(createClient());
     const router = useRouter();
 
     useEffect(() => {
+        const supabase = supabaseRef.current;
+
         const channel = supabase
             .channel(`game_detail_${gameId}`)
             .on("postgres_changes", {
@@ -44,7 +50,7 @@ export function GameRealtimeSync({ gameId }: GameRealtimeSyncProps) {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [gameId, router, supabase]);
+    }, [gameId, router]);
 
     return null;
 }
