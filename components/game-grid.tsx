@@ -204,8 +204,6 @@ export function GameGrid({ initialGames, userId, joinedGameIds = [], waitlistedG
     const filters = [
         { label: "All", icon: null },
         { label: "Today", icon: <Flame className="w-3 h-3" /> },
-        { label: "Competitive", icon: null },
-        { label: "Casual", icon: null },
         { label: "Near Me", icon: <MapPin className="w-3 h-3" /> }
     ];
 
