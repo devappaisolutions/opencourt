@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenCourt User Manual</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0F0E0D;
+            --surface: #1A1918;
+            --surface-2: #242220;
+            --surface-3: #2E2C2A;
+            --border: rgba(255,255,255,0.08);
+            --border-hover: rgba(255,255,255,0.15);
+            --text: #F5EFEA;
+            --text-muted: #A09890;
+            --text-dim: #6B6560;
+            --primary: #E8A966;
+            --primary-glow: rgba(232,169,102,0.15);
+            --accent: #A855F7;
+            --accent-glow: rgba(168,85,247,0.15);
+            --emerald: #10B981;
+            --emerald-glow: rgba(16,185,129,0.1);
+            --amber: #F59E0B;
+            --red: #EF4444;
+            --radius: 16px;
+            --radius-lg: 24px;
+        }
+
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        /* ── Layout ── */
+        .page-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            scrollbar-width: thin;
+            scrollbar-color: var(--surface-3) transparent;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 4px; }
+
+        .sidebar-header {
+            padding: 32px 24px 24px;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--surface);
+            z-index: 10;
+        }
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), #D4944A);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            color: #000;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .sidebar-logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+        }
+        .sidebar-logo-badge {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .sidebar-nav {
+            padding: 16px 12px;
+            flex: 1;
+        }
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-dim);
+            padding: 16px 12px 8px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .sidebar-link:hover {
+            background: var(--surface-2);
+            color: var(--text);
+        }
+        .sidebar-link.active {
+            background: var(--primary-glow);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .sidebar-link-num {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            min-width: 20px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .sidebar-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        /* ── Main Content ── */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            padding: 80px 64px 64px;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--surface) 0%, var(--bg) 100%);
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--primary-glow), transparent 70%);
+            pointer-events: none;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -150px;
+            left: -50px;
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, var(--accent-glow), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 100px;
+            background: var(--primary-glow);
+            border: 1px solid rgba(232,169,102,0.2);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--primary);
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+            position: relative;
+        }
+        .hero p {
+            font-size: 18px;
+            color: var(--text-muted);
+            max-width: 600px;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        /* ── Section Content ── */
+        .content-area {
+            max-width: 860px;
+            padding: 48px 64px 120px;
+        }
+
+        .section {
+            margin-bottom: 64px;
+            scroll-margin-top: 32px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .section-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .section-icon.orange { background: var(--primary-glow); border: 1px solid rgba(232,169,102,0.2); }
+        .section-icon.purple { background: var(--accent-glow); border: 1px solid rgba(168,85,247,0.2); }
+        .section-icon.green { background: var(--emerald-glow); border: 1px solid rgba(16,185,129,0.2); }
+        .section-icon.amber { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); }
+        .section-icon.red { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); }
+
+        .section h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 32px 0 12px;
+        }
+        .section h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 24px 0 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .section p {
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+        .section ul, .section ol {
+            color: var(--text-muted);
+            padding-left: 20px;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+        .section li {
+            margin-bottom: 6px;
+        }
+        .section li::marker {
+            color: var(--primary);
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        .card-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card p { margin-bottom: 8px; }
+
+        /* ── Step Cards ── */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .step-card {
+            display: flex;
+            gap: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+        .step-card:hover { border-color: var(--border-hover); }
+        .step-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--primary-glow);
+            border: 1px solid rgba(232,169,102,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        .step-content { flex: 1; }
+        .step-content strong {
+            display: block;
+            font-size: 14px;
+            color: var(--text);
+            margin-bottom: 4px;
+        }
+        .step-content p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        /* ── Info Boxes ── */
+        .info-box {
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin: 16px 0;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+        .info-box .icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .info-box p { margin: 0; font-size: 14px; }
+        .info-box.tip {
+            background: var(--emerald-glow);
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+        .info-box.tip p { color: #6EE7B7; }
+        .info-box.warning {
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+        .info-box.warning p { color: #FCD34D; }
+        .info-box.important {
+            background: rgba(239,68,68,0.08);
+            border: 1px solid rgba(239,68,68,0.15);
+        }
+        .info-box.important p { color: #FCA5A5; }
+        .info-box.note {
+            background: var(--accent-glow);
+            border: 1px solid rgba(168,85,247,0.15);
+        }
+        .info-box.note p { color: #C4B5FD; }
+
+        /* ── Table ── */
+        .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 16px 0;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .data-table th {
+            background: var(--surface-2);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-dim);
+            padding: 12px 16px;
+            text-align: left;
+        }
+        .data-table td {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+        }
+        .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+        /* ── Tags ── */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .tag.green { background: var(--emerald-glow); color: var(--emerald); border: 1px solid rgba(16,185,129,0.2); }
+        .tag.orange { background: var(--primary-glow); color: var(--primary); border: 1px solid rgba(232,169,102,0.2); }
+        .tag.purple { background: var(--accent-glow); color: var(--accent); border: 1px solid rgba(168,85,247,0.2); }
+        .tag.red { background: rgba(239,68,68,0.1); color: var(--red); border: 1px solid rgba(239,68,68,0.15); }
+        .tag.amber { background: rgba(245,158,11,0.1); color: var(--amber); border: 1px solid rgba(245,158,11,0.2); }
+
+        /* ── Keyboard Shortcut Style ── */
+        kbd {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-family: 'Space Grotesk', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* ── Flow / Pipeline ── */
+        .flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            margin: 12px 0;
+        }
+        .flow-item {
+            padding: 6px 14px;
+            border-radius: 8px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+        .flow-arrow {
+            color: var(--text-dim);
+            font-size: 14px;
+        }
+
+        /* ── Back to Top ── */
+        .back-top {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-size: 18px;
+            z-index: 50;
+        }
+        .back-top:hover {
+            background: var(--primary-glow);
+            border-color: rgba(232,169,102,0.3);
+            color: var(--primary);
+        }
+
+        /* ── Footer ── */
+        .manual-footer {
+            padding: 48px 64px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ── Mobile ── */
+        .mobile-header {
+            display: none;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            backdrop-filter: blur(20px);
+        }
+        .mobile-menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 99;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .mobile-header { display: flex; align-items: center; justify-content: space-between; }
+            .main-content { margin-left: 0; }
+            .hero { padding: 48px 24px 40px; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 16px; }
+            .content-area { padding: 32px 20px 80px; }
+            .manual-footer { padding: 32px 20px; flex-direction: column; gap: 8px; text-align: center; }
+            .data-table { font-size: 13px; }
+            .data-table th, .data-table td { padding: 8px 10px; }
+            .step-card { flex-direction: column; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Mobile Header -->
+<div class="mobile-header">
+    <div style="display:flex;align-items:center;gap:10px;">
+        <div class="sidebar-logo-icon" style="width:32px;height:32px;font-size:13px;">OC</div>
+        <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;">User Manual</span>
+    </div>
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">&#9776;</button>
+</div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="page-wrapper">
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">OC</div>
+                <div>
+                    <div class="sidebar-logo-text">OpenCourt</div>
+                    <div class="sidebar-logo-badge">User Manual v6.1</div>
+                </div>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-title">Getting Started</div>
+            <a class="sidebar-link" href="#overview"><span class="sidebar-link-num">01</span> Overview</a>
+            <a class="sidebar-link" href="#create-account"><span class="sidebar-link-num">02</span> Create an Account</a>
+            <a class="sidebar-link" href="#your-profile"><span class="sidebar-link-num">03</span> Your Profile</a>
+
+            <div class="sidebar-section-title">Playing</div>
+            <a class="sidebar-link" href="#dashboard"><span class="sidebar-link-num">04</span> Dashboard</a>
+            <a class="sidebar-link" href="#joining-games"><span class="sidebar-link-num">05</span> Joining a Game</a>
+            <a class="sidebar-link" href="#check-in"><span class="sidebar-link-num">06</span> QR Check-In</a>
+            <a class="sidebar-link" href="#my-games"><span class="sidebar-link-num">07</span> My Games</a>
+
+            <div class="sidebar-section-title">Hosting</div>
+            <a class="sidebar-link" href="#hosting"><span class="sidebar-link-num">08</span> Host a Game</a>
+            <a class="sidebar-link" href="#host-controls"><span class="sidebar-link-num">09</span> Host Controls</a>
+            <a class="sidebar-link" href="#team-generation"><span class="sidebar-link-num">10</span> Team Matchups</a>
+
+            <div class="sidebar-section-title">Features</div>
+            <a class="sidebar-link" href="#map"><span class="sidebar-link-num">11</span> Live Map</a>
+            <a class="sidebar-link" href="#reliability"><span class="sidebar-link-num">12</span> Reliability Score</a>
+            <a class="sidebar-link" href="#game-stats"><span class="sidebar-link-num">13</span> Game Stats</a>
+
+            <div class="sidebar-section-title">Help</div>
+            <a class="sidebar-link" href="#faq"><span class="sidebar-link-num">14</span> FAQ</a>
+            <a class="sidebar-link" href="#support"><span class="sidebar-link-num">15</span> Support &amp; Contact</a>
+        </nav>
+        <div class="sidebar-footer">
+            OpenCourt &copy; 2025. All rights reserved.
+        </div>
+    </aside>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-content" id="top">
+
+        <!-- Hero -->
+        <div class="hero">
+            <div class="hero-badge">&#9889; Papawis Pickup Basketball</div>
+            <h1>OpenCourt User Manual</h1>
+            <p>Everything you need to know about finding games, hosting runs, managing your squad, and building your reputation on the court.</p>
+        </div>
+
+        <div class="content-area">
+
+            <!-- ═══ 01 · Overview ═══ -->
+            <section class="section" id="overview">
+                <div class="section-header">
+                    <div class="section-icon orange">&#127936;</div>
+                    <h2>01 &mdash; Overview</h2>
+                </div>
+                <p>OpenCourt is the premier platform for organizing and joining pickup basketball games. Whether you are looking for a casual run or a competitive game, OpenCourt connects you with players in your area.</p>
+
+                <h3>What You Can Do</h3>
+                <ul>
+                    <li><strong>Find Games</strong> &mdash; Browse available pickup games on the dashboard or live map</li>
+                    <li><strong>Join Games</strong> &mdash; Secure your spot with one tap; auto-waitlist if full</li>
+                    <li><strong>Host Games</strong> &mdash; Create your own run with custom rules, location, and entry fee</li>
+                    <li><strong>QR Check-In</strong> &mdash; Scan in when you arrive at the court</li>
+                    <li><strong>Team Matchups</strong> &mdash; Hosts can auto-generate or manually drag-and-drop players into Team Dark and Team Light, then publish the lineup for players to see</li>
+                    <li><strong>Track Your Reputation</strong> &mdash; Build a Reliability Score by showing up consistently</li>
+                    <li><strong>Log Game Stats</strong> &mdash; Record points, rebounds, assists, and more after completed games</li>
+                </ul>
+
+                <h3>Platform Requirements</h3>
+                <p>OpenCourt works in any modern web browser (Chrome, Safari, Firefox, Edge) on desktop and mobile devices. No app download required.</p>
+            </section>
+
+            <!-- ═══ 02 · Create an Account ═══ -->
+            <section class="section" id="create-account">
+                <div class="section-header">
+                    <div class="section-icon purple">&#128100;</div>
+                    <h2>02 &mdash; Create an Account</h2>
+                </div>
+                <p>Getting started on OpenCourt takes less than two minutes.</p>
+
+                <h3>Sign Up Options</h3>
+                <p>You can create your account using any of the following methods:</p>
+                <ul>
+                    <li><strong>Google</strong> &mdash; Sign in with your Google account (fastest option)</li>
+                    <li><strong>Facebook</strong> &mdash; Sign in with your Facebook account</li>
+                    <li><strong>Email &amp; Password</strong> &mdash; Create an account with your email address</li>
+                </ul>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>When signing up with email, you will receive a verification link. Click the link to activate your account before logging in.</p>
+                </div>
+
+                <h3>Onboarding &mdash; Create Your Baller ID</h3>
+                <p>After signing up, you will be taken to the onboarding page to set up your player profile. This is your <strong>Baller ID</strong> that other players will see.</p>
+
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Full Name</strong>
+                            <p>Enter your real name (e.g., "Juan dela Cruz"). Required.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Display Name</strong>
+                            <p>Choose a unique username (minimum 3 characters). This is how you appear on the court. Required.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Position (Optional)</strong>
+                            <p>Select your playing position: PG (Point Guard), SG (Shooting Guard), SF (Small Forward), PF (Power Forward), or C (Center).</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <strong>Height (Optional)</strong>
+                            <p>Enter your height in feet and inches. Used for team balancing.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <strong>Skill Level (Optional)</strong>
+                            <p>Rate your skill: Casual, Competitive, or Elite. Helps hosts and the team generator.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <p>Click <strong>"Create Baller ID"</strong> to save your profile and start using OpenCourt.</p>
+            </section>
+
+            <!-- ═══ 03 · Your Profile ═══ -->
+            <section class="section" id="your-profile">
+                <div class="section-header">
+                    <div class="section-icon green">&#128084;</div>
+                    <h2>03 &mdash; Your Profile</h2>
+                </div>
+                <p>Your profile page (accessed from the sidebar or menu) is your <strong>Player Locker</strong>. Here you can view and update all your information.</p>
+
+                <h3>What You Can Edit</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Full Name</strong></td>
+                            <td>Your real name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Display Name</strong></td>
+                            <td>Your @username visible to other players</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Position</strong></td>
+                            <td>PG, SG, SF, PF, or C</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Skill Level</strong></td>
+                            <td>Casual, Competitive, or Elite</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Height</strong></td>
+                            <td>Your height in feet and inches</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Reliability Score</h3>
+                <p>Your profile displays your <strong>Reliability Score</strong> as a percentage. All new accounts start at <strong>100%</strong>. See <a href="#reliability" style="color:var(--primary);">Section 12</a> for details on how this score works.</p>
+
+                <p>After updating your information, click <strong>"Save Changes"</strong> to save.</p>
+            </section>
+
+            <!-- ═══ 04 · Dashboard ═══ -->
+            <section class="section" id="dashboard">
+                <div class="section-header">
+                    <div class="section-icon orange">&#127968;</div>
+                    <h2>04 &mdash; Dashboard</h2>
+                </div>
+                <p>The Dashboard is your home screen. It shows all available pickup games from the last 7 days onward, sorted by date (soonest first).</p>
+
+                <h3>Game Cards</h3>
+                <p>Each game appears as a card displaying:</p>
+                <ul>
+                    <li><strong>Game title</strong> and location</li>
+                    <li><strong>Date and time</strong> of the game</li>
+                    <li><strong>Player count</strong> (e.g., "3/20 Players")</li>
+                    <li><strong>Format</strong> (Full Court, Full Court with Ref)</li>
+                    <li><strong>Skill level</strong> (Open Run, Papawis, Elite, etc.)</li>
+                    <li><strong>Entry fee</strong> (FREE or amount in Philippine Pesos, e.g., &#8369;200)</li>
+                </ul>
+
+                <h3>Game Card States</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Appearance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag green">Open</span></td>
+                            <td>Full color card</td>
+                            <td>"JOIN THE RUN" button available</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag orange">Joined</span></td>
+                            <td>Shows "CONFIRMED" badge</td>
+                            <td>Click card to view details</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag red">Cancelled</span></td>
+                            <td>Red border, reduced opacity</td>
+                            <td>Shows cancellation reason</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag green">Completed</span></td>
+                            <td>Green border</td>
+                            <td>View game stats</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag amber">Waitlisted</span></td>
+                            <td>Shows amber <strong>WAITLIST</strong> badge with clock icon</td>
+                            <td>You are on the waitlist — spot not yet confirmed</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag amber">Ended</span></td>
+                            <td>Grayed out, grayscale filter</td>
+                            <td>"ENDED" badge, button disabled</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box note">
+                    <span class="icon">&#128204;</span>
+                    <p>Past games automatically appear grayed out with an "ENDED" badge. The Join button is disabled for these games.</p>
+                </div>
+
+                <h3>Real-Time Updates</h3>
+                <p>The Dashboard updates live as new games are posted — a <strong>"New game just posted!"</strong> toast appears at the top of the screen. Game statuses (player count, cancellation, completion) also refresh automatically without needing to reload the page.</p>
+            </section>
+
+            <!-- ═══ 05 · Joining a Game ═══ -->
+            <section class="section" id="joining-games">
+                <div class="section-header">
+                    <div class="section-icon green">&#9989;</div>
+                    <h2>05 &mdash; Joining a Game</h2>
+                </div>
+                <p>Found a game you want to play? Here is how to join.</p>
+
+                <h3>How to Join</h3>
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Browse the Dashboard</strong>
+                            <p>Find a game that matches your schedule, location, and skill level.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Tap "JOIN THE RUN"</strong>
+                            <p>Click the button on the game card. If the game has house rules, you will be asked to agree before joining.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>You Are In!</strong>
+                            <p>Your card now shows "CONFIRMED". You can view game details or leave the squad at any time.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Waitlist</h3>
+                <p>If the game is full, tapping "JOIN THE WAITLIST" places you on the waitlist automatically. Your waitlist status is shown clearly in two places:</p>
+                <ul>
+                    <li><strong>Dashboard card</strong> — an amber <span class="tag amber">&#9201; WAITLIST</span> badge replaces the green CONFIRMED badge</li>
+                    <li><strong>Game detail page</strong> — an amber <strong>"YOU'RE ON THE WAITLIST"</strong> banner and a <strong>"LEAVE WAITLIST"</strong> button replace the QR Check-In button</li>
+                </ul>
+                <p>If another player leaves, you will be promoted to the main roster in the order you joined. The page updates in real time — no refresh needed.</p>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>Waitlist promotions happen automatically. Once promoted, your status changes to CONFIRMED and the QR Check-In button becomes available.</p>
+                </div>
+
+                <h3>Leaving a Game or Waitlist</h3>
+                <p>To leave a game you have joined or a waitlist you are on:</p>
+                <ol>
+                    <li>Go to the game detail page</li>
+                    <li>Click <strong>"Leave Squad"</strong> (if confirmed) or <strong>"Leave Waitlist"</strong> (if waitlisted)</li>
+                    <li>You will be removed from the roster</li>
+                </ol>
+
+                <div class="info-box warning">
+                    <span class="icon">&#9888;&#65039;</span>
+                    <p>Leaving games too close to start time or not showing up may affect your Reliability Score.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 06 · QR Check-In ═══ -->
+            <section class="section" id="check-in">
+                <div class="section-header">
+                    <div class="section-icon purple">&#128246;</div>
+                    <h2>06 &mdash; QR Check-In</h2>
+                </div>
+                <p>OpenCourt uses QR codes to verify that players actually show up at the court. This system keeps the community accountable.</p>
+
+                <h3>For Players</h3>
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Open Game Details</strong>
+                            <p>Navigate to the game you joined.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Tap "SHOW CHECK-IN QR"</strong>
+                            <p>A modal will appear showing your personal QR code (your Player Pass).</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Show It to the Host</strong>
+                            <p>Present your screen to the host when you arrive. They will scan your code to check you in.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box warning">
+                    <span class="icon">&#9888;&#65039;</span>
+                    <p>The QR Check-In button is only available to <strong>confirmed players</strong>. If you are on the waitlist, you will see a "YOU'RE ON THE WAITLIST" banner instead. Wait to be promoted before arriving at the court.</p>
+                </div>
+
+                <h3>For Hosts</h3>
+                <p>As a host, you can check players in using the QR scanner or manually:</p>
+                <ul>
+                    <li><strong>Scan Mode</strong> &mdash; Tap the scan icon in the roster section to activate your camera. Point it at a player's QR code to automatically check them in.</li>
+                    <li><strong>Manual Check-In</strong> &mdash; Tap the checkmark icon next to a player's name to manually mark them as checked in.</li>
+                </ul>
+            </section>
+
+            <!-- ═══ 07 · My Games ═══ -->
+            <section class="section" id="my-games">
+                <div class="section-header">
+                    <div class="section-icon amber">&#128197;</div>
+                    <h2>07 &mdash; My Games</h2>
+                </div>
+                <p>The My Games page is your personal schedule. Access it from the sidebar by tapping the calendar icon.</p>
+
+                <h3>Two Sections</h3>
+                <div class="card">
+                    <div class="card-title">&#128338; Upcoming Runs (Joined Games)</div>
+                    <p>A timeline view of all games you have joined. Your next game is highlighted with a <span class="tag green">Next Up</span> badge. Each entry shows the date, time, location, player count, and entry fee.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">&#128081; Hosted by You</div>
+                    <p>All games you have created are listed here with a crown badge. Click any game to access host controls, manage the roster, or generate teams.</p>
+                </div>
+
+                <p>Click any game card to go to its detail page where you can view the full roster, check in, or manage it (if you are the host).</p>
+            </section>
+
+            <!-- ═══ 08 · Host a Game ═══ -->
+            <section class="section" id="hosting">
+                <div class="section-header">
+                    <div class="section-icon orange">&#10133;</div>
+                    <h2>08 &mdash; Host a Game</h2>
+                </div>
+                <p>Hosting a game lets you organize your own pickup run. You control the location, rules, format, and entry fee.</p>
+
+                <h3>5-Step Game Creation Wizard</h3>
+
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Location &amp; Schedule</strong>
+                            <p>Enter the court name or address (required). Choose a date: Today, Tomorrow, or pick from the calendar (future dates only). Set the start time. If "Today" is selected, the time must be at least 30 minutes from now.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Format &amp; Capacity</strong>
+                            <p>Select game format: <kbd>Full Court</kbd> or <kbd>Full Court (with Ref)</kbd>. Set the maximum number of players (15&ndash;25). Choose the competition level: Open Run, Papawis, Tito Gaming, Dayo, Malakasan, or Elite.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Details</strong>
+                            <p>Add an optional description about the game and any house rules (e.g., "No hard fouls", "Call your own fouls"). House rules will be shown to players before they join.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <strong>Filters</strong>
+                            <p>Set gender restriction (Mens, Womens, or Mixed) and age range (All Ages, 12U, 14U, 17U, 18+, or 40+).</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <strong>Cost &amp; Publish</strong>
+                            <p>Review all your game details. Set the entry fee using the <strong>Free toggle</strong> or enter an amount up to &#8369;10,000. Tap <strong>"Publish Game"</strong> to make your game live on the dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Cost Settings</h3>
+                <ul>
+                    <li><strong>Free Toggle ON</strong> &mdash; Game is free to join. Shows "This game is free to join" confirmation.</li>
+                    <li><strong>Free Toggle OFF</strong> &mdash; Enter the entry fee in Philippine Pesos (&#8369;). Maximum amount: &#8369;10,000. Numeric values only.</li>
+                </ul>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>After publishing, your game immediately appears on the Dashboard for other players to join. You will be redirected to the Dashboard.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 09 · Host Controls ═══ -->
+            <section class="section" id="host-controls">
+                <div class="section-header">
+                    <div class="section-icon red">&#128296;</div>
+                    <h2>09 &mdash; Host Controls</h2>
+                </div>
+                <p>As the host, you have full control over your game from the game detail page.</p>
+
+                <h3>Roster Management</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Scan QR</strong></td>
+                            <td>Activate the camera scanner to check in players by scanning their QR code</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Manual Check-In</strong></td>
+                            <td>Tap the checkmark icon to manually mark a player as checked in</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mark Absent</strong></td>
+                            <td>Tap the X icon to mark a no-show player as absent (affects their Reliability Score)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Kick from Squad</strong></td>
+                            <td>Remove a player from the roster entirely</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Promote Waitlist</strong></td>
+                            <td>Tap "SQUAD UP" to move a waitlisted player to the main roster</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reset Status</strong></td>
+                            <td>Revert a checked-in or absent player back to joined status</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Game Status Actions</h3>
+                <div class="card">
+                    <div class="card-title"><span class="tag green">Complete Run</span></div>
+                    <p>Mark the game as completed when the run is over. This enables stat tracking for all checked-in players.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title"><span class="tag red">Cancel Run</span></div>
+                    <p>Cancel the game with a reason (e.g., "Rain", "Not enough players"). The cancellation reason is visible to all joined players. Cancelled games appear with a red border on the dashboard.</p>
+                </div>
+
+                <div class="info-box warning">
+                    <span class="icon">&#9888;&#65039;</span>
+                    <p>Please give at least 3 hours notice when cancelling a game to respect your players' time.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 10 · Team Matchups ═══ -->
+            <section class="section" id="team-generation">
+                <div class="section-header">
+                    <div class="section-icon purple">&#9878;&#65039;</div>
+                    <h2>10 &mdash; Team Matchups</h2>
+                </div>
+                <p>Hosts can build and publish team lineups directly from the game detail page. Teams can be arranged automatically by the algorithm or manually using drag-and-drop. Lineups are <strong>private</strong> until the host explicitly publishes them.</p>
+
+                <h3>Requirements</h3>
+                <ul>
+                    <li>You must be the <strong>host</strong> of the game</li>
+                    <li>The game status must be <strong>active</strong> (not upcoming)</li>
+                    <li>At least <strong>4 confirmed players</strong> must be in the roster (joined or checked-in status)</li>
+                </ul>
+
+                <h3>The Two Teams</h3>
+                <div class="card">
+                    <div class="card-title">&#9899; Team Dark &nbsp;&amp;&nbsp; &#9898; Team Light</div>
+                    <p>Players are distributed between two squads — <strong>Team Dark</strong> and <strong>Team Light</strong>. Each team card shows the average OVR (Overall Rating) of its players so you can see the balance at a glance.</p>
+                </div>
+
+                <h3>Building a Lineup — Host Workflow</h3>
+
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Auto-Generate (optional)</strong>
+                            <p>Tap <strong>"Generate Teams"</strong> to let the algorithm distribute players automatically based on Skill Level (60%), Reliability Score (30%), and Height (10%). A confirmation dialog appears if a lineup already exists.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Drag &amp; Drop to Adjust</strong>
+                            <p>Drag any player card between <strong>Team Dark</strong>, <strong>Team Light</strong>, and the <strong>Unassigned Pool</strong>. Changes are local until you save. Works on both desktop (mouse) and mobile (touch).</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Save Lineup</strong>
+                            <p>Tap <strong>"Save Lineup"</strong> to persist your arrangement. An amber <em>"Unsaved changes"</em> banner appears whenever you have moved players but not yet saved. The Save button is disabled once the lineup is saved and unchanged.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">4</div>
+                        <div class="step-content">
+                            <strong>Publish Matchup</strong>
+                            <p>Tap <strong>"Publish Matchup"</strong> to make the teams visible to all joined players. A green <em>"Players can see this lineup"</em> banner confirms it is live. The Squad Roster section is hidden for non-host players once teams are published.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">5</div>
+                        <div class="step-content">
+                            <strong>Unpublish (if needed)</strong>
+                            <p>Tap <strong>"Unpublish"</strong> to pull back a published lineup for revisions. Players will no longer see the teams until you publish again.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Algorithm — How Teams Are Balanced</h3>
+                <p>When using Auto-Generate, the algorithm scores every player and distributes them evenly:</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Weight</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Skill Level</strong></td>
+                            <td>60%</td>
+                            <td>Player's self-reported skill (Casual, Competitive, Elite)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reliability</strong></td>
+                            <td>30%</td>
+                            <td>Player's reliability percentage</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Height</strong></td>
+                            <td>10%</td>
+                            <td>Player's height for positional balance</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h4>Balancing Process</h4>
+                <ol>
+                    <li>Players are grouped by position (Guard, Forward, Center)</li>
+                    <li>Each group is sorted by composite OVR score</li>
+                    <li>A snake draft distributes players between Team Dark and Team Light</li>
+                    <li>Each team gets an equal mix of positions</li>
+                </ol>
+
+                <h3>Player View</h3>
+                <p>Joined non-host players see the Team Matchups section based on publish status:</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>What Players See</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Not published</strong></td>
+                            <td>A <em>"Team lineup is being prepared — check back soon"</em> placeholder card</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Published</strong></td>
+                            <td>Team Dark and Team Light cards with full player lists and OVR scores. The Squad Roster section is also hidden to focus attention on the matchup.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>Player views update in <strong>real time</strong> — the moment the host publishes the lineup, all joined players see it immediately without refreshing the page.</p>
+                </div>
+
+                <div class="info-box note">
+                    <span class="icon">&#128204;</span>
+                    <p>Players who are not joined to the game will not see the Team Matchups section at all, regardless of publish status.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 11 · Live Map ═══ -->
+            <section class="section" id="map">
+                <div class="section-header">
+                    <div class="section-icon green">&#128205;</div>
+                    <h2>11 &mdash; Live Map</h2>
+                </div>
+                <p>The Live Map shows all active games on a real-time Google Maps view. Access it from the navigation sidebar or menu.</p>
+
+                <h3>Map Markers</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Marker Color</th>
+                            <th>Meaning</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag purple">Purple</span></td>
+                            <td>Available &mdash; game has open spots</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag amber">Amber</span></td>
+                            <td>Almost Full &mdash; 75% or more spots taken</td>
+                        </tr>
+                        <tr>
+                            <td><span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;background:rgba(255,255,255,0.05);color:var(--text-dim);border:1px solid var(--border);">Gray</span></td>
+                            <td>Full &mdash; no spots available (waitlist only)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>Tap on any marker to view the game details and join directly from the map.</p>
+            </section>
+
+            <!-- ═══ 12 · Reliability Score ═══ -->
+            <section class="section" id="reliability">
+                <div class="section-header">
+                    <div class="section-icon amber">&#128170;</div>
+                    <h2>12 &mdash; Reliability Score</h2>
+                </div>
+                <p>Your Reliability Score represents how dependable you are as a player. It is displayed as a percentage on your profile and visible to hosts.</p>
+
+                <h3>How It Works</h3>
+                <ul>
+                    <li>All new accounts start at <strong>100%</strong></li>
+                    <li>Your score <strong>decreases</strong> when you are marked as <strong>absent</strong> by a host (no-show)</li>
+                    <li>Your score is used in the team generation algorithm (30% weight)</li>
+                    <li>Higher scores signal to hosts that you are a reliable player</li>
+                </ul>
+
+                <div class="info-box important">
+                    <span class="icon">&#9888;&#65039;</span>
+                    <p>Consistently not showing up to games you have joined will lower your Reliability Score. Always cancel your spot if you cannot attend.</p>
+                </div>
+
+                <h3>Tips to Maintain Your Score</h3>
+                <ul>
+                    <li>Only join games you can attend</li>
+                    <li>Leave the squad early if your plans change</li>
+                    <li>Always check in with the host when you arrive</li>
+                    <li>Arrive on time &mdash; hosts may mark late arrivals as absent</li>
+                </ul>
+            </section>
+
+            <!-- ═══ 13 · Game Stats ═══ -->
+            <section class="section" id="game-stats">
+                <div class="section-header">
+                    <div class="section-icon orange">&#128200;</div>
+                    <h2>13 &mdash; Game Stats</h2>
+                </div>
+                <p>After a game is marked as completed by the host, checked-in players can log their game statistics.</p>
+
+                <h3>How to Submit Stats</h3>
+                <ol>
+                    <li>Go to the completed game's detail page</li>
+                    <li>You will see the <strong>Stats Form</strong> (only visible if you were checked in)</li>
+                    <li>Enter your stats: points, rebounds, assists, steals, turnovers</li>
+                    <li>Submit your stats</li>
+                </ol>
+
+                <h3>Stats Leaderboard</h3>
+                <p>Once players submit their stats, a leaderboard is displayed on the game detail page showing all participants' performances.</p>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>Stats submission is only available for players who were checked in during the game. Make sure to check in with the host when you arrive!</p>
+                </div>
+            </section>
+
+            <!-- ═══ 14 · FAQ ═══ -->
+            <section class="section" id="faq">
+                <div class="section-header">
+                    <div class="section-icon purple">&#10067;</div>
+                    <h2>14 &mdash; Frequently Asked Questions</h2>
+                </div>
+
+                <h3>Getting Started</h3>
+
+                <div class="card">
+                    <div class="card-title">How do I join a game?</div>
+                    <p>Browse the Dashboard, find a game, and tap "JOIN THE RUN". If the game is full, you will be placed on the waitlist automatically.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">What if I cannot make it to a game I joined?</div>
+                    <p>Go to the game detail page and tap "Leave Squad" as soon as possible. This frees up your spot for other players and protects your Reliability Score.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">What is the waitlist?</div>
+                    <p>When a game is full, new players are added to a waitlist in order. If someone leaves, the first person on the waitlist is automatically promoted to the main roster.</p>
+                </div>
+
+                <h3>Hosting</h3>
+
+                <div class="card">
+                    <div class="card-title">How do I create a game?</div>
+                    <p>Tap the <strong>+</strong> button in the navigation bar or go to the Host page. Follow the 5-step wizard to set up your game details, rules, and entry fee.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Can I edit a game after publishing?</div>
+                    <p>Currently, games cannot be edited after publishing. You can cancel the game and create a new one if needed.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">How does QR check-in work?</div>
+                    <p>Players show their QR code from the app. As the host, tap the scan button in the roster section to activate your camera and scan each player's code. You can also manually check in players by tapping the checkmark icon.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Why can't I generate teams?</div>
+                    <p>Team generation requires at least <strong>4 confirmed players</strong> (joined or checked-in status). The Auto-Generate button is disabled until that minimum is met.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Players can't see the teams I generated</div>
+                    <p>Lineups are private until you explicitly <strong>Publish</strong> them. After saving your lineup, tap <strong>"Publish Matchup"</strong> to make it visible to all joined players. They will see it in real time.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Can I edit teams after publishing?</div>
+                    <p>Yes. Tap <strong>"Unpublish"</strong> to hide the lineup, make your drag-and-drop adjustments, save, and publish again.</p>
+                </div>
+
+                <h3>Account</h3>
+
+                <div class="card">
+                    <div class="card-title">How do I update my profile?</div>
+                    <p>Go to the Profile page from the sidebar navigation. Update your information and tap "Save Changes".</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">Can I delete my account?</div>
+                    <p>Yes. You can request account deletion through the app or by emailing <strong>devappaisolutions@gmail.com</strong>. All your data will be permanently deleted within 30 days. See the Data Deletion page for details.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">How do I change my email?</div>
+                    <p>Contact support at <strong>devappaisolutions@gmail.com</strong> for email change requests.</p>
+                </div>
+
+                <h3>Troubleshooting</h3>
+
+                <div class="card">
+                    <div class="card-title">My check-in QR is not scanning</div>
+                    <p>Make sure your screen brightness is high. Try holding the phone steady and closer to the camera. The host can also check you in manually using the checkmark button.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">I was checked in but my score still dropped</div>
+                    <p>Contact support with your game details. A host may have accidentally marked you absent before correcting it.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 15 · Support ═══ -->
+            <section class="section" id="support">
+                <div class="section-header">
+                    <div class="section-icon green">&#128231;</div>
+                    <h2>15 &mdash; Support &amp; Contact</h2>
+                </div>
+                <p>Need help? We are here for you.</p>
+
+                <h3>Contact Us</h3>
+                <div class="card">
+                    <div class="card-title">&#128231; Email Support</div>
+                    <p><strong>devappaisolutions@gmail.com</strong></p>
+                    <p>Response time: 24&ndash;48 hours</p>
+                </div>
+
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><strong>Privacy Policy</strong> &mdash; Available at <kbd>/privacy</kbd> in the app</li>
+                    <li><strong>Terms of Service</strong> &mdash; Available at <kbd>/terms</kbd> in the app</li>
+                    <li><strong>Data Deletion</strong> &mdash; Available at <kbd>/data-deletion</kbd> in the app</li>
+                    <li><strong>Support &amp; FAQ</strong> &mdash; Available at <kbd>/support</kbd> in the app</li>
+                </ul>
+
+                <h3>Important Policies</h3>
+                <div class="card">
+                    <div class="card-title">&#128274; Privacy</div>
+                    <p>OpenCourt collects only the data necessary to provide the service. Your data is never sold to third parties. You can request deletion of all your data at any time.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">&#127874; Age Requirement</div>
+                    <p>You must be at least 13 years old to use OpenCourt.</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">&#127760; Cookie Consent</div>
+                    <p>On your first visit, you will see a cookie consent banner. Essential cookies (authentication, session) are always active. Analytics cookies are optional and can be declined.</p>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="manual-footer">
+            <span>OpenCourt User Manual v6.1 &mdash; Last updated April 2026</span>
+            <span>Papawis Pickup Basketball</span>
+        </div>
+    </main>
+</div>
+
+<!-- Back to Top -->
+<a href="#top" class="back-top" title="Back to top">&#8593;</a>
+
+<script>
+    // Sidebar toggle (mobile)
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+
+    // Active link highlighting
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('.sidebar-link');
+
+    function setActiveLink() {
+        let current = '';
+        sections.forEach(section => {
+            const top = section.getBoundingClientRect().top;
+            if (top < 200) current = section.getAttribute('id');
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    }
+
+    window.addEventListener('scroll', setActiveLink);
+    setActiveLink();
+
+    // Close sidebar on link click (mobile)
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 900) {
+                toggleSidebar();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
