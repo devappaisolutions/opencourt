@@ -9,7 +9,7 @@ import { TeamDndBoard, type DraggablePlayer, type LocalTeamState } from "./team-
 export interface TeamGeneratorProps {
     gameId: string;
     isHost: boolean;
-    isJoined: boolean;
+
     gameStatus: string;
     teamsGenerated: boolean;
     teamsPublished: boolean;
@@ -36,7 +36,6 @@ function initTeamState(confirmedRoster: DraggablePlayer[], existingTeams?: any[]
 export function TeamGenerator({
     gameId,
     isHost,
-    isJoined,
     gameStatus,
     teamsGenerated,
     teamsPublished,
@@ -178,7 +177,6 @@ export function TeamGenerator({
 
     // --- PLAYER VIEW ---
     if (!isHost) {
-        if (!isJoined) return null;
         if (!localPublished) {
             return (
                 <div className="bg-[#2A2827] rounded-2xl border border-white/10 p-5 text-center space-y-2">

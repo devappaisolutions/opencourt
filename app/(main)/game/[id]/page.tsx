@@ -297,7 +297,6 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 <TeamGenerator
                     gameId={id}
                     isHost={isHost}
-                    isJoined={!!userRosterEntry}
                     gameStatus={game.status}
                     teamsGenerated={existingTeams !== null}
                     teamsPublished={game.teams_published || false}
