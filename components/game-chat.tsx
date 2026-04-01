@@ -79,7 +79,7 @@ const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; 
                 type="text"
                 placeholder="Type a message..."
                 maxLength={500}
-                className="flex-1 h-9 bg-[#1F1D1D] border border-white/8 rounded-xl px-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+                className="flex-1 h-9 bg-[#1F1D1D] border border-white/8 rounded-xl px-3 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
             />
             <button type="submit" className="h-9 w-9 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white shrink-0 active:scale-90 transition-transform">
                 <Send className="w-3.5 h-3.5" />
