@@ -150,7 +150,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             {/* Chat Panel — centered on mobile, above FAB on desktop */}
             {isOpen && (
                 <div className="
-                    fixed left-4 right-4 bottom-[104px]
+                    fixed left-4 right-4 bottom-4
                     sm:absolute sm:bottom-full sm:right-0 sm:left-auto sm:w-[360px] sm:mb-3 sm:rounded-2xl
                     bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200
                     z-[9999]
