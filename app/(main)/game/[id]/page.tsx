@@ -7,7 +7,7 @@ import { TeamGenerator } from "@/components/team-generator";
 import { GameChat } from "@/components/game-chat";
 import { createClient } from "@/lib/supabase/server";
 import { calculateOVR } from "@/lib/team-generator";
-import { Calendar, Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap, DollarSign, Users } from "lucide-react";
+import { Clock, MapPin, User as UserIcon, Shield, Sparkles, Zap, DollarSign, Users } from "lucide-react";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -35,7 +35,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
     }
 
     // Fetch Roster
-    const { data: roster, error: rosterError } = await supabase
+    const { data: roster } = await supabase
         .from('game_roster')
         .select(`
             id,
@@ -232,8 +232,9 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                             maxPlayers={game.max_players}
                             disabled={!user}
                             houseRules={game.house_rules}
-                            rosterId={roster?.find((p: any) => p.player_id === user?.id)?.id}
+                            rosterId={userRosterEntry?.id}
                             status={game.status}
+                            rosterStatus={userRosterEntry?.status}
                         />
                     </div>
                 </div>

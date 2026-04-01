@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { LogOut, Plus, ShieldCheck, X, ScrollText, CheckCircle2, QrCode, AlertTriangle, Trophy, Loader2 } from "lucide-react";
+import { LogOut, Plus, ShieldCheck, X, ScrollText, CheckCircle2, QrCode, AlertTriangle, Trophy, Loader2, Clock } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -18,9 +18,10 @@ interface GameActionsProps {
     houseRules?: string;
     rosterId?: string;
     status?: string;
+    rosterStatus?: string;
 }
 
-export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, maxPlayers, disabled, houseRules, rosterId, status }: GameActionsProps) {
+export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, maxPlayers, disabled, houseRules, rosterId, status, rosterStatus }: GameActionsProps) {
     const supabase = createClient();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -204,6 +205,24 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                     className="flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
                 >
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />} CANCEL RUN
+                </button>
+            </div>
+        );
+    }
+
+    if (isJoined && rosterStatus === 'waitlist') {
+        return (
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <div className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-400 font-black text-[10px] tracking-[0.2em] uppercase">
+                    <Clock className="w-4 h-4" />
+                    YOU'RE ON THE WAITLIST
+                </div>
+                <button
+                    onClick={handleLeave}
+                    disabled={loading}
+                    className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl font-bold text-[10px] tracking-widest uppercase bg-zinc-950 border border-white/5 text-zinc-500 hover:text-rose-500 hover:border-rose-500/20 transition-all active:scale-95 disabled:opacity-50 italic"
+                >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />} LEAVE WAITLIST
                 </button>
             </div>
         );
