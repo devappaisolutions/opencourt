@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, useRef, memo, useCallback, startTransition } from "react";
+import { createPortal } from "react-dom";
 import { MessageCircle, Send, X } from "lucide-react";
 
 interface ChatMessage {
@@ -145,13 +146,12 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         });
     }, []);
 
-    return (
+    // Portal renders directly into document.body, escaping all parent stacking contexts
+    const portal = (
         <>
-            {/* Chat Panel — independent fixed element, no parent stacking context */}
             {isOpen && (
-                <div className="fixed left-4 right-4 bottom-4 z-[9999] sm:left-auto sm:right-6 sm:w-[360px] bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#2A2827]">
+                <div className="fixed left-4 right-4 bottom-4 z-[9999] sm:left-auto sm:right-6 sm:w-[360px] bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/8">
                         <div className="flex items-center gap-2">
                             <MessageCircle className="w-4 h-4 text-primary" />
                             <h2 className="text-sm font-black uppercase tracking-widest text-white">Game Chat</h2>
@@ -163,9 +163,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                             <X className="w-4 h-4" />
                         </button>
                     </div>
-
-                    {/* Messages */}
-                    <div className="h-72 overflow-y-auto p-3 space-y-3 bg-[#2A2827]" style={{ contain: 'content' }}>
+                    <div className="h-72 overflow-y-auto p-3 space-y-3" style={{ contain: 'content' }}>
                         {messages.length === 0 ? (
                             <p className="text-center text-zinc-600 text-xs py-10">No messages yet. Start the conversation!</p>
                         ) : (
@@ -173,8 +171,6 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                         )}
                         <div ref={messagesEndRef} />
                     </div>
-
-                    {/* Input */}
                     {userId ? (
                         <ChatInput gameId={gameId} userId={userId} />
                     ) : (
@@ -185,7 +181,6 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 </div>
             )}
 
-            {/* FAB — independent fixed element, hidden when chat is open */}
             {!isOpen && (
                 <button
                     onClick={handleToggle}
@@ -202,4 +197,6 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             )}
         </>
     );
+
+    return typeof document !== 'undefined' ? createPortal(portal, document.body) : null;
 }
