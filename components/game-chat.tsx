@@ -146,10 +146,14 @@ export function GameChat({ gameId, userId }: GameChatProps) {
     }, []);
 
     return (
-        <div className="fixed bottom-6 right-4 z-[150] flex flex-col items-end gap-3">
-            {/* Chat Panel */}
+        <div className="fixed bottom-20 right-4 sm:bottom-6 z-[150]">
+            {/* Chat Panel — centered on mobile, above FAB on desktop */}
             {isOpen && (
-                <div className="w-[320px] sm:w-[360px] bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+                <div className="
+                    fixed left-4 right-4 bottom-36
+                    sm:absolute sm:bottom-full sm:right-0 sm:left-auto sm:w-[360px] sm:mb-3
+                    bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200
+                ">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#2A2827]">
                         <div className="flex items-center gap-2">
