@@ -146,15 +146,10 @@ export function GameChat({ gameId, userId }: GameChatProps) {
     }, []);
 
     return (
-        <div className="fixed bottom-20 right-4 sm:bottom-6 z-[150]">
-            {/* Chat Panel — centered on mobile, above FAB on desktop */}
+        <>
+            {/* Chat Panel — independent fixed element, no parent stacking context */}
             {isOpen && (
-                <div className="
-                    fixed left-4 right-4 bottom-4
-                    sm:absolute sm:bottom-full sm:right-0 sm:left-auto sm:w-[360px] sm:mb-3 sm:rounded-2xl
-                    bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200
-                    z-[9999]
-                ">
+                <div className="fixed left-4 right-4 bottom-4 z-[9999] sm:left-auto sm:right-6 sm:w-[360px] bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#2A2827]">
                         <div className="flex items-center gap-2">
@@ -190,19 +185,21 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 </div>
             )}
 
-            {/* FAB — hidden when chat is open */}
-            <button
-                onClick={handleToggle}
-                className={`relative w-14 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-all active:scale-90 hover:scale-105 ${isOpen ? 'hidden' : ''}`}
-                aria-label="Toggle chat"
-            >
-                <MessageCircle className="w-6 h-6" />
-                {unreadCount > 0 && !isOpen && (
-                    <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-zinc-950 animate-bounce">
-                        {unreadCount > 9 ? '9+' : unreadCount}
-                    </span>
-                )}
-            </button>
-        </div>
+            {/* FAB — independent fixed element, hidden when chat is open */}
+            {!isOpen && (
+                <button
+                    onClick={handleToggle}
+                    className="fixed bottom-24 right-4 sm:bottom-6 z-[9999] w-14 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-all active:scale-90 hover:scale-105"
+                    aria-label="Toggle chat"
+                >
+                    <MessageCircle className="w-6 h-6" />
+                    {unreadCount > 0 && (
+                        <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-zinc-950 animate-bounce">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                    )}
+                </button>
+            )}
+        </>
     );
 }
