@@ -17,7 +17,7 @@ export async function POST(
         // Verify caller is host and get current game state
         const { data: game, error: gameError } = await supabase
             .from("games")
-            .select("host_id, teams_generated")
+            .select("*")
             .eq("id", gameId)
             .single();
 
