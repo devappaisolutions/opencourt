@@ -284,13 +284,11 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 </div>
             )}
 
-            {/* Game Chat */}
-            <div className="px-4 relative">
-                <GameChat
-                    gameId={id}
-                    userId={user?.id || ''}
-                />
-            </div>
+            {/* Game Chat — floating FAB, renders outside page flow */}
+            <GameChat
+                gameId={id}
+                userId={user?.id || ''}
+            />
 
             {/* Team Generator Section */}
             <div className="px-4 relative">

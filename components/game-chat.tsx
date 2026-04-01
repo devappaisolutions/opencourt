@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, useRef, memo, useCallback, startTransition } from "react";
-import { MessageCircle, Send, ChevronDown, ChevronUp } from "lucide-react";
+import { MessageCircle, Send, X } from "lucide-react";
 
 interface ChatMessage {
     id: string;
@@ -21,64 +21,35 @@ interface GameChatProps {
     userId: string;
 }
 
-// --- Static helpers (never recreated) ---
+const formatTime = (dateStr: string) =>
+    new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Manila' });
 
-const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'Asia/Manila'
-    });
-};
-
-const MESSAGE_SELECT = `
-    id, game_id, user_id, message, created_at,
-    profiles:user_id (username, avatar_url)
-`;
-
-// --- Memoized message bubble (plain <img>, no next/image overhead) ---
+const MESSAGE_SELECT = `id, game_id, user_id, message, created_at, profiles:user_id (username, avatar_url)`;
 
 const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; isOwn: boolean }) {
     return (
-        <div className={`flex gap-2.5 ${isOwn ? 'flex-row-reverse' : ''}`}>
-            <div className="w-7 h-7 rounded-lg bg-zinc-900 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
+        <div className={`flex gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}>
+            <div className="w-6 h-6 rounded-lg bg-zinc-800 flex items-center justify-center border border-white/5 shrink-0 overflow-hidden">
                 {msg.profiles?.avatar_url ? (
-                    <img
-                        src={msg.profiles.avatar_url}
-                        alt={msg.profiles.username || 'User'}
-                        width={28}
-                        height={28}
-                        loading="lazy"
-                        className="w-7 h-7 object-cover"
-                    />
+                    <img src={msg.profiles.avatar_url} alt={msg.profiles.username || 'User'} width={24} height={24} loading="lazy" className="w-6 h-6 object-cover" />
                 ) : (
-                    <span className="text-[10px] text-zinc-600 font-bold">
-                        {(msg.profiles?.username || '?')[0].toUpperCase()}
-                    </span>
+                    <span className="text-[9px] text-zinc-500 font-bold">{(msg.profiles?.username || '?')[0].toUpperCase()}</span>
                 )}
             </div>
             <div className={`max-w-[75%] ${isOwn ? 'text-right' : ''}`}>
-                <div className={`flex items-baseline gap-2 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
+                <div className={`flex items-baseline gap-1.5 mb-0.5 ${isOwn ? 'justify-end' : ''}`}>
+                    <span className={`text-[9px] font-black uppercase tracking-widest ${isOwn ? 'text-primary' : 'text-zinc-500'}`}>
                         {msg.profiles?.username || 'Unknown'}
                     </span>
-                    <span className="text-[9px] text-zinc-700">
-                        {formatTime(msg.created_at)}
-                    </span>
+                    <span className="text-[9px] text-zinc-700">{formatTime(msg.created_at)}</span>
                 </div>
-                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm overflow-wrap-anywhere ${
-                    isOwn
-                        ? 'bg-primary/20 text-white rounded-tr-sm'
-                        : 'bg-white/5 text-zinc-300 rounded-tl-sm'
-                }`}>
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm leading-snug ${isOwn ? 'bg-primary/20 text-white rounded-tr-sm' : 'bg-white/5 text-zinc-300 rounded-tl-sm'}`}>
                     {msg.message}
                 </div>
             </div>
         </div>
     );
 });
-
-// --- Isolated input (own state boundary, never re-renders from messages) ---
 
 const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; userId: string }) {
     const supabase = useRef(createClient()).current;
@@ -89,16 +60,9 @@ const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; 
         e.preventDefault();
         const value = inputRef.current?.value?.trim();
         if (!value || !userId || sendingRef.current) return;
-
         sendingRef.current = true;
         try {
-            const { error } = await supabase
-                .from('game_chat')
-                .insert({
-                    game_id: gameId,
-                    user_id: userId,
-                    message: value,
-                });
+            const { error } = await supabase.from('game_chat').insert({ game_id: gameId, user_id: userId, message: value });
             if (error) throw error;
             if (inputRef.current) inputRef.current.value = '';
         } catch (error) {
@@ -109,56 +73,38 @@ const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; 
     };
 
     return (
-        <form
-            onSubmit={handleSend}
-            className="flex items-center gap-2 p-3 border-t border-white/5"
-        >
+        <form onSubmit={handleSend} className="flex items-center gap-2 p-3 border-t border-white/8">
             <input
                 ref={inputRef}
                 type="text"
                 placeholder="Type a message..."
                 maxLength={500}
-                className="flex-1 h-10 bg-zinc-900/50 border border-white/10 rounded-xl px-4 text-base text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+                className="flex-1 h-9 bg-zinc-900 border border-white/10 rounded-xl px-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
             />
-            <button
-                type="submit"
-                className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white disabled:opacity-30 disabled:cursor-not-allowed shrink-0 active:scale-90"
-            >
-                <Send className="w-4 h-4" />
+            <button type="submit" className="h-9 w-9 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white shrink-0 active:scale-90 transition-transform">
+                <Send className="w-3.5 h-3.5" />
             </button>
         </form>
     );
 });
 
-// --- Main chat component (manages messages + subscription only) ---
-
 export function GameChat({ gameId, userId }: GameChatProps) {
     const supabaseRef = useRef(createClient());
     const [messages, setMessages] = useState<ChatMessage[]>([]);
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const isExpandedRef = useRef(isExpanded);
+    const isOpenRef = useRef(isOpen);
     const scrollRaf = useRef<number>(0);
 
-    useEffect(() => {
-        isExpandedRef.current = isExpanded;
-    }, [isExpanded]);
+    useEffect(() => { isOpenRef.current = isOpen; }, [isOpen]);
 
     // Fetch last 50 messages on mount
     useEffect(() => {
         const supabase = supabaseRef.current;
-        const fetchMessages = async () => {
-            const { data } = await supabase
-                .from('game_chat')
-                .select(MESSAGE_SELECT)
-                .eq('game_id', gameId)
-                .order('created_at', { ascending: true })
-                .limit(50);
-
-            if (data) setMessages(data as unknown as ChatMessage[]);
-        };
-        fetchMessages();
+        supabase.from('game_chat').select(MESSAGE_SELECT).eq('game_id', gameId)
+            .order('created_at', { ascending: true }).limit(50)
+            .then(({ data }) => { if (data) setMessages(data as unknown as ChatMessage[]); });
     }, [gameId]);
 
     // Real-time subscription
@@ -166,128 +112,92 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         const supabase = supabaseRef.current;
         const channel = supabase
             .channel(`game_chat_${gameId}`)
-            .on('postgres_changes', {
-                event: 'INSERT',
-                schema: 'public',
-                table: 'game_chat',
-                filter: `game_id=eq.${gameId}`
-            }, async (payload: any) => {
-                const { data: newMsg } = await supabase
-                    .from('game_chat')
-                    .select(MESSAGE_SELECT)
-                    .eq('id', payload.new.id)
-                    .single();
-
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'game_chat', filter: `game_id=eq.${gameId}` }, async (payload: any) => {
+                const { data: newMsg } = await supabase.from('game_chat').select(MESSAGE_SELECT).eq('id', payload.new.id).single();
                 if (newMsg) {
-                    // Low-priority update — won't block input events
                     startTransition(() => {
-                        setMessages(prev => {
-                            if (prev.find(m => m.id === newMsg.id)) return prev;
-                            return [...prev, newMsg as unknown as ChatMessage];
-                        });
+                        setMessages(prev => prev.find(m => m.id === newMsg.id) ? prev : [...prev, newMsg as unknown as ChatMessage]);
                     });
-                    if (!isExpandedRef.current) {
-                        setUnreadCount(prev => prev + 1);
-                    }
+                    if (!isOpenRef.current) setUnreadCount(prev => prev + 1);
                 }
             })
-            .on('postgres_changes', {
-                event: 'DELETE',
-                schema: 'public',
-                table: 'game_chat',
-                filter: `game_id=eq.${gameId}`
-            }, (payload: any) => {
-                startTransition(() => {
-                    setMessages(prev => prev.filter(m => m.id !== payload.old.id));
-                });
+            .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'game_chat', filter: `game_id=eq.${gameId}` }, (payload: any) => {
+                startTransition(() => { setMessages(prev => prev.filter(m => m.id !== payload.old.id)); });
             })
             .subscribe();
-
-        return () => {
-            supabase.removeChannel(channel);
-        };
+        return () => { supabase.removeChannel(channel); };
     }, [gameId]);
 
-    // Debounced auto-scroll — collapses rapid arrivals, uses instant scroll
+    // Auto-scroll when open
     useEffect(() => {
-        if (isExpanded && messages.length > 0) {
+        if (isOpen && messages.length > 0) {
             cancelAnimationFrame(scrollRaf.current);
             scrollRaf.current = requestAnimationFrame(() => {
                 messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
             });
         }
-    }, [messages, isExpanded]);
+    }, [messages, isOpen]);
 
     const handleToggle = useCallback(() => {
-        setIsExpanded(prev => !prev);
-        setUnreadCount(prev => {
-            if (!isExpandedRef.current) return 0;
-            return prev;
+        setIsOpen(prev => {
+            if (!prev) setUnreadCount(0);
+            return !prev;
         });
     }, []);
 
     return (
-        <div className="bg-[#2A2827] rounded-2xl border border-white/10 overflow-hidden shadow-xl">
-            {/* Collapsible Header */}
-            <button
-                onClick={handleToggle}
-                className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
-            >
-                <div className="flex items-center gap-2">
-                    <MessageCircle className="w-5 h-5 text-primary" />
-                    <h2 className="text-lg font-bold text-white uppercase tracking-wider">
-                        Game Chat
-                    </h2>
-                    {messages.length > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-zinc-400 text-xs font-bold">
-                            {messages.length}
-                        </span>
-                    )}
-                    {unreadCount > 0 && !isExpanded && (
-                        <span className="px-2 py-0.5 rounded-full bg-primary text-white text-xs font-bold animate-pulse">
-                            {unreadCount} new
-                        </span>
-                    )}
-                </div>
-                {isExpanded
-                    ? <ChevronUp className="w-5 h-5 text-zinc-500" />
-                    : <ChevronDown className="w-5 h-5 text-zinc-500" />
-                }
-            </button>
+        <div className="fixed bottom-6 right-4 z-[150] flex flex-col items-end gap-3">
+            {/* Chat Panel */}
+            {isOpen && (
+                <div className="w-[320px] sm:w-[360px] bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-zinc-900/60">
+                        <div className="flex items-center gap-2">
+                            <MessageCircle className="w-4 h-4 text-primary" />
+                            <h2 className="text-sm font-black uppercase tracking-widest text-white">Game Chat</h2>
+                            {messages.length > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full bg-white/10 text-zinc-400 text-[10px] font-bold">{messages.length}</span>
+                            )}
+                        </div>
+                        <button onClick={handleToggle} className="p-1.5 rounded-lg hover:bg-white/10 text-zinc-500 hover:text-white transition-colors">
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
 
-            {/* Chat Body */}
-            {isExpanded && (
-                <div className="border-t border-white/5">
-                    {/* Messages — contained so repaints don't affect input */}
-                    <div className="h-64 overflow-y-auto p-4 space-y-3" style={{ contain: 'content' }}>
+                    {/* Messages */}
+                    <div className="h-72 overflow-y-auto p-3 space-y-3" style={{ contain: 'content' }}>
                         {messages.length === 0 ? (
-                            <p className="text-center text-zinc-600 text-sm py-8">
-                                No messages yet. Start the conversation!
-                            </p>
+                            <p className="text-center text-zinc-600 text-xs py-10">No messages yet. Start the conversation!</p>
                         ) : (
-                            messages.map((msg) => (
-                                <ChatBubble
-                                    key={msg.id}
-                                    msg={msg}
-                                    isOwn={msg.user_id === userId}
-                                />
-                            ))
+                            messages.map(msg => <ChatBubble key={msg.id} msg={msg} isOwn={msg.user_id === userId} />)
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input — completely isolated component */}
+                    {/* Input */}
                     {userId ? (
                         <ChatInput gameId={gameId} userId={userId} />
                     ) : (
-                        <div className="p-3 border-t border-white/5 text-center">
-                            <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">
-                                Sign in to chat
-                            </p>
+                        <div className="p-3 border-t border-white/8 text-center">
+                            <p className="text-zinc-600 text-xs font-bold uppercase tracking-widest">Sign in to chat</p>
                         </div>
                     )}
                 </div>
             )}
+
+            {/* FAB */}
+            <button
+                onClick={handleToggle}
+                className="relative w-14 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-all active:scale-90 hover:scale-105"
+                aria-label="Toggle chat"
+            >
+                <MessageCircle className="w-6 h-6" />
+                {unreadCount > 0 && !isOpen && (
+                    <span className="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1 rounded-full bg-rose-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-zinc-950 animate-bounce">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                )}
+            </button>
         </div>
     );
 }
