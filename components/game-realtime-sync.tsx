@@ -27,6 +27,12 @@ export function GameRealtimeSync({ gameId }: GameRealtimeSyncProps) {
     useEffect(() => {
         const supabase = supabaseRef.current;
 
+        // Only subscribe to `games` — it has a public SELECT policy (USING TRUE).
+        // team_assignments has an RLS policy that blocks non-hosts when teams are
+        // unpublished, causing Supabase Realtime to return UNAUTHORIZED.
+        // Subscribing to `games` alone is sufficient: when the host publishes,
+        // games.teams_published changes, this fires, router.refresh() re-fetches
+        // the server component which then queries team_assignments (now accessible).
         const channel = supabase
             .channel(`game_detail_${gameId}`)
             .on("postgres_changes", {
@@ -34,14 +40,6 @@ export function GameRealtimeSync({ gameId }: GameRealtimeSyncProps) {
                 schema: "public",
                 table: "games",
                 filter: `id=eq.${gameId}`,
-            }, () => {
-                router.refresh();
-            })
-            .on("postgres_changes", {
-                event: "*",
-                schema: "public",
-                table: "team_assignments",
-                filter: `game_id=eq.${gameId}`,
             }, () => {
                 router.refresh();
             })
