@@ -42,7 +42,8 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
             joined_at,
             player_id,
             profiles:player_id (
-                id, full_name, username, avatar_url, position, height_ft, height_in, skill_level
+                id, full_name, username, avatar_url, position, height_ft, height_in, skill_level,
+                avg_points, avg_rebounds, avg_assists, avg_steals, avg_blocks, avg_turnovers
             )
         `)
         .eq('game_id', id);
@@ -50,6 +51,14 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
     // Check if current user is host
     const { data: { user } } = await supabase.auth.getUser();
     const isHost = user?.id === game.host_id;
+
+    // Build confirmed roster with pre-computed OVR for TeamGenerator
+    const confirmedRoster = (roster ?? [])
+        .filter((r: any) => ['joined', 'checked_in'].includes(r.status))
+        .map((r: any) => ({
+            ...r.profiles,
+            ovr: calculateOVR(r.profiles),
+        }));
 
     // Check if user can add stats (completed game + checked in)
     const userRosterEntry = roster?.find((r: any) => r.player_id === user?.id);
@@ -288,10 +297,12 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 <TeamGenerator
                     gameId={id}
                     isHost={isHost}
+                    isJoined={!!userRosterEntry}
                     gameStatus={game.status}
                     teamsGenerated={game.teams_generated || false}
-                    existingTeams={existingTeams || undefined}
-                    confirmedCount={roster?.filter((r: any) => ['joined', 'checked_in'].includes(r.status)).length || 0}
+                    teamsPublished={game.teams_published || false}
+                    confirmedRoster={confirmedRoster}
+                    existingTeams={existingTeams ?? undefined}
                 />
             </div>
 

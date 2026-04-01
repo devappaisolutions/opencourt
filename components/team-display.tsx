@@ -45,7 +45,7 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${color.replace('border', 'bg')}`} />
                         <h3 className="font-bold text-white uppercase tracking-wider font-heading">
-                            Team {team.team_number}
+                            {team.team_number === 1 ? 'Team Dark' : 'Team Light'}
                         </h3>
                     </div>
                     <div className="text-xs text-zinc-400 font-bold">
@@ -118,11 +118,11 @@ export function TeamDisplay({ teams }: TeamDisplayProps) {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
-                <TeamCard team={team1} color="border-blue-500/50" />
+                <TeamCard team={team1} color="border-zinc-600/50" />
                 <div className="flex items-center justify-center">
                     <div className="text-2xl font-bold text-zinc-600">VS</div>
                 </div>
-                <TeamCard team={team2} color="border-red-500/50" />
+                <TeamCard team={team2} color="border-amber-500/40" />
             </div>
         </div>
     );

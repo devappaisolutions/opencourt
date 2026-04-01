@@ -152,12 +152,14 @@ export async function generateTeams(gameId: string, hostId: string) {
         return { error: "Failed to save team assignments" };
     }
 
-    // 6. Update game status
+    // 6. Update game status — reset teams_published so host must re-publish
     await supabase
         .from("games")
         .update({
             teams_generated: true,
             teams_generated_at: new Date().toISOString(),
+            teams_published: false,
+            teams_published_at: null,
         })
         .eq("id", gameId);
 

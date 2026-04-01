@@ -95,6 +95,8 @@ CREATE TABLE IF NOT EXISTS games (
   -- Team generation
   teams_generated BOOLEAN DEFAULT FALSE,
   teams_generated_at TIMESTAMP WITH TIME ZONE,
+  teams_published BOOLEAN DEFAULT FALSE,
+  teams_published_at TIMESTAMP WITH TIME ZONE,
 
   CONSTRAINT valid_latitude CHECK (latitude >= -90 AND latitude <= 90),
   CONSTRAINT valid_longitude CHECK (longitude >= -180 AND longitude <= 180)
@@ -169,8 +171,16 @@ CREATE TABLE IF NOT EXISTS team_assignments (
 ALTER TABLE team_assignments ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Team assignments are viewable by everyone" ON team_assignments;
-CREATE POLICY "Team assignments are viewable by everyone"
-  ON team_assignments FOR SELECT USING (TRUE);
+DROP POLICY IF EXISTS "Team assignments viewable when published or by host" ON team_assignments;
+CREATE POLICY "Team assignments viewable when published or by host"
+  ON team_assignments FOR SELECT
+  USING (
+    auth.uid() IN (SELECT host_id FROM games WHERE id = game_id)
+    OR EXISTS (
+      SELECT 1 FROM games
+      WHERE id = game_id AND teams_published = TRUE
+    )
+  );
 
 DROP POLICY IF EXISTS "Hosts can manage team assignments" ON team_assignments;
 CREATE POLICY "Hosts can manage team assignments"
