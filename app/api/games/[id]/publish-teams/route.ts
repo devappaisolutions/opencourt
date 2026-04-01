@@ -32,8 +32,14 @@ export async function POST(
 
         const { publish }: { publish: boolean } = await request.json();
 
-        if (publish && !game.teams_generated) {
-            return NextResponse.json({ error: "Save a lineup before publishing" }, { status: 400 });
+        if (publish) {
+            const { count } = await supabase
+                .from("team_assignments")
+                .select("*", { count: "exact", head: true })
+                .eq("game_id", gameId);
+            if (!count || count === 0) {
+                return NextResponse.json({ error: "Save a lineup before publishing" }, { status: 400 });
+            }
         }
 
         const { error: updateError } = await supabase
