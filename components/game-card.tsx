@@ -117,23 +117,34 @@ export function GameCard({
             <div className="relative h-full flex flex-col justify-between p-6 z-20 pointer-events-none">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-2 relative">
                     <div className="flex flex-wrap gap-2 items-center">
-                        <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase badge-premium text-[#B8B0A6]">
-                            {game.format}
-                        </span>
+                        {!isCancelled && (
+                            <>
+                                <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase badge-premium text-[#B8B0A6]">
+                                    {game.format}
+                                </span>
 
-                        <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${game.level === 'Elite' ? 'bg-primary/10 text-primary border-primary/30' :
-                            game.level === 'Competitive' ? 'bg-[#FF9800]/10 text-[#FF9800] border-[#FF9800]/30' :
-                                'bg-[#F5EFEA]/10 text-[#F5EFEA] border-[#F5EFEA]/30'
-                            }`}>
-                            {game.level}
-                        </span>
+                                <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${game.level === 'Elite' ? 'bg-primary/10 text-primary border-primary/30' :
+                                    game.level === 'Competitive' ? 'bg-[#FF9800]/10 text-[#FF9800] border-[#FF9800]/30' :
+                                        'bg-[#F5EFEA]/10 text-[#F5EFEA] border-[#F5EFEA]/30'
+                                    }`}>
+                                    {game.level}
+                                </span>
+                            </>
+                        )}
 
-                        {/* Cancelled badge - inline on mobile */}
+                        {/* Cancelled badge */}
                         {isCancelled && (
-                            <span className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-red-500/20 text-red-400 border border-red-500/30 md:hidden">
-                                <AlertTriangle className="w-3 h-3" />
-                                CANCELLED
-                            </span>
+                            <div className="flex flex-col gap-1">
+                                <span className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-red-500/20 text-red-400 border border-red-500/30 w-fit">
+                                    <AlertTriangle className="w-3 h-3" />
+                                    CANCELLED
+                                </span>
+                                {game.cancellation_reason && (
+                                    <span className="px-2 py-1 rounded-lg bg-[#1F1D1D]/80 text-[9px] text-red-300/70 italic">
+                                        "{game.cancellation_reason}"
+                                    </span>
+                                )}
+                            </div>
                         )}
                         {isCompleted && (
                             <span className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 md:hidden">
@@ -143,27 +154,8 @@ export function GameCard({
                         )}
                     </div>
 
-                    {/* Cancellation reason on mobile - below badges */}
-                    {isCancelled && game.cancellation_reason && (
-                        <span className="md:hidden px-2 py-1 rounded-lg bg-[#1F1D1D]/80 text-[9px] text-red-300/70 italic">
-                            "{game.cancellation_reason}"
-                        </span>
-                    )}
-
-                    {/* Right side desktop only: Role badge OR Cancelled/Completed status */}
-                    {isCancelled ? (
-                        <div className="hidden md:flex flex-col items-end gap-1 absolute top-0 right-0">
-                            <span className="flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-red-500/20 text-red-400 border border-red-500/30">
-                                <AlertTriangle className="w-3 h-3" />
-                                CANCELLED
-                            </span>
-                            {game.cancellation_reason && (
-                                <span className="max-w-[180px] px-2 py-1 rounded-lg bg-[#1F1D1D]/80 text-[9px] text-red-300/70 italic text-right truncate">
-                                    "{game.cancellation_reason}"
-                                </span>
-                            )}
-                        </div>
-                    ) : isCompleted ? (
+                    {/* Right side desktop only: Role badge OR Completed status */}
+                    {isCancelled ? null : isCompleted ? (
                         <span className="hidden md:flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                             <CheckCircle2 className="w-3 h-3" />
                             COMPLETED
