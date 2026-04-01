@@ -1,5 +1,6 @@
 import { GameActions } from "@/components/game-actions";
 import { GameRoster } from "@/components/game-roster";
+import { GameRealtimeSync } from "@/components/game-realtime-sync";
 import { GameStatsForm } from "@/components/game-stats-form";
 import { GameStatsDisplay } from "@/components/game-stats-display";
 import { TeamGenerator } from "@/components/team-generator";
@@ -137,6 +138,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
 
     return (
         <div className="space-y-6 animate-in fade-in duration-1000 pb-16 relative">
+            <GameRealtimeSync gameId={id} />
             {/* Hero Section */}
             <div className={`relative rounded-2xl overflow-hidden ${bgGradient} border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.4)]`}>
                 {/* Background Overlay */}
