@@ -128,7 +128,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
         }
     };
 
-    const handleKick = async (rosterId: string, username: string) => {
+    const handleKick = async (rosterId: string, playerId: string, username: string) => {
         if (!isHost) return;
         if (!confirm(`Are you sure you want to kick @${username} from this run?`)) return;
 
@@ -140,6 +140,14 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                 .eq('id', rosterId);
 
             if (error) throw error;
+
+            // Clean up team assignment (best-effort; DB trigger also handles this)
+            await supabase
+                .from('team_assignments')
+                .delete()
+                .eq('game_id', gameId)
+                .eq('player_id', playerId);
+
             // Native UI refresh is handled by Realtime subscription
         } catch (error: any) {
             console.error("Error kicking player:", error);
@@ -224,7 +232,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             {updating === entry.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <XCircle className="w-4 h-4" />}
                                         </button>
                                         <button
-                                            onClick={() => handleKick(entry.id, entry.profiles?.username)}
+                                            onClick={() => handleKick(entry.id, entry.player_id, entry.profiles?.username)}
                                             disabled={!!updating}
                                             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-rose-500 hover:text-white text-zinc-600 border border-white/5 transition-all hover:scale-110 active:scale-90"
                                             title="Kick from Squad"
@@ -245,7 +253,7 @@ export function GameRoster({ roster, gameId, maxPlayers, isHost }: RosterProps) 
                                             </button>
                                         )}
                                         <button
-                                            onClick={() => handleKick(entry.id, entry.profiles?.username)}
+                                            onClick={() => handleKick(entry.id, entry.player_id, entry.profiles?.username)}
                                             disabled={!!updating}
                                             className="p-1.5 rounded-xl bg-zinc-900 hover:bg-rose-500 hover:text-white text-zinc-600 border border-white/5 transition-all hover:scale-110 active:scale-90"
                                             title="Remove from Waitlist"

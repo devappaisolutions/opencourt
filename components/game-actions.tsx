@@ -84,6 +84,14 @@ export function GameActions({ gameId, userId, isHost, isJoined, currentPlayers, 
                 .eq("player_id", userId);
 
             if (error) throw error;
+
+            // Clean up team assignment (best-effort; DB trigger also handles this)
+            await supabase
+                .from("team_assignments")
+                .delete()
+                .eq("game_id", gameId)
+                .eq("player_id", userId);
+
             router.refresh();
         } catch (error) {
             console.error("Error leaving game:", error);
