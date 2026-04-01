@@ -152,8 +152,9 @@ export async function generateTeams(gameId: string, hostId: string) {
         return { error: "Failed to save team assignments" };
     }
 
-    // 6. Update game status — reset teams_published so host must re-publish
-    const { error: updateError } = await supabase
+    // 6. Best-effort: update game flags. Non-fatal because page.tsx now derives
+    // team state from actual team_assignments rows, not the teams_generated flag.
+    await supabase
         .from("games")
         .update({
             teams_generated: true,
@@ -162,14 +163,6 @@ export async function generateTeams(gameId: string, hostId: string) {
             teams_published_at: null,
         })
         .eq("id", gameId);
-
-    if (updateError) {
-        // Fallback: at minimum set teams_generated without the published columns
-        await supabase
-            .from("games")
-            .update({ teams_generated: true, teams_generated_at: new Date().toISOString() })
-            .eq("id", gameId);
-    }
 
     return { teams, success: true };
 }

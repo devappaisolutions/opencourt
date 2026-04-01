@@ -83,61 +83,51 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
         userStats = stats?.find((s: any) => s.player_id === user?.id);
     }
 
-    // Fetch team assignments if teams have been generated
+    // Always fetch team assignments — derive state from actual rows, not the teams_generated flag
+    // (teams_generated UPDATE can silently fail due to RLS, so we never gate on it)
     let existingTeams = null;
-    if (game.teams_generated) {
-        const { data: assignments } = await supabase
-            .from('team_assignments')
-            .select(`
-                team_number,
-                profiles:player_id (
-                    id,
-                    full_name,
-                    position,
-                    height_ft,
-                    height_in,
-                    skill_level,
-                    reliability_score,
-                    avatar_url,
-                    avg_points,
-                    avg_rebounds,
-                    avg_assists,
-                    avg_steals,
-                    avg_blocks,
-                    avg_turnovers
-                )
-            `)
-            .eq('game_id', id)
-            .order('team_number');
+    const { data: assignments } = await supabase
+        .from('team_assignments')
+        .select(`
+            team_number,
+            profiles:player_id (
+                id,
+                full_name,
+                position,
+                height_ft,
+                height_in,
+                skill_level,
+                reliability_score,
+                avatar_url,
+                avg_points,
+                avg_rebounds,
+                avg_assists,
+                avg_steals,
+                avg_blocks,
+                avg_turnovers
+            )
+        `)
+        .eq('game_id', id)
+        .order('team_number');
 
-        if (assignments && assignments.length > 0) {
-            // Group by team number and attach OVR
-            const withOVR = (players: any[]) =>
-                players.map((p: any) => ({ ...p, ovr: calculateOVR(p) }));
+    if (assignments && assignments.length > 0) {
+        const withOVR = (players: any[]) =>
+            players.map((p: any) => ({ ...p, ovr: calculateOVR(p) }));
 
-            const team1Players = withOVR(
-                assignments.filter((a: any) => a.team_number === 1).map((a: any) => a.profiles)
-            );
-            const team2Players = withOVR(
-                assignments.filter((a: any) => a.team_number === 2).map((a: any) => a.profiles)
-            );
+        const team1Players = withOVR(
+            assignments.filter((a: any) => a.team_number === 1).map((a: any) => a.profiles)
+        );
+        const team2Players = withOVR(
+            assignments.filter((a: any) => a.team_number === 2).map((a: any) => a.profiles)
+        );
 
-            const avgOVR = (players: any[]) =>
-                players.length === 0 ? 0 : Math.round(players.reduce((sum: number, p: any) => sum + p.ovr, 0) / players.length);
+        const avgOVR = (players: any[]) =>
+            players.length === 0 ? 0 : Math.round(players.reduce((sum: number, p: any) => sum + p.ovr, 0) / players.length);
 
-            existingTeams = [
-                {
-                    team_number: 1,
-                    players: team1Players,
-                    avg_ovr: avgOVR(team1Players),
-                },
-                {
-                    team_number: 2,
-                    players: team2Players,
-                    avg_ovr: avgOVR(team2Players),
-                },
-            ];
-        }
+        existingTeams = [
+            { team_number: 1, players: team1Players, avg_ovr: avgOVR(team1Players) },
+            { team_number: 2, players: team2Players, avg_ovr: avgOVR(team2Players) },
+        ];
     }
 
     // Default gradient if missing - use warm charcoal gradients instead of purple
@@ -299,7 +289,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     isHost={isHost}
                     isJoined={!!userRosterEntry}
                     gameStatus={game.status}
-                    teamsGenerated={game.teams_generated || false}
+                    teamsGenerated={existingTeams !== null}
                     teamsPublished={game.teams_published || false}
                     confirmedRoster={confirmedRoster}
                     existingTeams={existingTeams ?? undefined}
