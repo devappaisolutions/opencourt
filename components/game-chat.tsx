@@ -150,10 +150,10 @@ export function GameChat({ gameId, userId }: GameChatProps) {
             {/* Chat Panel — centered on mobile, above FAB on desktop */}
             {isOpen && (
                 <div className="
-                    fixed left-0 right-0 bottom-16
+                    fixed left-4 right-4 bottom-[104px]
                     sm:absolute sm:bottom-full sm:right-0 sm:left-auto sm:w-[360px] sm:mb-3 sm:rounded-2xl
-                    bg-[#2A2827] border border-white/8 rounded-t-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200
-                    z-[200]
+                    bg-[#2A2827] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200
+                    z-[9999]
                 ">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#2A2827]">
