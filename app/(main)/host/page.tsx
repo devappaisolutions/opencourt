@@ -176,7 +176,7 @@ export default function HostGamePage() {
         ];
         const randomGradient = gradients[Math.floor(Math.random() * gradients.length)];
 
-        const insertTitle = title.trim() ? title : `${format} ${level} Run`;
+        const insertTitle = title.trim() ? title : `${format} ${level}`;
 
         const { error } = await supabase.from('games').insert({
             host_id: user.id,
@@ -553,7 +553,7 @@ export default function HostGamePage() {
                             <div className="absolute inset-0 holographic rounded-2xl opacity-30" />
                             <div className="flex justify-between items-start relative z-10">
                                 <div>
-                                    <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">{title.trim() ? title : `${format} ${level} Run`}</h3>
+                                    <h3 className="text-lg font-bold text-white uppercase italic tracking-tight">{title.trim() ? title : `${format} ${level}`}</h3>
                                     <p className="text-zinc-400 text-sm font-medium flex items-center gap-2">
                                         <MapPin className="w-3 h-3 text-primary" />
                                         {location || "No location set"}
