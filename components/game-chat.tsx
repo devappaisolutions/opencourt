@@ -43,7 +43,7 @@ const ChatBubble = memo(function ChatBubble({ msg, isOwn }: { msg: ChatMessage; 
                     </span>
                     <span className="text-[9px] text-zinc-700">{formatTime(msg.created_at)}</span>
                 </div>
-                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm leading-snug ${isOwn ? 'bg-primary/20 text-white rounded-tr-sm' : 'bg-white/5 text-zinc-300 rounded-tl-sm'}`}>
+                <div className={`inline-block px-3 py-1.5 rounded-xl text-sm leading-snug ${isOwn ? 'bg-primary/20 text-white rounded-tr-sm' : 'bg-[#2E2C2A] text-zinc-300 rounded-tl-sm border border-white/5'}`}>
                     {msg.message}
                 </div>
             </div>
@@ -73,13 +73,13 @@ const ChatInput = memo(function ChatInput({ gameId, userId }: { gameId: string; 
     };
 
     return (
-        <form onSubmit={handleSend} className="flex items-center gap-2 p-3 border-t border-white/8">
+        <form onSubmit={handleSend} className="flex items-center gap-2 p-3 border-t border-white/8 bg-[#1A1918]">
             <input
                 ref={inputRef}
                 type="text"
                 placeholder="Type a message..."
                 maxLength={500}
-                className="flex-1 h-9 bg-zinc-900 border border-white/10 rounded-xl px-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
+                className="flex-1 h-9 bg-[#2E2C2A] border border-white/8 rounded-xl px-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/30"
             />
             <button type="submit" className="h-9 w-9 flex items-center justify-center rounded-xl bg-primary hover:bg-primary/90 text-white shrink-0 active:scale-90 transition-transform">
                 <Send className="w-3.5 h-3.5" />
@@ -149,9 +149,9 @@ export function GameChat({ gameId, userId }: GameChatProps) {
         <div className="fixed bottom-6 right-4 z-[150] flex flex-col items-end gap-3">
             {/* Chat Panel */}
             {isOpen && (
-                <div className="w-[320px] sm:w-[360px] bg-zinc-950 border border-white/10 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+                <div className="w-[320px] sm:w-[360px] bg-[#1A1918] border border-white/8 rounded-2xl shadow-2xl shadow-black/60 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-zinc-900/60">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-white/8 bg-[#242220]">
                         <div className="flex items-center gap-2">
                             <MessageCircle className="w-4 h-4 text-primary" />
                             <h2 className="text-sm font-black uppercase tracking-widest text-white">Game Chat</h2>
@@ -165,7 +165,7 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                     </div>
 
                     {/* Messages */}
-                    <div className="h-72 overflow-y-auto p-3 space-y-3" style={{ contain: 'content' }}>
+                    <div className="h-72 overflow-y-auto p-3 space-y-3 bg-[#1A1918]" style={{ contain: 'content' }}>
                         {messages.length === 0 ? (
                             <p className="text-center text-zinc-600 text-xs py-10">No messages yet. Start the conversation!</p>
                         ) : (
