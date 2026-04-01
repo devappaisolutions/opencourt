@@ -264,15 +264,17 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 </div>
             )}
 
-            {/* Interactive Roster Section */}
-            <div className="px-4 relative">
-                <GameRoster
-                    roster={roster || []}
-                    gameId={id}
-                    maxPlayers={game.max_players}
-                    isHost={isHost}
-                />
-            </div>
+            {/* Interactive Roster Section — hidden for non-hosts when teams are published */}
+            {(isHost || !game.teams_published) && (
+                <div className="px-4 relative">
+                    <GameRoster
+                        roster={roster || []}
+                        gameId={id}
+                        maxPlayers={game.max_players}
+                        isHost={isHost}
+                    />
+                </div>
+            )}
 
             {/* Game Chat */}
             <div className="px-4 relative">
