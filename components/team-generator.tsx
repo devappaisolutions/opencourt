@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Loader2, RefreshCw, Zap, Save, Eye, EyeOff, CheckCircle, Clock } from "lucide-react";
 import { TeamDisplay } from "./team-display";
@@ -52,6 +52,23 @@ export function TeamGenerator({
     useEffect(() => {
         setLocalPublished(teamsPublished);
     }, [teamsPublished]);
+
+    // Remove departed players from local team state when confirmedRoster shrinks
+    useEffect(() => {
+        const activeIds = new Set(confirmedRoster.map(p => p.id));
+        setTeamState(prev => {
+            const hasGone =
+                prev.pool.some(p => !activeIds.has(p.id)) ||
+                prev.team1.some(p => !activeIds.has(p.id)) ||
+                prev.team2.some(p => !activeIds.has(p.id));
+            if (!hasGone) return prev;
+            return {
+                pool:  prev.pool.filter(p => activeIds.has(p.id)),
+                team1: prev.team1.filter(p => activeIds.has(p.id)),
+                team2: prev.team2.filter(p => activeIds.has(p.id)),
+            };
+        });
+    }, [confirmedRoster]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
