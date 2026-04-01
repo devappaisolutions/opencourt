@@ -241,7 +241,7 @@ export function GameGrid({ initialGames, userId, joinedGameIds = [], waitlistedG
                         Find Your Run
                     </h1>
                     <p className="text-[#B8B0A6] text-sm font-medium">
-                        <span className="text-[#F5EFEA] font-bold">{filteredGames.length}</span> games happening near you this week
+                        <span className="text-[#F5EFEA] font-bold">{filteredGames.filter(g => new Date(g.date_time) >= new Date()).length}</span> games happening near you this week
                     </p>
                 </div>
 
