@@ -96,7 +96,7 @@ export function GameCard({
             onMouseLeave={() => setIsHovered(false)}
             onMouseEnter={() => setIsHovered(true)}
             className={`group relative block h-full overflow-hidden rounded-2xl border p-1 transition-all duration-300 ${isPast ? '' : 'hover-lift card-shine'} ${isCancelled
-                ? 'border-red-500/30 bg-[#2A2827]/60 opacity-70'
+                ? 'border-red-500/30 bg-[#2A2827]/60 opacity-60 grayscale'
                 : isCompleted
                     ? 'border-emerald-500/30 bg-[#2A2827]'
                     : isPast

@@ -141,9 +141,19 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
         ? "bg-gradient-to-br from-[#2A2827] to-[#1F1D1D]"
         : (game.image_gradient || "bg-gradient-to-br from-[#2A2827] to-[#1F1D1D]");
 
+    const isCancelled = game.status === 'cancelled';
+
     return (
-        <div className="space-y-6 animate-in fade-in duration-1000 pb-16 relative">
+        <div className="animate-in fade-in duration-1000 pb-16 relative">
             <GameRealtimeSync gameId={id} />
+
+            {/* Game Chat — always visible, outside grayscale wrapper */}
+            <GameChat
+                gameId={id}
+                userId={user?.id || ''}
+            />
+
+            <div className={`space-y-6 ${isCancelled ? 'grayscale opacity-50 pointer-events-none' : ''}`}>
             {/* Hero Section */}
             <div className={`relative rounded-2xl overflow-hidden ${bgGradient} border border-white/10 shadow-[0_0_60px_rgba(0,0,0,0.4)]`}>
                 {/* Background Overlay */}
@@ -284,12 +294,6 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                 </div>
             )}
 
-            {/* Game Chat — floating FAB, renders outside page flow */}
-            <GameChat
-                gameId={id}
-                userId={user?.id || ''}
-            />
-
             {/* Team Generator Section */}
             <div className="px-4 relative">
                 <TeamGenerator
@@ -324,6 +328,7 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
                     )}
                 </div>
             )}
+            </div>{/* end grayscale wrapper */}
         </div>
     );
 }
