@@ -61,7 +61,7 @@ export async function POST(
         }
 
         // Mark teams as generated and reset published state
-        await supabase
+        const { error: updateError } = await supabase
             .from("games")
             .update({
                 teams_generated: true,
@@ -70,6 +70,15 @@ export async function POST(
                 teams_published_at: null,
             })
             .eq("id", gameId);
+
+        if (updateError) {
+            console.error("save-teams: game update failed", updateError);
+            // Fallback: at minimum set teams_generated without the published columns
+            await supabase
+                .from("games")
+                .update({ teams_generated: true, teams_generated_at: new Date().toISOString() })
+                .eq("id", gameId);
+        }
 
         return NextResponse.json({ success: true });
     } catch (error: any) {

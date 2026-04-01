@@ -153,7 +153,7 @@ export async function generateTeams(gameId: string, hostId: string) {
     }
 
     // 6. Update game status — reset teams_published so host must re-publish
-    await supabase
+    const { error: updateError } = await supabase
         .from("games")
         .update({
             teams_generated: true,
@@ -162,6 +162,14 @@ export async function generateTeams(gameId: string, hostId: string) {
             teams_published_at: null,
         })
         .eq("id", gameId);
+
+    if (updateError) {
+        // Fallback: at minimum set teams_generated without the published columns
+        await supabase
+            .from("games")
+            .update({ teams_generated: true, teams_generated_at: new Date().toISOString() })
+            .eq("id", gameId);
+    }
 
     return { teams, success: true };
 }

@@ -15,13 +15,18 @@ export async function POST(
         }
 
         // Verify caller is host and get current game state
-        const { data: game } = await supabase
+        const { data: game, error: gameError } = await supabase
             .from("games")
             .select("host_id, teams_generated")
             .eq("id", gameId)
             .single();
 
-        if (!game || game.host_id !== user.id) {
+        if (gameError || !game) {
+            console.error("publish-teams: game query failed", gameError);
+            return NextResponse.json({ error: "Game not found" }, { status: 404 });
+        }
+
+        if (game.host_id !== user.id) {
             return NextResponse.json({ error: "Only the host can publish teams" }, { status: 403 });
         }
 
@@ -31,13 +36,18 @@ export async function POST(
             return NextResponse.json({ error: "Save a lineup before publishing" }, { status: 400 });
         }
 
-        await supabase
+        const { error: updateError } = await supabase
             .from("games")
             .update({
                 teams_published: publish,
                 teams_published_at: publish ? new Date().toISOString() : null,
             })
             .eq("id", gameId);
+
+        if (updateError) {
+            console.error("publish-teams: update failed", updateError);
+            return NextResponse.json({ error: "Failed to update publish state — run the teams_published migration in Supabase" }, { status: 500 });
+        }
 
         return NextResponse.json({ success: true, published: publish });
     } catch (error: any) {
