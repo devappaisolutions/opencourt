@@ -53,17 +53,18 @@ export function TeamGenerator({
         setLocalPublished(teamsPublished);
     }, [teamsPublished]);
 
-    // Remove departed players from local team state when confirmedRoster shrinks
+    // Keep local teamState in sync when confirmedRoster changes:
+    // - player leaves / is kicked  → remove from their zone
+    // - player is squad'd up from waitlist → add to Unassigned pool
     useEffect(() => {
         const activeIds = new Set(confirmedRoster.map(p => p.id));
         setTeamState(prev => {
-            const hasGone =
-                prev.pool.some(p => !activeIds.has(p.id)) ||
-                prev.team1.some(p => !activeIds.has(p.id)) ||
-                prev.team2.some(p => !activeIds.has(p.id));
-            if (!hasGone) return prev;
+            const assignedIds = new Set([...prev.pool, ...prev.team1, ...prev.team2].map(p => p.id));
+            const hasGone = [...prev.pool, ...prev.team1, ...prev.team2].some(p => !activeIds.has(p.id));
+            const newlyAdded = confirmedRoster.filter(p => !assignedIds.has(p.id));
+            if (!hasGone && newlyAdded.length === 0) return prev;
             return {
-                pool:  prev.pool.filter(p => activeIds.has(p.id)),
+                pool:  [...prev.pool.filter(p => activeIds.has(p.id)), ...newlyAdded],
                 team1: prev.team1.filter(p => activeIds.has(p.id)),
                 team2: prev.team2.filter(p => activeIds.has(p.id)),
             };
