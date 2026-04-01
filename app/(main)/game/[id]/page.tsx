@@ -115,11 +115,16 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ id
         const withOVR = (players: any[]) =>
             players.map((p: any) => ({ ...p, ovr: calculateOVR(p) }));
 
+        // Filter out players who have since left the game — team_assignments rows
+        // are not cleaned up on roster delete, so we cross-check against confirmedRoster.
+        const activeIds = new Set(confirmedRoster.map((p: any) => p.id));
+        const activeAssignments = assignments.filter((a: any) => activeIds.has(a.profiles?.id));
+
         const team1Players = withOVR(
-            assignments.filter((a: any) => a.team_number === 1).map((a: any) => a.profiles)
+            activeAssignments.filter((a: any) => a.team_number === 1).map((a: any) => a.profiles)
         );
         const team2Players = withOVR(
-            assignments.filter((a: any) => a.team_number === 2).map((a: any) => a.profiles)
+            activeAssignments.filter((a: any) => a.team_number === 2).map((a: any) => a.profiles)
         );
 
         const avgOVR = (players: any[]) =>
