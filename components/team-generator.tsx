@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Users, Loader2, RefreshCw, Zap, Save, Eye, EyeOff, CheckCircle, Clock } from "lucide-react";
 import { TeamDisplay } from "./team-display";
@@ -47,6 +47,11 @@ export function TeamGenerator({
     const [teamState, setTeamState] = useState<LocalTeamState>(() => initTeamState(confirmedRoster, existingTeams));
     const [isDirty, setIsDirty] = useState(false);
     const [localPublished, setLocalPublished] = useState(teamsPublished);
+
+    // Sync localPublished when the server prop updates (e.g. after router.refresh())
+    useEffect(() => {
+        setLocalPublished(teamsPublished);
+    }, [teamsPublished]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isPublishing, setIsPublishing] = useState(false);
