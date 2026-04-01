@@ -1,6 +1,7 @@
 "use client";
 
 import { Calendar, Home, LogOut, MapPin, Menu, PlusCircle, User } from "lucide-react";
+import { Logo4 } from "@/components/logos";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -72,9 +73,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
                 style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
                 {/* Logo */}
                 <Link href="/dashboard" className="mb-8 group">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#E8A966] flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-primary/20">
-                        <span className="text-white font-heading font-bold text-sm">OC</span>
-                    </div>
+                    <Logo4 className="w-10 h-10 group-hover:scale-110 transition-transform" />
                 </Link>
 
                 {/* Nav Items */}
