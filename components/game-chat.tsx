@@ -189,10 +189,10 @@ export function GameChat({ gameId, userId }: GameChatProps) {
                 </div>
             )}
 
-            {/* FAB */}
+            {/* FAB — hidden when chat is open */}
             <button
                 onClick={handleToggle}
-                className="relative w-14 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-all active:scale-90 hover:scale-105"
+                className={`relative w-14 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-all active:scale-90 hover:scale-105 ${isOpen ? 'hidden' : ''}`}
                 aria-label="Toggle chat"
             >
                 <MessageCircle className="w-6 h-6" />
