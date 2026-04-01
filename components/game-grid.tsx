@@ -10,13 +10,14 @@ interface GameGridProps {
     initialGames: any[];
     userId?: string;
     joinedGameIds?: string[];
+    waitlistedGameIds?: string[];
 }
 
 // Number of games to show per page
 const GAMES_PER_PAGE_MOBILE = 5;
 const GAMES_PER_PAGE_DESKTOP = 8;
 
-export function GameGrid({ initialGames, userId, joinedGameIds = [] }: GameGridProps) {
+export function GameGrid({ initialGames, userId, joinedGameIds = [], waitlistedGameIds = [] }: GameGridProps) {
     const supabase = createClient();
     const [games, setGames] = useState<any[]>(initialGames);
     const [newGameAlert, setNewGameAlert] = useState(false);
@@ -325,6 +326,7 @@ export function GameGrid({ initialGames, userId, joinedGameIds = [] }: GameGridP
                                         }}
                                         currentUserId={userId}
                                         isJoined={joinedGameIds.includes(game.id)}
+                                        isWaitlisted={waitlistedGameIds.includes(game.id)}
                                     />
                                 </div>
                             ))
@@ -380,6 +382,7 @@ export function GameGrid({ initialGames, userId, joinedGameIds = [] }: GameGridP
                                     }}
                                     currentUserId={userId}
                                     isJoined={joinedGameIds.includes(game.id)}
+                                        isWaitlisted={waitlistedGameIds.includes(game.id)}
                                 />
                             </div>
                         ))

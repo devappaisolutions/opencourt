@@ -29,14 +29,16 @@ export default async function DashboardPage() {
 
     // Fetch games the user has already joined (to show correct button state)
     let joinedGameIds: string[] = [];
+    let waitlistedGameIds: string[] = [];
     if (user) {
         try {
             const { data } = await supabase
                 .from('game_roster')
-                .select('game_id')
+                .select('game_id, status')
                 .eq('player_id', user.id)
                 .in('status', ['joined', 'checked_in', 'waitlist']);
-            joinedGameIds = (data || []).map((r: any) => r.game_id);
+            joinedGameIds = (data || []).filter((r: any) => r.status !== 'waitlist').map((r: any) => r.game_id);
+            waitlistedGameIds = (data || []).filter((r: any) => r.status === 'waitlist').map((r: any) => r.game_id);
         } catch (error) {
             console.warn('Could not fetch roster:', error);
         }
@@ -47,7 +49,7 @@ export default async function DashboardPage() {
             {/* Background Mesh - Very Subtle */}
             <div className="fixed inset-0 mesh-gradient opacity-20 pointer-events-none z-0" />
 
-            <GameGrid initialGames={games} userId={user?.id} joinedGameIds={joinedGameIds} />
+            <GameGrid initialGames={games} userId={user?.id} joinedGameIds={joinedGameIds} waitlistedGameIds={waitlistedGameIds} />
         </div>
     );
 }

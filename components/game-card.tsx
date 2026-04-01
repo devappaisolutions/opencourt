@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { AlertTriangle, Calendar, CheckCircle2, Clock, Crown, MapPin, User, Users } from "lucide-react";
+
 import NextLink from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
@@ -30,11 +31,13 @@ export function GameCard({
     currentUserId,
     role,
     isJoined = false,
+    isWaitlisted = false,
 }: {
     game: GameProps;
     currentUserId?: string;
     role?: 'host' | 'joined';
     isJoined?: boolean;
+    isWaitlisted?: boolean;
 }) {
     const supabase = createClient();
     const router = useRouter();
@@ -230,7 +233,12 @@ export function GameCard({
 
                         {/* Show appropriate status based on role */}
                         {!isCancelled && !isCompleted && !isPast && (
-                            (role === 'joined' || joined) ? (
+                            isWaitlisted ? (
+                                <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-bold text-xs tracking-widest uppercase bg-amber-500/15 text-amber-400 border border-amber-500/25">
+                                    <Clock className="w-3.5 h-3.5" />
+                                    WAITLIST
+                                </div>
+                            ) : (role === 'joined' || joined) ? (
                                 <div className="px-6 py-2.5 rounded-xl font-bold text-xs tracking-widest uppercase bg-primary/15 text-primary border border-primary/30">
                                     {role === 'host' ? 'PLAYING' : 'CONFIRMED'}
                                 </div>
