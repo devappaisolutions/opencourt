@@ -43,34 +43,34 @@ export default function LoginPage() {
         e.preventDefault();
         if (!email || !password) return;
         setIsLoading(true);
-        try {
-            if (mode === "login") {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) {
-                    const isRateLimit = error.message.toLowerCase().includes("rate") || error.message.toLowerCase().includes("too many");
-                    setFailedAttempts(prev => isRateLimit ? 5 : prev + 1);
-                    setAuthError(error.message);
-                    return;
-                }
+        setAuthError(null);
+
+        if (mode === "login") {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            setIsLoading(false);
+            if (error) {
+                const isRateLimit = error.message.toLowerCase().includes("rate") || error.message.toLowerCase().includes("too many");
+                const next = isRateLimit ? 5 : failedAttempts + 1;
+                setFailedAttempts(next);
+                setAuthError(error.message);
+            } else {
                 setFailedAttempts(0);
-                setAuthError(null);
                 router.refresh();
                 router.push("/dashboard");
+            }
+        } else {
+            const redirectUrl = window.location.origin;
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { emailRedirectTo: `${redirectUrl}/auth/callback` },
+            });
+            setIsLoading(false);
+            if (error) {
+                setAuthError(error.message);
             } else {
-                const redirectUrl = window.location.origin;
-                const { error } = await supabase.auth.signUp({
-                    email,
-                    password,
-                    options: { emailRedirectTo: `${redirectUrl}/auth/callback` },
-                });
-                if (error) throw error;
                 setIsVerificationSent(true);
             }
-        } catch (error: any) {
-            console.error("Auth failed:", error);
-            setAuthError(error.message || "Authentication failed. Please check your credentials.");
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -221,7 +221,7 @@ export default function LoginPage() {
                                     </div>
 
                                     {/* Inline error (1–3 attempts) */}
-                                    {mode === "login" && authError && failedAttempts > 0 && failedAttempts < 4 && (
+                                    {mode === "login" && authError && failedAttempts >= 1 && failedAttempts < 4 && (
                                         <div className="flex items-center gap-2 text-red-400 text-xs">
                                             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                                             {authError}
