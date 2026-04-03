@@ -1,7 +1,7 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { Facebook, Loader2, Mail, Zap } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Facebook, Loader2, Mail, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,10 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isVerificationSent, setIsVerificationSent] = useState(false);
+    const [failedAttempts, setFailedAttempts] = useState(0);
+    const [authError, setAuthError] = useState<string | null>(null);
+    const [resetSent, setResetSent] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
     const supabase = createClient();
     const router = useRouter();
 
@@ -41,11 +45,15 @@ export default function LoginPage() {
         setIsLoading(true);
         try {
             if (mode === "login") {
-                const { error } = await supabase.auth.signInWithPassword({
-                    email,
-                    password,
-                });
-                if (error) throw error;
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) {
+                    const isRateLimit = error.message.toLowerCase().includes("rate") || error.message.toLowerCase().includes("too many");
+                    setFailedAttempts(prev => isRateLimit ? 5 : prev + 1);
+                    setAuthError(error.message);
+                    return;
+                }
+                setFailedAttempts(0);
+                setAuthError(null);
                 router.refresh();
                 router.push("/dashboard");
             } else {
@@ -53,19 +61,27 @@ export default function LoginPage() {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
-                    options: {
-                        emailRedirectTo: `${redirectUrl}/auth/callback`,
-                    },
+                    options: { emailRedirectTo: `${redirectUrl}/auth/callback` },
                 });
                 if (error) throw error;
                 setIsVerificationSent(true);
             }
         } catch (error: any) {
             console.error("Auth failed:", error);
-            alert(error.message || "Authentication failed. Please check your credentials.");
+            setAuthError(error.message || "Authentication failed. Please check your credentials.");
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email) return;
+        setResetLoading(true);
+        await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/auth/callback?next=/settings`,
+        });
+        setResetSent(true);
+        setResetLoading(false);
     };
 
     return (
@@ -190,7 +206,7 @@ export default function LoginPage() {
                                             type="email"
                                             placeholder="Email"
                                             value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
+                                            onChange={(e) => { setEmail(e.target.value); setFailedAttempts(0); setAuthError(null); setResetSent(false); }}
                                             required
                                             className="w-full h-14 rounded-2xl bg-[#1F1D1D] border border-white/10 px-5 text-sm font-medium placeholder:text-[#B8B0A6]/50 focus:outline-none focus:border-primary/50 input-premium transition-all"
                                         />
@@ -204,9 +220,59 @@ export default function LoginPage() {
                                         />
                                     </div>
 
+                                    {/* Inline error (1–3 attempts) */}
+                                    {mode === "login" && authError && failedAttempts > 0 && failedAttempts < 4 && (
+                                        <div className="flex items-center gap-2 text-red-400 text-xs">
+                                            <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                                            {authError}
+                                        </div>
+                                    )}
+
+                                    {/* Warning banner (attempt 4) */}
+                                    {mode === "login" && failedAttempts === 4 && (
+                                        <div className="rounded-xl bg-amber-500/10 border border-amber-500/25 p-4 space-y-3">
+                                            <div className="flex items-start gap-2 text-amber-300 text-xs leading-relaxed">
+                                                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                                <span><strong>1 attempt remaining</strong> before your account is locked for 15 minutes.</span>
+                                            </div>
+                                            {resetSent ? (
+                                                <div className="flex items-center gap-2 text-emerald-400 text-xs">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                                    Reset link sent to <strong>{email}</strong>
+                                                </div>
+                                            ) : (
+                                                <button type="button" onClick={handleForgotPassword} disabled={resetLoading || !email}
+                                                    className="w-full py-2.5 rounded-lg bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-xs tracking-widest uppercase disabled:opacity-50 transition-all active:scale-[0.98]">
+                                                    {resetLoading ? "Sending..." : "Forgot your password?"}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Lockout banner (attempt 5+) */}
+                                    {mode === "login" && failedAttempts >= 5 && (
+                                        <div className="rounded-xl bg-red-500/10 border border-red-500/25 p-4 space-y-3">
+                                            <div className="flex items-start gap-2 text-red-400 text-xs leading-relaxed">
+                                                <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                                                <span><strong>Account temporarily locked.</strong> Too many failed attempts. Try again in 15 minutes.</span>
+                                            </div>
+                                            {resetSent ? (
+                                                <div className="flex items-center gap-2 text-emerald-400 text-xs">
+                                                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                                                    Reset link sent to <strong>{email}</strong>
+                                                </div>
+                                            ) : (
+                                                <button type="button" onClick={handleForgotPassword} disabled={resetLoading || !email}
+                                                    className="w-full py-2.5 rounded-lg bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-xs tracking-widest uppercase disabled:opacity-50 transition-all active:scale-[0.98]">
+                                                    {resetLoading ? "Sending..." : "Forgot your password?"}
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
                                     <button
                                         type="submit"
-                                        disabled={isLoading}
+                                        disabled={isLoading || failedAttempts >= 5}
                                         className="w-full h-14 rounded-2xl bg-gradient-to-r from-primary to-[#E8A966] text-white font-bold text-xs tracking-widest uppercase shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all active:scale-[0.98] disabled:opacity-50 shimmer-btn btn-glow"
                                     >
                                         {isLoading ? <><Loader2 className="w-4 h-4 animate-spin inline mr-2" />{mode === "login" ? "Signing In..." : "Creating Account..."}</> : mode === "login" ? "Sign In" : "Create Account"}
