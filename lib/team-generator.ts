@@ -121,8 +121,8 @@ export async function generateTeams(gameId: string, hostId: string) {
         .map((r: any) => r.profiles)
         .filter((p: any) => p !== null);
 
-    if (players.length < 4) {
-        return { error: "Need at least 4 confirmed players to generate teams" };
+    if (players.length < 10) {
+        return { error: "Need at least 10 confirmed players to generate teams" };
     }
 
     // 3. Balance teams

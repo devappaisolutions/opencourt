@@ -228,10 +228,10 @@ export function TeamGenerator({
             )}
 
             {/* Not enough players warning */}
-            {confirmedCount < 4 && (
+            {confirmedCount < 10 && (
                 <div className="p-4 rounded-xl bg-white/3 border border-white/8">
                     <p className="text-sm text-zinc-400">
-                        Need at least 4 confirmed players to generate teams ({confirmedCount}/4 confirmed)
+                        Need at least 10 confirmed players to generate teams ({confirmedCount}/10 confirmed)
                     </p>
                 </div>
             )}
@@ -246,7 +246,7 @@ export function TeamGenerator({
                 {/* Auto-generate */}
                 <button
                     onClick={() => hasLineup ? setShowRegenerateConfirm(true) : handleAutoGenerate()}
-                    disabled={isGenerating || confirmedCount < 4}
+                    disabled={isGenerating || confirmedCount < 10}
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/8 hover:bg-white/12 text-white font-bold text-sm uppercase tracking-wider transition-colors disabled:opacity-40 disabled:cursor-not-allowed border border-white/10"
                 >
                     {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}

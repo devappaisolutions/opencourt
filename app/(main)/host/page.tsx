@@ -422,14 +422,14 @@ export default function HostGamePage() {
                                 <Users className="w-4 h-4 text-primary" /> Max Players: {maxPlayers}
                             </label>
                             {(() => {
-                                const playerOptions = [4, 15, 20, 25];
-                                const sliderIndex = playerOptions.indexOf(maxPlayers) + 1 || 3;
+                                const playerOptions = [15, 20, 25];
+                                const sliderIndex = playerOptions.indexOf(maxPlayers) + 1 || 2;
                                 return (
                                     <>
                                         <input
                                             type="range"
                                             min="1"
-                                            max="4"
+                                            max="3"
                                             step="1"
                                             value={sliderIndex}
                                             onChange={(e) => setMaxPlayers(playerOptions[Number(e.target.value) - 1])}
