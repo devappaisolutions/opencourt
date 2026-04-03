@@ -13,9 +13,10 @@
 5. [Viewing a Game's Details](#5-viewing-a-games-details)
 6. [Hosting a Run](#6-hosting-a-run)
 7. [Managing Your Schedule](#7-managing-your-schedule)
-8. [Your Profile Page](#8-your-profile-page)
-9. [Check-In System (QR Code)](#9-check-in-system-qr-code)
-10. [Host Controls](#10-host-controls)
+8. [Account Settings](#8-account-settings)
+9. [Your Profile Page](#9-your-profile-page)
+10. [Check-In System (QR Code)](#10-check-in-system-qr-code)
+11. [Host Controls](#11-host-controls)
 
 ---
 
@@ -34,6 +35,18 @@ Visit **[opencourtph.vercel.app](https://opencourtph.vercel.app)** — you will 
 | **Email** | Enter your email + password and click **Sign Up** |
 
 > **First-time users:** After signing in for the first time, you will be taken to a **Profile Completion** screen before reaching the dashboard.
+
+### Email Login — Failed Attempt Protection
+
+If you sign in with email and enter the wrong password repeatedly:
+
+| Attempt | What Happens |
+|---|---|
+| 1–3 | Red inline error: "Invalid login credentials" |
+| 4 | Amber warning banner: **"1 attempt remaining before your account is locked for 15 minutes"** + Forgot Password button |
+| 5+ | Red lockout banner: **"Account temporarily locked. Try again in 15 minutes."** — submit button disabled |
+
+> Clicking **Forgot your password?** sends a reset link to your email. The link redirects you to Settings where you can set a new password. This protection only applies to email/password login — Google and Facebook sign-in are unaffected.
 
 ---
 
@@ -73,7 +86,7 @@ The **Dashboard** (`/dashboard`) is the main hub — it shows all upcoming baske
 │  🛜 LIVE GAMES      FIND YOUR RUN                       │
 │  5 games happening near you this week                   │
 │                                                         │
-│  [ALL] [TODAY 🔥] [COMPETITIVE] [CASUAL] [NEAR ME 📍]  │
+│  [ALL] [TODAY 🔥] [NEAR ME 📍]                          │
 │                                                         │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐   │
 │  │ Game Card    │ │ Game Card    │ │ + HOST A RUN │   │
@@ -87,8 +100,6 @@ The **Dashboard** (`/dashboard`) is the main hub — it shows all upcoming baske
 |---|---|
 | **All** | Every upcoming game |
 | **Today 🔥** | Only games scheduled today |
-| **Competitive** | Competitive skill level games |
-| **Casual** | Casual/open run games |
 | **Near Me 📍** | Games sorted by proximity (requires location permission) |
 
 ### Game Cards
@@ -100,7 +111,11 @@ Each card shows:
 - **Entry fee** — Free or paid amount
 - **JOIN RUN** button — or **CONFIRMED** if you've already joined
 
+> **Cancelled games** appear grayed out (reduced opacity, grayscale) with a red **CANCELLED** badge and the host's cancellation reason. The join button is hidden.
+
 > 🔴 **Live Updates** — New games posted by other users appear automatically without needing to refresh the page. A **🏀 New game just posted!** toast notification appears for 5 seconds when this happens.
+
+> **Dashboard count** only reflects games that are upcoming (not yet started), not cancelled, and not completed.
 
 ---
 
@@ -178,7 +193,7 @@ The wizard has **5 steps**:
 | Field | Options |
 |---|---|
 | **Game Format** | Full Court (with Ref), Full Court (no Ref), Half Court, 3-on-3 |
-| **Max Players** | 15 / 20 / 25 |
+| **Max Players** | 15 / 20 / 25 (default: 20) |
 | **Competition Level** | Beginner, Casual, Competitive, Elite, Open Run |
 
 ### Step 3 — Details *(Optional)*
@@ -221,7 +236,25 @@ Shows all games you have **created** as a host:
 
 ---
 
-## 8. Your Profile Page
+## 8. Account Settings
+
+Navigate to **Settings** (`/settings`) via the **Menu** page (tap the Settings icon in the top-right of the Menu).
+
+### Change Password *(Email users only)*
+
+If you signed up with an email and password, you can update your password here:
+
+1. Enter your **New Password** (minimum 8 characters)
+2. Enter it again in **Confirm New Password**
+3. Click **Update Password**
+
+A green confirmation appears on success.
+
+> **Google / Facebook users:** Password management is handled by your provider. The Change Password form is replaced with a note explaining this.
+
+---
+
+## 9. Your Profile Page
 
 Navigate to **Profile** (`/profile`) via the sidebar person icon.
 
@@ -247,7 +280,7 @@ Below the edit form, your stats are displayed:
 
 ---
 
-## 9. Check-In System (QR Code)
+## 10. Check-In System (QR Code)
 
 OpenCourt uses a **QR code check-in system** to confirm player attendance on game day.
 
@@ -269,7 +302,7 @@ OpenCourt uses a **QR code check-in system** to confirm player attendance on gam
 
 ---
 
-## 10. Host Controls
+## 11. Host Controls
 
 As the game host, you have additional controls on the game detail page.
 
@@ -296,10 +329,11 @@ If players are on the waitlist and a spot opens:
 
 ### Team Generator
 
-Once your squad is set:
-1. Click **Generate Teams** to auto-split players into 2 balanced teams
-2. Teams are balanced by skill level and position
-3. Once generated, team assignments are saved and visible to all players
+Once your squad is set (minimum **10 confirmed players**):
+1. Click **Generate Teams** to auto-split players into 2 balanced teams using OVR scores (stats + skill level)
+2. Drag-and-drop players between Team Dark, Team Light, and the Unassigned pool to adjust
+3. Click **Save Lineup** to persist changes
+4. Click **Publish Matchup** to make teams visible to all joined players
 
 ---
 
@@ -328,4 +362,4 @@ A high reliability score signals to hosts that you're dependable — aim to keep
 
 ---
 
-*Last updated: March 2026 · OpenCourt v1.0*
+*Last updated: April 2026 · OpenCourt v1.0*

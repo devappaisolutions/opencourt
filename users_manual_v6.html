@@ -580,7 +580,7 @@
                 <div class="sidebar-logo-icon">OC</div>
                 <div>
                     <div class="sidebar-logo-text">OpenCourt</div>
-                    <div class="sidebar-logo-badge">User Manual v6.1</div>
+                    <div class="sidebar-logo-badge">User Manual v6.2</div>
                 </div>
             </div>
         </div>
@@ -606,9 +606,13 @@
             <a class="sidebar-link" href="#reliability"><span class="sidebar-link-num">12</span> Reliability Score</a>
             <a class="sidebar-link" href="#game-stats"><span class="sidebar-link-num">13</span> Game Stats</a>
 
+            <div class="sidebar-section-title">Account</div>
+            <a class="sidebar-link" href="#settings"><span class="sidebar-link-num">14</span> Settings</a>
+            <a class="sidebar-link" href="#login-security"><span class="sidebar-link-num">15</span> Login Security</a>
+
             <div class="sidebar-section-title">Help</div>
-            <a class="sidebar-link" href="#faq"><span class="sidebar-link-num">14</span> FAQ</a>
-            <a class="sidebar-link" href="#support"><span class="sidebar-link-num">15</span> Support &amp; Contact</a>
+            <a class="sidebar-link" href="#faq"><span class="sidebar-link-num">16</span> FAQ</a>
+            <a class="sidebar-link" href="#support"><span class="sidebar-link-num">17</span> Support &amp; Contact</a>
         </nav>
         <div class="sidebar-footer">
             OpenCourt &copy; 2025. All rights reserved.
@@ -767,7 +771,8 @@
                     <div class="section-icon orange">&#127968;</div>
                     <h2>04 &mdash; Dashboard</h2>
                 </div>
-                <p>The Dashboard is your home screen. It shows all available pickup games from the last 7 days onward, sorted by date (soonest first).</p>
+                <p>The Dashboard is your home screen. It shows all upcoming pickup games sorted by date (soonest first). The game count shown at the top only includes games that are upcoming, not cancelled, and not completed.</p>
+                <p>Filters available: <strong>All</strong>, <strong>Today 🔥</strong>, and <strong>Near Me 📍</strong> (sorts by proximity, requires location permission).</p>
 
                 <h3>Game Cards</h3>
                 <p>Each game appears as a card displaying:</p>
@@ -802,8 +807,8 @@
                         </tr>
                         <tr>
                             <td><span class="tag red">Cancelled</span></td>
-                            <td>Red border, reduced opacity</td>
-                            <td>Shows cancellation reason</td>
+                            <td>Red border, reduced opacity, grayscale filter — shows only CANCELLED badge and host's reason</td>
+                            <td>Join button hidden; clicking the card opens the grayed-out detail page (chat remains active)</td>
                         </tr>
                         <tr>
                             <td><span class="tag green">Completed</span></td>
@@ -1091,7 +1096,7 @@
                 <ul>
                     <li>You must be the <strong>host</strong> of the game</li>
                     <li>The game status must be <strong>active</strong> (not upcoming)</li>
-                    <li>At least <strong>4 confirmed players</strong> must be in the roster (joined or checked-in status)</li>
+                    <li>At least <strong>10 confirmed players</strong> must be in the roster (joined or checked-in status)</li>
                 </ul>
 
                 <h3>The Two Teams</h3>
@@ -1141,41 +1146,34 @@
                 </div>
 
                 <h3>Algorithm — How Teams Are Balanced</h3>
-                <p>When using Auto-Generate, the algorithm scores every player and distributes them evenly:</p>
+                <p>When using Auto-Generate, each player is given an <strong>OVR (Overall Rating)</strong> from 0&ndash;100, then distributed using a snake draft and swap optimization.</p>
 
+                <h4>OVR Calculation</h4>
+                <p>If the player has recorded stats:</p>
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Factor</th>
+                            <th>Stat</th>
                             <th>Weight</th>
-                            <th>Description</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><strong>Skill Level</strong></td>
-                            <td>60%</td>
-                            <td>Player's self-reported skill (Casual, Competitive, Elite)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Reliability</strong></td>
-                            <td>30%</td>
-                            <td>Player's reliability percentage</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Height</strong></td>
-                            <td>10%</td>
-                            <td>Player's height for positional balance</td>
-                        </tr>
+                        <tr><td>Avg Points</td><td>35%</td></tr>
+                        <tr><td>Avg Assists</td><td>20%</td></tr>
+                        <tr><td>Avg Rebounds</td><td>15%</td></tr>
+                        <tr><td>Avg Steals</td><td>10%</td></tr>
+                        <tr><td>Avg Blocks</td><td>10%</td></tr>
+                        <tr><td>Avg Turnovers</td><td>&minus;10% (penalty)</td></tr>
+                        <tr><td>Skill Level bonus</td><td>Elite +20 / Competitive +15 / Casual +10 / Beginner +5</td></tr>
                     </tbody>
                 </table>
+                <p>If a player has <strong>no stats yet</strong>, a flat rating is used: Elite = 80, Competitive = 60, Casual = 40, Beginner = 20.</p>
 
                 <h4>Balancing Process</h4>
                 <ol>
-                    <li>Players are grouped by position (Guard, Forward, Center)</li>
-                    <li>Each group is sorted by composite OVR score</li>
-                    <li>A snake draft distributes players between Team Dark and Team Light</li>
-                    <li>Each team gets an equal mix of positions</li>
+                    <li>All players are sorted by OVR (highest to lowest)</li>
+                    <li>A <strong>snake draft</strong> distributes players: Team A gets pick 1, Team B gets picks 2&ndash;3, Team A gets picks 4&ndash;5, and so on</li>
+                    <li>A <strong>swap optimization pass</strong> then tries every pair of players (one from each team) — if swapping two players reduces the total OVR gap, the swap is made. This repeats until no more improvements are possible</li>
                 </ol>
 
                 <h3>Player View</h3>
@@ -1301,11 +1299,99 @@
                 </div>
             </section>
 
-            <!-- ═══ 14 · FAQ ═══ -->
+            <!-- ═══ 14 · Settings ═══ -->
+            <section class="section" id="settings">
+                <div class="section-header">
+                    <div class="section-icon amber">&#9881;&#65039;</div>
+                    <h2>14 &mdash; Settings</h2>
+                </div>
+                <p>Access Settings from the <strong>Menu</strong> page by tapping the gear icon in the top-right corner, or via the Settings link in the menu list.</p>
+
+                <h3>Change Password</h3>
+                <p>Available only to users who signed up with <strong>email and password</strong>.</p>
+                <div class="step-list">
+                    <div class="step-card">
+                        <div class="step-num">1</div>
+                        <div class="step-content">
+                            <strong>Enter New Password</strong>
+                            <p>Minimum 8 characters. Use the eye icon to show or hide the field.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">2</div>
+                        <div class="step-content">
+                            <strong>Confirm New Password</strong>
+                            <p>Re-enter the same password. The form validates that both fields match before enabling the button.</p>
+                        </div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">3</div>
+                        <div class="step-content">
+                            <strong>Tap "Update Password"</strong>
+                            <p>A green confirmation message appears on success. The fields are cleared automatically.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box note">
+                    <span class="icon">&#128204;</span>
+                    <p><strong>Google / Facebook users:</strong> Password management is handled by your provider. The Change Password form is replaced with a notice explaining this — you cannot set a separate password through OpenCourt.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 15 · Login Security ═══ -->
+            <section class="section" id="login-security">
+                <div class="section-header">
+                    <div class="section-icon red">&#128274;</div>
+                    <h2>15 &mdash; Login Security</h2>
+                </div>
+                <p>OpenCourt protects email accounts from brute-force attacks with a progressive warning system.</p>
+
+                <h3>Failed Login Attempt Behavior</h3>
+                <p>This only applies to <strong>email/password login</strong>. Google and Facebook sign-in are not affected.</p>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Attempt</th>
+                            <th>What You See</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1 &ndash; 3</td>
+                            <td>Red inline error: <em>"Invalid login credentials"</em></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Amber warning banner: <em>"1 attempt remaining before your account is locked for 15 minutes"</em> + orange <strong>Forgot your password?</strong> button</td>
+                        </tr>
+                        <tr>
+                            <td>5+</td>
+                            <td>Red lockout banner: <em>"Account temporarily locked. Try again in 15 minutes."</em> — Submit button is disabled</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Forgot Password</h3>
+                <p>At attempt 4 or 5+, a <strong>"Forgot your password?"</strong> button appears. Tapping it sends a password reset link to the email address entered in the login field.</p>
+                <ul>
+                    <li>Clicking the link in the email takes you directly to the <strong>Settings</strong> page</li>
+                    <li>Enter and confirm your new password there</li>
+                    <li>A green <em>"Reset link sent"</em> confirmation appears in the login form after the email is dispatched</li>
+                </ul>
+
+                <div class="info-box tip">
+                    <span class="icon">&#128161;</span>
+                    <p>The failed-attempt counter resets when you change the email address in the login field, or when the page is refreshed. The actual account lockout is enforced server-side by Supabase for 15 minutes regardless of page refresh.</p>
+                </div>
+            </section>
+
+            <!-- ═══ 16 · FAQ ═══ -->
             <section class="section" id="faq">
                 <div class="section-header">
                     <div class="section-icon purple">&#10067;</div>
-                    <h2>14 &mdash; Frequently Asked Questions</h2>
+                    <h2>16 &mdash; Frequently Asked Questions</h2>
                 </div>
 
                 <h3>Getting Started</h3>
@@ -1339,7 +1425,7 @@
                 </div>
                 <div class="card">
                     <div class="card-title">Why can't I generate teams?</div>
-                    <p>Team generation requires at least <strong>4 confirmed players</strong> (joined or checked-in status). The Auto-Generate button is disabled until that minimum is met.</p>
+                    <p>Team generation requires at least <strong>10 confirmed players</strong> (joined or checked-in status). The Auto-Generate button is disabled until that minimum is met.</p>
                 </div>
                 <div class="card">
                     <div class="card-title">Players can't see the teams I generated</div>
@@ -1381,7 +1467,7 @@
             <section class="section" id="support">
                 <div class="section-header">
                     <div class="section-icon green">&#128231;</div>
-                    <h2>15 &mdash; Support &amp; Contact</h2>
+                    <h2>17 &mdash; Support &amp; Contact</h2>
                 </div>
                 <p>Need help? We are here for you.</p>
 
@@ -1419,7 +1505,7 @@
 
         <!-- Footer -->
         <div class="manual-footer">
-            <span>OpenCourt User Manual v6.1 &mdash; Last updated April 2026</span>
+            <span>OpenCourt User Manual v6.2 &mdash; Last updated April 2026</span>
             <span>Papawis Pickup Basketball</span>
         </div>
     </main>
