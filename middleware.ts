@@ -41,7 +41,8 @@ export async function middleware(request: NextRequest) {
         request.nextUrl.pathname === "/profile" ||
         request.nextUrl.pathname === "/host" ||
         request.nextUrl.pathname === "/my-games" ||
-        request.nextUrl.pathname === "/map";
+        request.nextUrl.pathname === "/map" ||
+        request.nextUrl.pathname === "/settings";
 
     const isAuthRoute = request.nextUrl.pathname.startsWith("/login");
 
